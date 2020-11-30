@@ -11,9 +11,11 @@ performance indicators.
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy.integrate import trapz
 from flask._compat import iteritems
 from collections import OrderedDict
+import scipy.interpolate as interpolate
 
 class KPI_Calculator(object):
     '''This class calculates the KPIs as a post-process after 
@@ -48,6 +50,7 @@ class KPI_Calculator(object):
         self.case = testcase
         
         # Naming convention from the signal exchange package of IBPSA
+        #Add EquipmentEfficiency, EquimentOnOff
         self.sources = ['AirZoneTemperature',
                         'RadiativeZoneTemperature',
                         'OperativeZoneTemperature',
@@ -59,8 +62,15 @@ class KPI_Calculator(object):
                         'BiomassPower',
                         'SolarThermalPower', 
                         'FreshWaterFlowRate']
+        
+        # initialize the data buffer
+        self.data_buff=None
+        
+        #Occupancy start hour and end hour
+        self.start_Occ = 6
+        self.end_Occ = 19
     
-    def get_core_kpis(self, price_scenario='Constant'):
+    def get_core_kpis(self, runtime_KPI=False, price_scenario='Constant'):
         '''Return the core KPIs of a test case.
         
         Parameters
@@ -78,18 +88,49 @@ class KPI_Calculator(object):
             two test cases
             
         '''
-        
         ckpi = OrderedDict()
-        ckpi['tdis_tot'] = self.get_thermal_discomfort()
-        ckpi['idis_tot'] = self.get_iaq_discomfort()
-        ckpi['ener_tot'] = self.get_energy()
-        ckpi['cost_tot'] = self.get_cost(scenario=price_scenario)
-        ckpi['emis_tot'] = self.get_emissions()        
-        ckpi['time_rat'] = self.get_computational_time_ratio()
-        
+        if runtime_KPI:
+            # Runtime KPIs
+            ckpi['cost_tot'] = self.get_cost(runtime_KPI,scenario=price_scenario) 
+        else:
+            # Postprocessing KPIs
+            ckpi['tdis_tot'] = self.get_thermal_discomfort(runtime_KPI)
+            ckpi['timdis_tot']=self.get_unmet_hour(runtime_KPI)
+            ckpi['dT_max_dict']=self.get_max_temperature_deviation(runtime_KPI)
+            ckpi['idis_tot'] = self.get_iaq_discomfort(runtime_KPI)
+            ckpi['ener_tot'] = self.get_energy(runtime_KPI)
+            ckpi['cost_tot'] = self.get_cost(runtime_KPI,scenario=price_scenario)
+            ckpi['emis_tot'] = self.get_emissions(runtime_KPI)        
+            ckpi['pow_dvf'] = self.get_diversity_factor(runtime_KPI)
+            ckpi['pow_peak'] = self.get_power_peaks(runtime_KPI)
+
         return ckpi
+
+    def interp(self, t_old,x_old,t_new,columns):
+        #Return the interpolated dataframe
         
-    def get_thermal_discomfort(self, plot=False):
+    	intp = interpolate.interp1d(t_old, x_old, kind='linear')
+    	x_new = intp(t_new)
+    	x_new = pd.DataFrame(x_new, index=t_new, columns=columns)
+    	return x_new
+
+    def filter_Occ(self, index, narray):
+        '''Return the array after filtering out the non-operation data
+        
+        Parameters
+        ----------
+        index: Original time array
+        array: Original array of the variable 
+        Returns 
+        -------
+        array_Occ: Filtered array of the variable
+        '''
+        index_Occ_remainder=np.array(index)/3600%24
+        array_Occ=narray[np.logical_and(index_Occ_remainder>=self.start_Occ, \
+                                       index_Occ_remainder<=self.end_Occ)]
+        return array_Occ
+        
+    def get_thermal_discomfort(self, runtime_KPI=False, plot=False):
         '''The thermal discomfort is the integral of the deviation 
         of the temperature with respect to the predefined comfort 
         setpoint. Its units are of K*h.
@@ -106,8 +147,12 @@ class KPI_Calculator(object):
             total thermal discomfort accounted in this test case
 
         '''
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
         
-        index=self.case.y_store['time']
+        index=self.data_buff['time']
         
         tdis_tot = 0
         tdis_dict = OrderedDict()
@@ -124,15 +169,15 @@ class KPI_Calculator(object):
                                      ['LowerSetp[{0}]'.format(zone_id)])
                     UpperSetp = np.array(self.case.data_manager.get_data(index=index)
                                      ['UpperSetp[{0}]'.format(zone_id)])                     
-                    data = np.array(self.case.y_store[signal])
+                    data = np.array(self.data_buff[signal])
                     dT_lower = LowerSetp - data
                     dT_lower[dT_lower<0]=0
                     dT_upper = data - UpperSetp
                     dT_upper[dT_upper<0]=0
                     tdis_dict[signal[:-1]+'dTlower_y'] = \
-                        trapz(dT_lower,self.case.y_store['time'])/3600.
+                        trapz(dT_lower,self.data_buff['time'])/3600.
                     tdis_dict[signal[:-1]+'dTupper_y'] = \
-                        trapz(dT_upper,self.case.y_store['time'])/3600.
+                        trapz(dT_upper,self.data_buff['time'])/3600.
                     tdis_tot = tdis_tot + \
                               tdis_dict[signal[:-1]+'dTlower_y'] + \
                               tdis_dict[signal[:-1]+'dTupper_y']
@@ -146,8 +191,155 @@ class KPI_Calculator(object):
                                  units='Kh', breakdonut=False)
         
         return tdis_tot
+
+
+    def get_max_temperature_deviation(self, runtime_KPI=False):
+        '''The maximum deviation of temperature unmet in the operating hours 
+       is maximum absolute value of the lower bound temperature deviation and
+       the upper bound temperature deviation.Its units is of K. The occur time is in the unit of s.
         
-    def get_iaq_discomfort(self, plot=False):
+        Parameters
+        ----------
+        plot: boolean, optional
+            True to show a donut plot with the thermal discomfort metrics.
+            Default is False.
+            
+        Returns
+        -------
+        dT_max_dict: dictionary 
+            dictionary of the maximum deviation of temperature unmet for different signals
+            each item is a tuple:(maximum temperature deviation, occur time)
+        '''
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+        
+        index=self.data_buff['time']
+        
+        
+        dT_max_dict = OrderedDict()
+        
+
+        for source in self.case.kpi_json.keys():
+            if source.startswith('AirZoneTemperature') or \
+               source.startswith('OperativeZoneTemperature'):
+                # This is a potential source of thermal discomfort
+                zone_id = source.split('[')[1][:-1]
+                
+                for signal in self.case.kpi_json[source]:
+                    # Load temperature set points from test case data
+                    LowerSetp = np.array(self.case.data_manager.get_data(index=index)
+                                     ['LowerSetp[{0}]'.format(zone_id)])
+                    UpperSetp = np.array(self.case.data_manager.get_data(index=index)
+                                     ['UpperSetp[{0}]'.format(zone_id)])                     
+                    data = np.array(self.data_buff[signal])
+                    dT_lower = LowerSetp - data
+                    dT_upper = data - UpperSetp
+
+                    # Filter the temperature deviation dataframe to the occupancy hour
+                    index_Occ=self.filter_Occ(index, np.array(index))
+                    dT_lower_Occ=self.filter_Occ(index, dT_lower)
+                    dT_upper_Occ=self.filter_Occ(index, dT_upper)
+                    #Calculate the maximum lower bound temperature deviation and occur time
+                    dT_lower_max=max(dT_lower_Occ)
+                    tim_lower_max=index_Occ[dT_lower_Occ==max(dT_lower_Occ)].tolist()
+                    #Calculate the maximum upper bound temperature deviation and occur time
+                    dT_upper_max=max(dT_upper_Occ)
+                    tim_upper_max=index_Occ[dT_upper_Occ==max(dT_upper_Occ)].tolist()
+                    #Calculate the overall maximum temperature deviation and occur time
+                    dT_max=max(dT_lower_max,dT_upper_max)
+                    tim_dT_max=tim_lower_max if dT_lower_max>dT_upper_max else tim_upper_max
+                    #Tuple of (maximum temperature deviation, occur time)
+                    dT_max_dict[signal[:-1]+'[dT_max,tim_dT_max]']=(dT_max,tim_dT_max)
+                    
+        self.case.dT_max_dict = dT_max_dict
+            
+        return dT_max_dict    
+
+    
+    
+    def get_unmet_hour(self, runtime_KPI=False, plot=False):
+        '''The unmet hours are the sum of the operating hours 
+        of which the temperature is outside the predefined comfort 
+        setpoint. Its units are of h. This function can also give unmet fraction,
+        that is the ratio of the unmet hours and the total operating hours
+        
+        Parameters
+        ----------
+        plot: boolean, optional
+            True to show a donut plot with the thermal discomfort metrics.
+            Default is False.
+            
+        Returns
+        -------
+        tim_unmet_tot: float
+            total unmet hour accounted in this test case
+
+        '''
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+        
+        index=self.data_buff['time']
+        
+        tim_unmet_tot = 0
+        tim_unmet_dict = OrderedDict()
+        
+
+        for source in self.case.kpi_json.keys():
+            if source.startswith('AirZoneTemperature') or \
+               source.startswith('OperativeZoneTemperature'):
+                # This is a potential source of thermal discomfort
+                zone_id = source.split('[')[1][:-1]
+                
+                for signal in self.case.kpi_json[source]:
+                    # Load temperature set points from test case data
+                    LowerSetp = np.array(self.case.data_manager.get_data(index=index)
+                                     ['LowerSetp[{0}]'.format(zone_id)])
+                    UpperSetp = np.array(self.case.data_manager.get_data(index=index)
+                                     ['UpperSetp[{0}]'.format(zone_id)])                     
+                    data = np.array(self.data_buff[signal])
+                    dT_lower = LowerSetp - data
+                    dT_upper = data - UpperSetp
+
+                    
+                    # Filter the temperature deviation dataframe to the occupancy hour
+                    index_Occ=self.filter_Occ(index, np.array(index))
+                    dT_lower_Occ=self.filter_Occ(index, dT_lower)
+                    dT_upper_Occ=self.filter_Occ(index, dT_upper)
+                        
+                    #Resample to 1-minute data
+                    index_Occ_new=np.arange(index_Occ[0], index_Occ[-1]+1, 60)
+                    index_Occ_new=self.filter_Occ(index_Occ_new, index_Occ_new)
+                    df_dT_lower_Occ = self.interp(index_Occ, dT_lower_Occ, index_Occ_new,['dT_lower_Occ'])
+                    df_dT_upper_Occ = self.interp(index_Occ, dT_upper_Occ, index_Occ_new,['dT_upper_Occ'])
+                    
+                    #Calculate the unmet hour for the outer-lower and outer-upper bounds
+                    tim_unmet_dict[signal[:-1]+'timlower_y'] = \
+                        float(df_dT_lower_Occ[df_dT_lower_Occ['dT_lower_Occ']>0].count())/60.
+                    tim_unmet_dict[signal[:-1]+'timupper_y'] = \
+                        float(df_dT_upper_Occ[df_dT_upper_Occ['dT_upper_Occ']>0].count())/60.
+                    tim_Occ_tot =len(index_Occ_new)/60
+                    tim_unmet_tot = tim_unmet_tot + \
+                              tim_unmet_dict[signal[:-1]+'timlower_y'] + \
+                              tim_unmet_dict[signal[:-1]+'timupper_y']
+                              
+        self.case.tim_Occ_tot=tim_Occ_tot                     
+        self.case.tim_unmet_tot  = tim_unmet_tot
+        self.case.unmet_fraction=round(tim_unmet_tot/tim_Occ_tot,3)
+        self.case.tim_unmet_dict = tim_unmet_dict
+            
+        if plot:
+            self.case.tim_unmet_tree = self.get_dict_tree(tim_unmet_dict)
+            self.plot_nested_pie(self.case.tim_unmet_tree, metric='discomfort',
+                                 units='hour', breakdonut=False)
+        
+        return tim_unmet_tot    
+    
+        
+    def get_iaq_discomfort(self, runtime_KPI=False, plot=False):
         '''The IAQ discomfort is the integral of the deviation 
         of the CO2 concentration with respect to the predefined comfort 
         setpoint. Its units are of ppm*h.
@@ -164,8 +356,12 @@ class KPI_Calculator(object):
             total IAQ discomfort accounted in this test case
 
         '''
-        
-        index=self.case.y_store['time']
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
+        index=self.data_buff['time']
         
         idis_tot = 0
         idis_dict = OrderedDict()
@@ -179,11 +375,11 @@ class KPI_Calculator(object):
                     # Load CO2 set points from test case data
                     UpperSetp = np.array(self.case.data_manager.get_data(index=index)
                                      ['UpperCO2[{0}]'.format(zone_id)])                     
-                    data = np.array(self.case.y_store[signal])
+                    data = np.array(self.data_buff[signal])
                     dI_upper = data - UpperSetp
                     dI_upper[dI_upper<0]=0
                     idis_dict[signal[:-1]+'dIupper_y'] = \
-                        trapz(dI_upper,self.case.y_store['time'])/3600.
+                        trapz(dI_upper,self.data_buff['time'])/3600.
                     idis_tot = idis_tot + \
                               idis_dict[signal[:-1]+'dIupper_y']
         
@@ -197,7 +393,7 @@ class KPI_Calculator(object):
         
         return idis_tot
     
-    def get_energy(self, plot=False, plot_by_source=False):
+    def get_energy(self,runtime_KPI=False,  plot=False, plot_by_source=False):
         '''This method returns the measure of the total building 
         energy use in kW*h when accounting for the sum of all 
         energy vectors present in the test case. 
@@ -219,7 +415,11 @@ class KPI_Calculator(object):
             total energy use
             
         '''
-        
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
         ener_tot = 0
         # Dictionary to store energy usage by element
         ener_dict = OrderedDict()
@@ -232,10 +432,10 @@ class KPI_Calculator(object):
             if 'Power' in source  and \
             source in self.case.kpi_json.keys():            
                 for signal in self.case.kpi_json[source]:
-                    pow_data = np.array(self.case.y_store[signal])
+                    pow_data = np.array(self.data_buff[signal])
                     ener_dict[signal] = \
                         trapz(pow_data,
-                              self.case.y_store['time'])*2.77778e-7 # Convert to kWh
+                              self.data_buff['time'])*2.77778e-7 # Convert to kWh
                     ener_dict_by_source[source+'_'+signal] = \
                         ener_dict[signal]
                     ener_tot = ener_tot + ener_dict[signal]
@@ -256,7 +456,7 @@ class KPI_Calculator(object):
         
         return ener_tot
     
-    def get_cost(self, scenario='Constant', plot=False,
+    def get_cost(self,runtime_KPI=False,  scenario='Constant', plot=False,
                  plot_by_source=False):
         '''This method returns the measure of the total building operational
         energy cost in euros when accounting for the sum of all energy
@@ -285,14 +485,18 @@ class KPI_Calculator(object):
         It is assumed that power is measured in Watts and water usage in m3
             
         '''
-        
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
         cost_tot = 0
         # Dictionary to store operational cost by element
         cost_dict = OrderedDict()
         # Dictionary to store operational cost by source 
         cost_dict_by_source = OrderedDict()
         # Define time index
-        index=self.case.y_store['time']
+        index=self.data_buff['time']
         
         for source in self.sources:
             
@@ -304,10 +508,10 @@ class KPI_Calculator(object):
                 np.array(self.case.data_manager.get_data(index=index)\
                          ['Price'+source+scenario])       
                 for signal in self.case.kpi_json[source]:
-                    pow_data = np.array(self.case.y_store[signal])
+                    pow_data = np.array(self.data_buff[signal])
                     cost_dict[signal] = \
                         trapz(np.multiply(electricity_price_data,pow_data),
-                              self.case.y_store['time'])*2.77778e-7 # Convert to kWh
+                              self.data_buff['time'])*2.77778e-7 # Convert to kWh
                     cost_dict_by_source[source+'_'+signal] = \
                         cost_dict[signal]
                     cost_tot = cost_tot + cost_dict[signal]
@@ -320,10 +524,10 @@ class KPI_Calculator(object):
                 np.array(self.case.data_manager.get_data(index=index)\
                          ['Price'+source])            
                 for signal in self.case.kpi_json[source]:
-                    pow_data = np.array(self.case.y_store[signal])
+                    pow_data = np.array(self.data_buff[signal])
                     cost_dict[signal] = \
                         trapz(np.multiply(source_price_data,pow_data),
-                              self.case.y_store['time'])*2.77778e-7 # Convert to kWh
+                              self.data_buff['time'])*2.77778e-7 # Convert to kWh
                     cost_dict_by_source[source+'_'+signal] = \
                         cost_dict[signal]
                     cost_tot = cost_tot + cost_dict[signal]       
@@ -336,10 +540,10 @@ class KPI_Calculator(object):
                 np.array(self.case.data_manager.get_data(index=index)\
                          ['Price'+source])            
                 for signal in self.case.kpi_json[source]:
-                    pow_data = np.array(self.case.y_store[signal])
+                    pow_data = np.array(self.data_buff[signal])
                     cost_dict[signal] = \
                         trapz(np.multiply(source_price_data,pow_data),
-                              self.case.y_store['time'])
+                              self.data_buff['time'])
                     cost_dict_by_source[source+'_'+signal] = \
                         cost_dict[signal]
                     cost_tot = cost_tot + cost_dict[signal]                      
@@ -360,7 +564,7 @@ class KPI_Calculator(object):
          
         return cost_tot
 
-    def get_emissions(self, plot=False, plot_by_source=False):
+    def get_emissions(self, runtime_KPI=False, plot=False, plot_by_source=False):
         '''This method returns the measure of the total building 
         emissions in kgCO2 when accounting for the sum of all 
         energy vectors present in the test case. 
@@ -381,14 +585,18 @@ class KPI_Calculator(object):
         It is assumed that power is measured in Watts 
             
         '''
-        
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
         emis_tot = 0
         # Dictionary to store emissions by element
         emis_dict = OrderedDict()
         # Dictionary to store emissions by source 
         emis_dict_by_source = OrderedDict()
         # Define time index
-        index=self.case.y_store['time']
+        index=self.data_buff['time']
         
         for source in self.sources:
             
@@ -399,10 +607,10 @@ class KPI_Calculator(object):
                 np.array(self.case.data_manager.get_data(index=index)\
                          ['Emissions'+source])            
                 for signal in self.case.kpi_json[source]:
-                    pow_data = np.array(self.case.y_store[signal])
+                    pow_data = np.array(self.data_buff[signal])
                     emis_dict[signal] = \
                         trapz(np.multiply(source_emissions_data,pow_data),
-                              self.case.y_store['time'])*2.77778e-7 # Convert to kWh
+                              self.data_buff['time'])*2.77778e-7 # Convert to kWh
                     emis_dict_by_source[source+'_'+signal] = \
                         emis_dict[signal]
                     emis_tot = emis_tot + emis_dict[signal]                           
@@ -423,7 +631,7 @@ class KPI_Calculator(object):
          
         return emis_tot
 
-    def get_computational_time_ratio(self, plot=False):
+    def get_computational_time_ratio(self,runtime_KPI=False,  plot=False):
         '''Obtain the computational time ratio as the ratio between 
         the average of the elapsed control time and the test case 
         sampling time. The elapsed control time is measured as the 
@@ -447,7 +655,11 @@ class KPI_Calculator(object):
             computational time ratio of this test case
 
         '''
-        
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
         elapsed_control_time = self.case.get_elapsed_control_time()
         elapsed_time_average = np.mean(np.asarray(elapsed_control_time))
         time_rat = elapsed_time_average/self.case.step
@@ -465,42 +677,233 @@ class KPI_Calculator(object):
             
         return time_rat
 
-    def get_load_factors(self):
+    def get_load_factors(self, runtime_KPI=False):
         '''Calculate the load factor for every power signal
         
         '''
-        
-        ldfs = OrderedDict()
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
+        ldfs_dict = OrderedDict()
         
         for signal in self.case.kpi_json['ElectricPower']:
-            pow_data = np.array(self.case.y_store[signal])
+            pow_data = np.array(self.data_buff[signal])
             avg_pow = pow_data.mean()
             max_pow = pow_data.max()
             try:
-                ldfs[signal]=avg_pow/max_pow
+                ldfs_dict[signal]=avg_pow/max_pow
             except ZeroDivisionError as err:
                 print("Error: {0}".format(err))
                 return
         
-        self.case.ldfs = ldfs
+        self.case.ldfs_dict = ldfs_dict
     
-        return ldfs
-
-    def get_power_peaks(self):
-        '''Calculate the power peak for every power signal
+        return ldfs_dict
+    
+    def get_diversity_factor(self, runtime_KPI=False):
+        '''Calculate the diversity factor 
         
         '''
-        
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
         ppks = OrderedDict()
+        power_data_tot=0
         
         for signal in self.case.kpi_json['ElectricPower']:
-            pow_data = np.array(self.case.y_store[signal])
+            pow_data = np.array(self.data_buff[signal])
             max_pow = pow_data.max()
             ppks[signal]=max_pow
+            power_data_tot=power_data_tot+pow_data
         
-        self.case.ppks = ppks
+        max_pow_tot=power_data_tot.max()
+        max_pow=sum(ppks.values())
+        try:
+            dvf=max_pow/max_pow_tot
+        except ZeroDivisionError as err:
+            print("Error: {0}".format(err))
+            return
+        
+        self.case.dvf = dvf
+    
+        return dvf
+    
+    
+    def get_power_peaks(self, runtime_KPI=False):
+        '''Calculate the power peak for all the equipment
+        
+        '''
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
             
-        return ppks
+        power_data_tot=0
+        
+        for signal in self.case.kpi_json['ElectricPower']:
+            pow_data = np.array(self.data_buff[signal])
+            power_data_tot=power_data_tot+pow_data
+            
+        max_pow_tot=power_data_tot.max()
+        
+        self.case.max_pow_tot = max_pow_tot
+            
+        return max_pow_tot
+    
+    def get_equiment_operation_time(self, runtime_KPI=False,  plot=False):
+        
+        #Calculate the equiment operation time for each equipment. Its unit is h.
+        
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
+        tim_equ_ope_dict = OrderedDict()
+        
+        for signal in self.case.kpi_json['EquipmentOnOff']:
+            equ_onoff_data = np.array(self.data_buff[signal])
+            tim_equ_ope_dict[signal] = \
+                trapz(equ_onoff_data,self.data_buff['time'])/3600.
+        
+        # Assign to case 
+        self.case.tim_equ_ope_dict = tim_equ_ope_dict
+              
+        if plot:
+            self.case.tim_equ_tree = self.get_dict_tree(tim_equ_ope_dict) 
+            self.plot_nested_pie(self.case.tim_equ_tree, metric='equipment operation time',
+                                 units='hour')
+    
+        return tim_equ_ope_dict
+
+    def get_maximum_capacity_percentage(self, runtime_KPI=False):
+        #Calculate the maximum capacity percentage for each equipment. 
+        #Read capacity for each equipment from test resourcedataset. 
+        
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
+        # Define time index
+        index=self.data_buff['time']            
+        cap_per_dict = OrderedDict()
+        
+        for signal in self.case.kpi_json['ElectricPower']:        
+        # Load equipment capacities from test case data
+            capcity_data = np.array(self.case.data_manager.get_data(index=index) \
+                 ['Capcity_'+signal[-5:-2]])
+            pow_data = np.array(self.data_buff[signal])
+            try:
+                cap_per=pow_data/capcity_data
+            except ZeroDivisionError as err:
+                print("Error: {0}".format(err))
+                return            
+            cap_per_dict[signal]=cap_per.max()
+            
+        self.case.cap_per_dict = cap_per_dict
+    
+        return cap_per_dict                                    
+
+    def get_average_capacity_percentage(self, runtime_KPI=False):
+        #Calculate the average capacity percentage for each equipment. 
+        #Read capacity for each equipment from test resourcedataset. 
+        
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+            
+        # Define time index
+        index=self.data_buff['time']            
+        cap_per_dict = OrderedDict()
+        
+        for signal in self.case.kpi_json['ElectricPower']:        
+        # Load equipment capacities from test case data
+            capcity_data = np.array(self.case.data_manager.get_data(index=index) \
+                 ['Capcity_'+signal[-5:-2]])
+            pow_data = np.array(self.data_buff[signal])
+            try:
+                cap_per=pow_data/capcity_data
+            except ZeroDivisionError as err:
+                print("Error: {0}".format(err))
+                return            
+            cap_per_dict[signal]=cap_per.mean()
+            
+        self.case.cap_per_dict = cap_per_dict
+    
+        return cap_per_dict
+
+    def get_average_efficiency_percentage(self, runtime_KPI=False):
+        #Calculate the average efficiency for each equipment.  
+        
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+                     
+        eff_dict = OrderedDict()
+        
+        for signal in self.case.kpi_json['EquipmentEfficiency']:        
+        # Load equipment capacities from test case data
+            eff_data = np.array(self.data_buff[signal])
+            eff_dict[signal]=eff_data.mean()
+            
+        self.case.eff_dict = eff_dict
+    
+        return eff_dict
+              
+    def get_oar_hourly(self, runtime_KPI=False):
+        '''The average hourly OAR is the mean of the outdoor air ratio, which is 
+        the actual outdoor air volumn and required outdoor air volumn
+    
+            
+        Returns
+        -------
+        oar_tot: float
+            average hourly OAR in this test case
+
+        '''
+        if runtime_KPI:
+            self.data_buff=self.case.y_store_step
+        else:
+            self.data_buff=self.case.y_store
+        
+        index=self.data_buff['time']
+        
+        oar_tot = 0
+        
+        # 'vot' and 'voa' are two signals in kpi source 'Ventilation'        
+        vot = np.array(self.data_buff['vot'])
+        voa = np.array(self.data_buff['voa'])
+
+        # Filter the temperature deviation dataframe to the occupancy hour
+        index_Occ=self.filter_Occ(index, np.array(index))
+        vot_Occ=self.filter_Occ(index, vot)
+        voa_Occ=self.filter_Occ(index, voa)
+            
+        #Resample to 1-minute data
+        index_Occ_new=np.arange(index_Occ[0], index_Occ[-1]+1, 60)
+        index_Occ_new=self.filter_Occ(index_Occ_new, index_Occ_new)
+        df_vot_Occ = self.interp(index_Occ, vot_Occ, index_Occ_new,['vot_Occ'])
+        df_voa_Occ = self.interp(index_Occ, voa_Occ, index_Occ_new,['voa_Occ'])
+        
+        #Calculate the OAR
+        oar_tot = df_voa_Occ['voa_Occ']/df_vot_Occ['vot_Occ']
+        #Drop the value where the vot is 0
+        oar_tot.replace([np.inf, -np.inf], np.nan, inplace=True)
+        oar_tot.dropna(inplace=True) 
+        #Calculate the mean OAR        
+        oar_tot = oar_tot.mean()
+                              
+        self.case.oar_tot=oar_tot                     
+        
+        return oar_tot
+
                             
     def get_dict_tree(self, dict_flat, sep='_',
                       remove_null=True, merge_branches=True):

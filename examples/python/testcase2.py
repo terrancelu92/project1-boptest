@@ -21,7 +21,7 @@ import json,collections
 from controllers import sup
 # ----------------------
 
-def run(plot=False, customized_kpi_config=None):
+def run(plot=True, customized_kpi_config=None):
     '''Run test case.
     
     Parameters
@@ -131,6 +131,12 @@ def run(plot=False, customized_kpi_config=None):
             unit = 'Euro or $'
         elif key == 'emis_tot':
             unit = 'KgCO2'
+        elif key =='timdis_tot':
+            unit = 'h'
+        elif key == 'dT_max_dict':
+            unit = '(K, s)'
+        elif key == 'pow_peak':
+            unit = 'W'            
         else:
             unit = None
         print('{0}: {1} {2}'.format(key, kpi[key], unit))

@@ -88,6 +88,7 @@ class TestCase(object):
         for key in self.output_names:
             self.y[key] = []
         self.y_store = copy.deepcopy(self.y)
+        self.y_store_step = copy.deepcopy(self.y)
         # Inputs data
         self.u = {'time':[]}
         for key in self.input_names:
@@ -153,7 +154,7 @@ class TestCase(object):
             self.y[key] = res[key][-1]
             if store:
                 self.y_store[key] = self.y_store[key] + res[key].tolist()[1:]
-        
+                self.y_store_step[key] = res[key].tolist()[1:]
         # Store control inputs
         if store:
             for key in self.u.keys():
@@ -353,7 +354,7 @@ class TestCase(object):
         
         return Y
         
-    def get_kpis(self):
+    def get_kpis(self,runtime_KPI=False):
         '''Returns KPI data.
         
         Requires standard sensor signals.
@@ -378,7 +379,7 @@ class TestCase(object):
         elif self.scenario['electricity_price'] == 'highly_dynamic':
             price_scenario = 'HighlyDynamic'
         # Calculate the core kpis 
-        kpis = self.cal.get_core_kpis(price_scenario=price_scenario)
+        kpis = self.cal.get_core_kpis(runtime_KPI,price_scenario=price_scenario)
 
         return kpis
 

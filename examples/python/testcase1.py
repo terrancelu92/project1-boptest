@@ -51,7 +51,7 @@ def run(plot=False, customized_kpi_config=None):
     # Set URL for testcase
     url = 'http://127.0.0.1:5000'
     # Set simulation parameters
-    length = 48*3600
+    length = 6*3600
     step = 300
     # ---------------
     
@@ -83,6 +83,7 @@ def run(plot=False, customized_kpi_config=None):
                customizedkpis_result[kpicalculation.cutomizedKPI(config[key]).name]=[]
     customizedkpis_result['time']=[]           
     # --------------------
+    elapsedtime=[]
     
     # RUN TEST CASE
     # -------------
@@ -97,12 +98,26 @@ def run(plot=False, customized_kpi_config=None):
     print('\nRunning test case...')
     # Initialize u
     u = pid.initialize()
+    
+    
     # Simulation Loop
     for i in range(int(length/step)):
         # Advance simulation
         y = requests.post('{0}/advance'.format(url), data=u).json()
         # Compute next control signal
         u = pid.compute_control(y)
+        
+        import time
+        start = time.time()        
+        # Compute runtime KPIs if any
+        kpi = requests.get('{0}/runtimekpi'.format(url)).json()
+        print('\nKPI RESULTS \n-----------')
+        print('{0}: {1} {2}'.format('cost_tot', kpi['cost_tot'], 'euro or $'))        
+
+        end = time.time()
+        elapsedtime.append(end-start)
+        
+        
         # Compute customized KPIs if any
         if customized_kpi_config is not None:
              for customizedkpi in customizedkpis:
@@ -111,7 +126,11 @@ def run(plot=False, customized_kpi_config=None):
                   customizedkpis_result[customizedkpi.name].append(round(customizedkpi_value,2)) # Track custom KPI value
                   print('KPI:\t{0}:\t{1}'.format(customizedkpi.name,round(customizedkpi_value,2))) # Print custom KPI value
              customizedkpis_result['time'].append(y['time']) # Track custom KPI calculation time  
+        
+        
+    print('KPI Calculation Elapsed time:'+str(sum(elapsedtime) / len(elapsedtime) ))
     print('\nTest case complete.')
+    
     # -------------
         
     # VIEW RESULTS
