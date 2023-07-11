@@ -111,7 +111,7 @@ model TestCase
     annotation (Placement(transformation(extent={{36,0},{56,20}})));
 
   inner Buildings.ThermalZones.EnergyPlus_9_6_0.Building building(
-    spawnExe="0.3.0-8d93151657",
+    spawnExe="spawn-0.3.0-8d93151657",
     idfName=Modelica.Utilities.Files.loadResource(
         "modelica://RohobothHeatPump/Resources/US+SF+CZ5A+hp+slab+IECC_2021.idf"),
     epwName=Modelica.Utilities.Files.loadResource(
