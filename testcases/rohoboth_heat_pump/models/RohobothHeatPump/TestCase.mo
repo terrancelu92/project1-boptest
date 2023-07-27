@@ -75,8 +75,7 @@ model TestCase
     final dpCooDX_nominal= 0,
     final dpHeaDX_nominal= 0,
     final dpSupHea_nominal= 0,
-    SupHeaCoi(
-      final tau=3600),
+    SupHeaCoi(final tau=30),
     redeclare package MediumA = MediumA,
     final mAirOut_flow_nominal=0.5075,
     final mAir_flow_nominal=0.5075,
@@ -86,7 +85,40 @@ model TestCase
       Buildings.Fluid.ZoneEquipment.PackagedTerminalHeatPump.CaseStudy.Data.FanData
       fanPer,
     datCooCoi=datCooCoi,
-    datDef=datDef) "Packaged terminal heat pump instance"
+    datDef=datDef,
+    TAirMix(
+      tau=10,
+      initType=Modelica.Blocks.Types.Init.InitialState,
+      transferHeat=true),
+    TAirCooCoi(
+      tau=10,
+      initType=Modelica.Blocks.Types.Init.InitialState,
+      transferHeat=true),
+    TAirHeaCoi(
+      tau=10,
+      initType=Modelica.Blocks.Types.Init.InitialState,
+      transferHeat=true),
+    TAirOut(
+      tau=10,
+      initType=Modelica.Blocks.Types.Init.InitialState,
+      transferHeat=true),
+    TAirFanOut(
+      tau=10,
+      initType=Modelica.Blocks.Types.Init.InitialState,
+      transferHeat=true),
+    TAirLvg(
+      tau=10,
+      initType=Modelica.Blocks.Types.Init.InitialState,
+      transferHeat=true),
+    TAirRet(
+      tau=10,
+      initType=Modelica.Blocks.Types.Init.InitialState,
+      transferHeat=true),
+    TAirExh(
+      tau=10,
+      initType=Modelica.Blocks.Types.Init.InitialState,
+      transferHeat=true))
+                   "Packaged terminal heat pump instance"
     annotation (Placement(transformation(extent={{-16,-26},{24,14}})));
 
   Buildings.Fluid.ZoneEquipment.BaseClasses.ModularController modCon(
@@ -94,7 +126,6 @@ model TestCase
     final fanTyp=Buildings.Fluid.ZoneEquipment.BaseClasses.Types.FanTypes.conSpeFan,
     final has_fanOpeMod=true,
     tFanEna=300,
-    dTHys=0.1,
     dTHeaSet(displayUnit="K"))
     "Instance of modular controller with constant speed fan and DX coils"
     annotation (Placement(transformation(extent={{-80,-78},{-60,-50}})));
@@ -118,7 +149,7 @@ model TestCase
         "modelica://RohobothHeatPump/Resources/USA_WA_Pasco-Tri.Cities.AP.727845_TMY3.epw"),
     weaName=Modelica.Utilities.Files.loadResource(
         "modelica://RohobothHeatPump/Resources/USA_WA_Pasco-Tri.Cities.AP.727845_TMY3.mos"))
-    "Building instance for thermal zone"
+    "Building instance for thermal zone, use spawnExe=spawn-0.3.0-8d93151657 for BOPTEST"
     annotation (Placement(transformation(extent={{-10,118},{10,138}})));
 
   Buildings.ThermalZones.EnergyPlus_9_6_0.ThermalZone zon(
@@ -220,6 +251,15 @@ model TestCase
     y(unit="1")) "Indoor fan speed measurement"
     annotation (Placement(transformation(extent={{80,-40},{100,-20}})));
 
+  Buildings.Utilities.IO.SignalExchange.Read QLoaMea(
+    description="Cooling or heating load measurement measurement",
+    KPIs=Buildings.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.None,
+    y(unit="W"),
+    zone="living_unit1") "Cooling or heating load measurement"
+    annotation (Placement(transformation(extent={{120,0},{140,20}})));
+
+  Modelica.Blocks.Sources.RealExpression realExpression(y=zon.conQCon_flow.Q_flow)
+    annotation (Placement(transformation(extent={{84,0},{104,20}})));
 equation
   connect(fanOpeMod.y, modCon.fanOpeMod) annotation (Line(points={{-108,-80},{-100,
           -80},{-100,-73.4},{-82,-73.4}}, color={255,0,255}));
@@ -300,6 +340,8 @@ equation
           120},{-40,-48},{-104,-48},{-104,-70},{-82,-70}}, color={255,0,255}));
   connect(pthp.yFan_actual, yFanMea.u) annotation (Line(points={{25,10},{32,10},
           {32,-30},{78,-30}}, color={0,0,127}));
+  connect(realExpression.y, QLoaMea.u)
+    annotation (Line(points={{105,10},{118,10}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-140,
             -120},{140,140}})),
       Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-140,-120},{

@@ -43,9 +43,9 @@ def run(plot=False):
     control_module = 'examples.python.controllers.rohoboth_heat_pump'
     start_time = 180*24*3600
     warmup_period = 0
-    length = 2*24*3600
+    length = 1*16*3600
     step = 300
-
+    use_forecast = True
     # ---------------------------------------
 
     # RUN THE CONTROL TEST
@@ -54,7 +54,8 @@ def run(plot=False):
                                                              start_time=start_time,
                                                              warmup_period=warmup_period,
                                                              length=length,
-                                                             step=step)
+                                                             step=step,
+                                                             use_forecast=use_forecast)
     # POST-PROCESS RESULTS
     # --------------------
     time = df_res.index.values/3600  # convert s --> hr

@@ -1,6 +1,6 @@
 {
 "name"          : "rohoboth_heat_pump",
-"area"          : 192.0,
+"area"          : 220.84,
 "start_time"    : 0.0,
 "warmup_period" : 0.0,
 "step"          : 3600.0,

@@ -10,7 +10,7 @@ The following libraries must be on the MODELICAPATH:
 
 """
 
-from parsing import parser
+from parsing1 import parser
 from pymodelica import environ
 
 environ['JVM_ARGS'] = '-Xmx4096m'
