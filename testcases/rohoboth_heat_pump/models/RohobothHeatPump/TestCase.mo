@@ -125,7 +125,11 @@ model TestCase
     final sysTyp=Buildings.Fluid.ZoneEquipment.BaseClasses.Types.SystemTypes.pthp,
     final fanTyp=Buildings.Fluid.ZoneEquipment.BaseClasses.Types.FanTypes.conSpeFan,
     final has_fanOpeMod=true,
+    tFanEnaDel=0,
     tFanEna=300,
+    dTHys=0.5,
+    TiCoo=120,
+    TiHea=120,
     dTHeaSet(displayUnit="K"))
     "Instance of modular controller with constant speed fan and DX coils"
     annotation (Placement(transformation(extent={{-80,-78},{-60,-50}})));
@@ -135,14 +139,12 @@ model TestCase
     "Fan operating mode"
     annotation (Placement(transformation(extent={{-130,-90},{-110,-70}})));
 
-  Buildings.Controls.OBC.CDL.Continuous.Hysteresis fanProOn(
-    final uLow=0.04,
-    final uHigh=0.05)
+  Buildings.Controls.OBC.CDL.Continuous.Hysteresis fanProOn(uLow=0, uHigh=0.001)
     "Check if fan is proven on based on measured fan speed"
     annotation (Placement(transformation(extent={{36,0},{56,20}})));
 
   inner Buildings.ThermalZones.EnergyPlus_9_6_0.Building building(
-    spawnExe="spawn-0.3.0-8d93151657",
+  spawnExe="spawn-0.3.0-8d93151657",
     idfName=Modelica.Utilities.Files.loadResource(
         "modelica://RohobothHeatPump/Resources/US+SF+CZ5A+hp+slab+IECC_2021.idf"),
     epwName=Modelica.Utilities.Files.loadResource(
@@ -155,7 +157,7 @@ model TestCase
   Buildings.ThermalZones.EnergyPlus_9_6_0.ThermalZone zon(
     zoneName="living_unit1",
     redeclare package Medium = MediumA,
-    T_start=297.15,
+    T_start=294.15,
     final nPorts=2)
     "Thermal zone model"
     annotation (Placement(transformation(extent={{58,30},{98,70}})));
@@ -191,7 +193,7 @@ model TestCase
   Buildings.Controls.OBC.CDL.Continuous.Sources.Constant TZonHea(k=273.15 + 21)
     "Zone heating temperature setpoint"
     annotation (Placement(transformation(extent={{-130,-30},{-110,-10}})));
-  Buildings.Controls.OBC.CDL.Continuous.Sources.Constant TZonCoo(k=273.15 + 24)
+  Buildings.Controls.OBC.CDL.Continuous.Sources.Constant TZonCoo(k=273.15 + 100)
     "Zone cooling temperature setpoint"
     annotation (Placement(transformation(extent={{-130,4},{-110,24}})));
   Buildings.ThermalZones.EnergyPlus_9_6_0.OutputVariable OccSch(
@@ -349,8 +351,8 @@ equation
                     graphics={Polygon(points={{-48,-16},{-48,-16}}, lineColor={28,
               108,200})}),
     experiment(
-      StartTime=15552000,
-      StopTime=16156800,
+      StartTime=86400,
+      StopTime=691200,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
