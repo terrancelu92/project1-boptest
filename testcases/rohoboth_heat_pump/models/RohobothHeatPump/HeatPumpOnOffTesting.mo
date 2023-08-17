@@ -262,15 +262,27 @@ model HeatPumpOnOffTesting
   Modelica.Blocks.Sources.RealExpression realExpression(y=zon.conQCon_flow.Q_flow)
     annotation (Placement(transformation(extent={{84,0},{104,20}})));
   Buildings.Controls.OBC.CDL.Logical.Switch uHeaEna
-    annotation (Placement(transformation(extent={{-40,-66},{-30,-56}})));
+    annotation (Placement(transformation(extent={{-32,-66},{-22,-56}})));
   Buildings.Controls.OBC.CDL.Logical.Sources.TimeTable booTimTab(
     table=[0,1; 18,1; 18,0; 23,0; 23,0; 24,0],
     timeScale=3600,
     period=24*3600)
-    annotation (Placement(transformation(extent={{-72,-114},{-60,-102}})));
+    annotation (Placement(transformation(extent={{-80,-156},{-68,-144}})));
   Buildings.Controls.OBC.CDL.Continuous.Sources.Constant uSupHea(final k=0)
     "Supplementary heat signal"
     annotation (Placement(transformation(extent={{-64,-18},{-44,2}})));
+  Buildings.Controls.OBC.CDL.Logical.Switch uHeaEna1
+    annotation (Placement(transformation(extent={{-48,-62},{-38,-52}})));
+  Buildings.Controls.OBC.CDL.Logical.Sources.Constant fanOpeMod1(final k=true)
+    "Fan operating mode"
+    annotation (Placement(transformation(extent={{-130,-120},{-110,-100}})));
+  Buildings.Controls.OBC.CDL.Logical.Sources.TimeTable booTimTab1(
+    table=[0,1; 9,1; 9,0; 18,0; 18,0; 24,0],
+    timeScale=3600,
+    period=24*3600)
+    annotation (Placement(transformation(extent={{-80,-132},{-68,-120}})));
+  Buildings.Controls.OBC.CDL.Logical.Switch uFan
+    annotation (Placement(transformation(extent={{-28,-120},{-18,-110}})));
 equation
   connect(fanOpeMod.y, modCon.fanOpeMod) annotation (Line(points={{-108,-80},{-100,
           -80},{-100,-73.4},{-82,-73.4}}, color={255,0,255}));
@@ -292,8 +304,8 @@ equation
           12},{-17,12}},
                      color={0,0,127}));
 
-  connect(modCon.yCooEna, pthp.uCooEna) annotation (Line(points={{-58,-52},{-30,
-          -52},{-30,-20},{-17,-20}},     color={255,0,255}));
+  connect(modCon.yCooEna, pthp.uCooEna) annotation (Line(points={{-58,-52},{-22,
+          -52},{-22,-20},{-17,-20}},     color={255,0,255}));
   connect(fanProOn.y, modCon.uFan) annotation (Line(points={{58,10},{60,10},{60,
           -94},{-102,-94},{-102,-51},{-82,-51}}, color={255,0,255}));
   connect(building.weaBus,pthp. weaBus) annotation (Line(
@@ -316,8 +328,6 @@ equation
       index=-1,
       extent={{-6,3},{-6,3}},
       horizontalAlignment=TextAlignment.Right));
-  connect(modCon.yFan, booToRea.u)
-    annotation (Line(points={{-58,-76},{-6,-76}},  color={255,0,255}));
   connect(booToRea.y,pthp. uFan) annotation (Line(points={{18,-76},{22,-76},{22,
           -40},{-34,-40},{-34,8},{-17,8}},     color={0,0,127}));
   connect(TOut.y, modCon.TOut) annotation (Line(points={{83,130},{100,130},{100,
@@ -350,16 +360,30 @@ equation
           {32,-30},{78,-30}}, color={0,0,127}));
   connect(realExpression.y, QLoaMea.u)
     annotation (Line(points={{105,10},{118,10}}, color={0,0,127}));
-  connect(modCon.yHeaEna, uHeaEna.u1) annotation (Line(points={{-58,-56},{-46,
-          -56},{-46,-57},{-41,-57}}, color={255,0,255}));
-  connect(uHeaEna.y, pthp.uHeaEna) annotation (Line(points={{-29,-61},{-28,-61},
-          {-28,-24},{-17,-24}}, color={255,0,255}));
-  connect(booTimTab.y[1], uHeaEna.u2) annotation (Line(points={{-58.8,-108},{
-          -50,-108},{-50,-61},{-41,-61}}, color={255,0,255}));
+  connect(uHeaEna.y, pthp.uHeaEna) annotation (Line(points={{-21,-61},{-20,-61},
+          {-20,-24},{-17,-24}}, color={255,0,255}));
   connect(fanOpeMod.y, uHeaEna.u3) annotation (Line(points={{-108,-80},{-46,-80},
-          {-46,-65},{-41,-65}}, color={255,0,255}));
+          {-46,-65},{-33,-65}}, color={255,0,255}));
   connect(uSupHea.y, pthp.uSupHea)
     annotation (Line(points={{-42,-8},{-17,-8}}, color={0,0,127}));
+  connect(booTimTab.y[1], uHeaEna.u2) annotation (Line(points={{-66.8,-150},{
+          -36,-150},{-36,-61},{-33,-61}}, color={255,0,255}));
+  connect(uHeaEna1.y, uHeaEna.u1)
+    annotation (Line(points={{-37,-57},{-33,-57}}, color={255,0,255}));
+  connect(modCon.yHeaEna, uHeaEna1.u1) annotation (Line(points={{-58,-56},{-54,
+          -56},{-54,-53},{-49,-53}}, color={255,0,255}));
+  connect(booTimTab1.y[1], uHeaEna1.u2) annotation (Line(points={{-66.8,-126},{
+          -52,-126},{-52,-57},{-49,-57}}, color={255,0,255}));
+  connect(fanOpeMod1.y, uHeaEna1.u3) annotation (Line(points={{-108,-110},{-54,
+          -110},{-54,-61},{-49,-61}}, color={255,0,255}));
+  connect(booTimTab1.y[1], uFan.u2) annotation (Line(points={{-66.8,-126},{-46,
+          -126},{-46,-115},{-29,-115}}, color={255,0,255}));
+  connect(modCon.yFan, uFan.u1) annotation (Line(points={{-58,-76},{-42,-76},{
+          -42,-111},{-29,-111}}, color={255,0,255}));
+  connect(uFan.y, booToRea.u) annotation (Line(points={{-17,-115},{-17,-116},{
+          -12,-116},{-12,-76},{-6,-76}}, color={255,0,255}));
+  connect(uHeaEna.y, uFan.u3) annotation (Line(points={{-21,-61},{-18,-61},{-18,
+          -106},{-38,-106},{-38,-119},{-29,-119}}, color={255,0,255}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-140,
             -120},{140,140}})),
       Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-140,-120},{
