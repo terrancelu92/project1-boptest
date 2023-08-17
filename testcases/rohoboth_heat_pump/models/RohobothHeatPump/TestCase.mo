@@ -21,11 +21,11 @@ model TestCase
   parameter Buildings.Fluid.HeatExchangers.DXCoils.AirSource.Data.Generic.BaseClasses.CoilHeatTransfer datHeaCoi(
     is_CooCoi=false,
     sta={
-      Buildings.Fluid.HeatExchangers.DXCoils.AirSource.Data.Generic.BaseClasses.Stage(
+        Buildings.Fluid.HeatExchangers.DXCoils.AirSource.Data.Generic.BaseClasses.Stage(
         spe=1800/60,
         nomVal=
           Buildings.Fluid.HeatExchangers.DXCoils.AirSource.Data.Generic.BaseClasses.NominalValues(
-          Q_flow_nominal=7144.01,
+          Q_flow_nominal=3000,
           COP_nominal=2.75,
           SHR_nominal=1,
           m_flow_nominal=0.5075,
@@ -71,7 +71,7 @@ model TestCase
 
   Buildings.Fluid.ZoneEquipment.PackagedTerminalHeatPump.PackagedTerminalHeatPump
     pthp(
-    final QSup_flow_nominal=5600.34,
+    final QSup_flow_nominal=3000,
     final dpCooDX_nominal= 0,
     final dpHeaDX_nominal= 0,
     final dpSupHea_nominal= 0,
@@ -262,6 +262,9 @@ model TestCase
 
   Modelica.Blocks.Sources.RealExpression realExpression(y=zon.conQCon_flow.Q_flow)
     annotation (Placement(transformation(extent={{84,0},{104,20}})));
+  Buildings.Controls.OBC.CDL.Continuous.Sources.Constant uSupHea(final k=0)
+    "Supplementary heat signal"
+    annotation (Placement(transformation(extent={{-62,-18},{-42,2}})));
 equation
   connect(fanOpeMod.y, modCon.fanOpeMod) annotation (Line(points={{-108,-80},{-100,
           -80},{-100,-73.4},{-82,-73.4}}, color={255,0,255}));
@@ -311,8 +314,6 @@ equation
     annotation (Line(points={{-58,-76},{-42,-76}}, color={255,0,255}));
   connect(booToRea.y,pthp. uFan) annotation (Line(points={{-18,-76},{-10,-76},{-10,
           -40},{-34,-40},{-34,8},{-17,8}},     color={0,0,127}));
-  connect(modCon.ySupHea, pthp.uSupHea) annotation (Line(points={{-58,-60},{-46,
-          -60},{-46,-8},{-17,-8}},   color={0,0,127}));
   connect(TOut.y, modCon.TOut) annotation (Line(points={{83,130},{100,130},{100,
           80},{-68,80},{-68,-42},{-90,-42},{-90,-66},{-82,-66}},
                                          color={0,0,127}));
@@ -344,6 +345,8 @@ equation
           {32,-30},{78,-30}}, color={0,0,127}));
   connect(realExpression.y, QLoaMea.u)
     annotation (Line(points={{105,10},{118,10}}, color={0,0,127}));
+  connect(uSupHea.y, pthp.uSupHea)
+    annotation (Line(points={{-40,-8},{-17,-8}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-140,
             -120},{140,140}})),
       Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-140,-120},{
@@ -351,10 +354,9 @@ equation
                     graphics={Polygon(points={{-48,-16},{-48,-16}}, lineColor={28,
               108,200})}),
     experiment(
-      StartTime=86400,
-      StopTime=691200,
+      StopTime=2592000,
       Tolerance=1e-06,
-      __Dymola_Algorithm="Cvode"),
+      __Dymola_Algorithm="Dassl"),
     Documentation(info="<html>
     <p>
     This is a validation model for the packaged terminal heat pump (PTHP) system model under heating mode 

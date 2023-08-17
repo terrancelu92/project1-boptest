@@ -1,0 +1,5 @@
+﻿simulateModel("RohobothHeatPump.HeatPumpOnOffTesting", startTime=86400, stopTime=172800, tolerance=1e-06, resultFile="HeatPumpOnOffTesting");
+createPlot(id=1, position={0, 0, 1220, 611}, y={"zon.TAir"}, range={24.0, 48.0, 15.0, 30.0}, grid=true, colors={{28,108,200}}, timeUnit="h", displayUnits={"degC"});
+createPlot(id=1, position={0, 0, 1220, 611}, y={"pthp.uHeaEna"}, range={24.0, 48.0, -0.5, 1.5}, grid=true, subPlot=103, colors={{28,108,200}}, timeUnit="h");
+createPlot(id=1, position={0, 0, 1220, 611}, y={"pthp.out.weaBus.TDryBul"}, range={24.0, 48.0, -10.0, 10.0}, grid=true, subPlot=102, colors={{28,108,200}}, timeUnit="h", displayUnits={"degC"});
+
