@@ -158,7 +158,8 @@ model TestCaseOverwriteOnOff
     zoneName="living_unit1",
     redeclare package Medium = MediumA,
     T_start=294.15,
-    final nPorts=2)
+    final nPorts=2,
+    vol(fluidVolume=4000))
     "Thermal zone model"
     annotation (Placement(transformation(extent={{58,30},{98,70}})));
 
