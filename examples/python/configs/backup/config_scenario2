@@ -1,0 +1,13 @@
+{
+   "start_day": 211,
+   "simulation_duration_days": 31,
+   "step": 60,
+   "reset_frequency": 5,
+   "resets": {
+       "chw": "configs/chw_reset.config",
+       "hw": "configs/hw_reset.config"
+   },
+   "controller": {
+
+   }
+}
