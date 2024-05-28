@@ -2,6 +2,8 @@ version: "3.7"
 
 services:
   boptest:
+    environment:
+      - DEBUG_MODE=true
     image: boptest_base
     build:
       context: .
@@ -16,6 +18,7 @@ services:
       - ./kpis:${APP_PATH}/kpis/
     ports:
       - 127.0.0.1:5000:5000
+      - "5678:5678" # Port for remote debugging
     networks:
       - boptest-net
 
