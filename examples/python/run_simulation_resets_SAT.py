@@ -149,8 +149,33 @@ class Simulate:
 if __name__ == "__main__":
     working_dir = 'C:/Github/project1-boptest/examples/python'
     os.chdir(working_dir)
-    with open("configs/config_summer1_SAT_convention") as f:
+    with open("configs/config_winter1_SAT_convention") as f:
         config = json.load(f)
     print(config)
     simulation = Simulate(config)
     simulation.run_loop()
+    with open("configs/config_winter2_SAT_convention") as f:
+        config = json.load(f)
+    print(config)
+    simulation = Simulate(config)
+    simulation.run_loop()
+    with open("configs/config_winter3_SAT_convention") as f:
+        config = json.load(f)
+    print(config)
+    simulation = Simulate(config)
+    simulation.run_loop()
+    with open("configs/config_winter4_SAT_convention") as f:
+        config = json.load(f)
+    print(config)
+    simulation = Simulate(config)
+    simulation.run_loop()
+    with open("configs/config_shoulder1_SAT_convention") as f:
+        config = json.load(f)
+    print(config)
+    simulation = Simulate(config)
+    simulation.run_loop()
+    with open("configs/config_shoulder2_SAT_convention") as f:
+        config = json.load(f)
+    print(config)
+    simulation = Simulate(config)
+    simulation.run_loop()    
