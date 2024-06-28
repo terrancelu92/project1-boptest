@@ -149,7 +149,7 @@ class Simulate:
 if __name__ == "__main__":
     working_dir = 'C:/Github/project1-boptest/examples/python'
     os.chdir(working_dir)
-    with open("configs/config_summer1_SAT_convention") as f:
+    with open("configs/config_demo") as f:
         config = json.load(f)
     print(config)
     simulation = Simulate(config)
