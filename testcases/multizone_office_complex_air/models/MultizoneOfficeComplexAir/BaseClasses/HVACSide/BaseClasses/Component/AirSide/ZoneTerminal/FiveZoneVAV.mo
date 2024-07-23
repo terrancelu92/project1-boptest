@@ -134,6 +134,7 @@ model FiveZoneVAV "Thermal zones, VAV terminals, and duct network"
   parameter Modelica.Media.Interfaces.Types.ExtraProperty C_nominal[MediumAir.nC]=C_nominal
     "Nominal value of trace substances. (Set to typical order of magnitude.)";
 
+  parameter Modelica.Units.SI.MassFlowRate m_flow_lea[4]=m_flow_lea "Air infiltration mass flow rates to four exterior zones";
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.AirSide.ZoneTerminal.FiveZoneDuctNetwork
     ReheatWatNet(
     redeclare package Medium = MediumWat,
@@ -189,7 +190,7 @@ model FiveZoneVAV "Thermal zones, VAV terminals, and duct network"
     each X_start=X_start,
     each final C_start=C_start,
     each C_nominal=C_nominal,
-    each nPorts=3,
+    each nPorts=4,
     each V=10,
     m_flow_nominal={mAirFloRat1,mAirFloRat2,mAirFloRat3,mAirFloRat4,mAirFloRat5},
     each allowFlowReversal=true,
@@ -200,21 +201,17 @@ model FiveZoneVAV "Thermal zones, VAV terminals, and duct network"
     annotation (Placement(transformation(extent={{-40,-84},{-20,-64}})));
   Modelica.Blocks.Interfaces.RealInput Q_flow[5]
     annotation (Placement(transformation(extent={{-120,-84},{-100,-64}})));
-  Modelica.Fluid.Interfaces.FluidPort_b port_b_Wat(redeclare package
-      Medium =
+  Modelica.Fluid.Interfaces.FluidPort_b port_b_Wat(redeclare package Medium =
         MediumWat) "Second port, typically outlet"
     annotation (Placement(transformation(extent={{30,90},{50,110}})));
-  Modelica.Fluid.Interfaces.FluidPort_a port_a_Wat(redeclare package
-      Medium =
+  Modelica.Fluid.Interfaces.FluidPort_a port_a_Wat(redeclare package Medium =
         MediumWat) "Second port, typically outlet"
     annotation (Placement(transformation(extent={{-50,90},{-30,110}})));
-  Modelica.Fluid.Interfaces.FluidPort_a port_a_Air(redeclare package
-      Medium =
+  Modelica.Fluid.Interfaces.FluidPort_a port_a_Air(redeclare package Medium =
         MediumAir)
     "Second port, typically outlet"
     annotation (Placement(transformation(extent={{-110,30},{-90,50}})));
-  Modelica.Fluid.Interfaces.FluidPort_b port_b_Air(redeclare package
-      Medium =
+  Modelica.Fluid.Interfaces.FluidPort_b port_b_Air(redeclare package Medium =
         MediumAir)
     "Second port, typically outlet"
     annotation (Placement(transformation(extent={{-110,-70},{-90,-50}})));
@@ -226,8 +223,8 @@ model FiveZoneVAV "Thermal zones, VAV terminals, and duct network"
     annotation (Placement(transformation(extent={{-120,50},{-100,70}})));
   Modelica.Blocks.Interfaces.BooleanInput On[5]
     annotation (Placement(transformation(extent={{-120,-22},{-100,-2}})));
-  Modelica.Fluid.Sensors.TemperatureTwoPort TZonSen[5](redeclare package
-      Medium = MediumAir)
+  Modelica.Fluid.Sensors.TemperatureTwoPort TZonSen[5](redeclare package Medium =
+               MediumAir)
     annotation (Placement(transformation(extent={{138,-68},{118,-48}})));
   Modelica.Blocks.Interfaces.RealOutput p "Pressure at port" annotation (
       Placement(transformation(extent={{200,-22},{220,-2}}),
@@ -333,26 +330,55 @@ model FiveZoneVAV "Thermal zones, VAV terminals, and duct network"
 
   Modelica.Blocks.Interfaces.RealInput nPeo[5] "Number of occupant" annotation (
      Placement(transformation(extent={{-120,-100},{-100,-80}}),
-        iconTransformation(extent={{-120,-110},{-100,-90}})));
+        iconTransformation(extent={{-120,-106},{-100,-86}})));
   Modelica.Blocks.Math.Gain gaiCO2[5](each k=8.18E-6)
     "CO2 emission per person"
     annotation (Placement(transformation(extent={{-40,-96},{-28,-84}})));
 
-  Buildings.Fluid.Sensors.TraceSubstances senCO2[5](redeclare package
-      Medium =                                                                 MediumAir,
+  Buildings.Fluid.Sensors.TraceSubstances senCO2[5](redeclare package Medium = MediumAir,
     each warnAboutOnePortConnection=false) "Sensor at volume"
-    annotation (Placement(transformation(extent={{82,-98},{98,-82}})));
+    annotation (Placement(transformation(extent={{86,-102},{102,-86}})));
   Buildings.Fluid.Sensors.Conversions.To_VolumeFraction conMasVolFra[5](each
       MMMea=Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM)
     "Conversion from mass fraction CO2 to volume fraction CO2"
-    annotation (Placement(transformation(extent={{104,-96},{116,-84}})));
-  Modelica.Blocks.Math.Gain gaiPPM[5](k=1e6)
-    "Convert mass fraction to PPM"
-    annotation (Placement(transformation(extent={{126,-96},{138,-84}})));
+    annotation (Placement(transformation(extent={{108,-100},{120,-88}})));
+  Modelica.Blocks.Math.Gain gaiPPM[5](each k=1e6) "Convert mass fraction to PPM"
+    annotation (Placement(transformation(extent={{130,-100},{142,-88}})));
   Modelica.Blocks.Interfaces.RealOutput CO2Zon[5]
     "Zonal CO2 volume fraction PPM" annotation (Placement(transformation(
           extent={{200,-104},{220,-84}}), iconTransformation(extent={{100,
             80},{120,100}})));
+  Buildings.Fluid.Sources.MassFlowSource_WeatherData infAir[4](
+    use_m_flow_in=true,
+    each nPorts=1,
+    redeclare package Medium = MediumAir,
+    C={fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM/
+        Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
+        fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM/
+        Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
+        fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM/
+        Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
+        fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM/
+        Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC)})
+    "Air infiltration through the envelope for four exterior zones (no infiltration for core zone)"
+    annotation (Placement(transformation(extent={{38,-120},{58,-100}})));
+
+  Modelica.Icons.SignalBus weaBus
+    annotation (Placement(transformation(extent={{-8,-128},{8,-112}}),
+        iconTransformation(extent={{-8,-128},{8,-112}})));
+
+  Modelica.Blocks.Sources.RealExpression m_flow_infAir[4](y=m_flow_lea)
+    "Infiltration nominal air flow rate"
+    annotation (Placement(transformation(extent={{-86,-114},{-66,-94}})));
+  Modelica.Blocks.Sources.RealExpression schFac_infAir[4](y={if On[1] == true
+         then 0.25 else 1.0 for i in 1:4})
+    "Schedule factor for infiltration air (refer to E+)"
+    annotation (Placement(transformation(extent={{-86,-134},{-66,-114}})));
+  Modelica.Blocks.Math.Gain winSpe_infAir[4](each k=0.224)
+    "Wind speed factor for infiltration air (refer to E+)"
+    annotation (Placement(transformation(extent={{-80,-148},{-66,-134}})));
+  Modelica.Blocks.Math.MultiProduct multiProduct[4](nu=3)
+    annotation (Placement(transformation(extent={{-38,-120},{-26,-108}})));
 equation
 
   connect(fixedHeatFlow.port, vol.heatPort) annotation (Line(points={{-20,-74},{
@@ -361,31 +387,30 @@ equation
   connect(fixedHeatFlow.Q_flow, Q_flow)
     annotation (Line(points={{-40,-74},{-110,-74}}, color={0,0,127},
       pattern=LinePattern.Dash));
-
   connect(vAV1.port_b, vol[1].ports[1])
-                                       annotation (Line(points={{10,8},{
-          14,8},{14,-78},{76,-78},{76,-74},{78.6667,-74},{78.6667,-70}},
+                                       annotation (Line(points={{10,8},{14,8},{14,
+          -78},{76,-78},{76,-74},{78.5,-74},{78.5,-70}},
                                          color={0,140,72},
       thickness=0.5,
       pattern=LinePattern.Dash));
   connect(vAV2.port_b, vol[2].ports[1])
-                                       annotation (Line(points={{50,8},{
-          60,8},{60,-78},{76,-78},{76,-74},{78.6667,-74},{78.6667,-70}},
+                                       annotation (Line(points={{50,8},{60,8},{60,
+          -78},{76,-78},{76,-74},{78.5,-74},{78.5,-70}},
                                          color={0,140,72},
       thickness=0.5,      pattern=LinePattern.Dash));
   connect(vAV3.port_b, vol[3].ports[1])
-                                       annotation (Line(points={{92,8},{
-          100,8},{100,-78},{80,-78},{80,-70},{78.6667,-70}},
+                                       annotation (Line(points={{92,8},{100,8},{
+          100,-78},{80,-78},{80,-70},{78.5,-70}},
                                          color={0,140,72},
       thickness=0.5,      pattern=LinePattern.Dash));
   connect(vAV4.port_b, vol[4].ports[1])
-                                       annotation (Line(points={{138,8},{
-          150,8},{150,-78},{80,-78},{80,-70},{78.6667,-70}},
+                                       annotation (Line(points={{138,8},{150,8},
+          {150,-78},{80,-78},{80,-70},{78.5,-70}},
                                          color={0,140,72},
       thickness=0.5,      pattern=LinePattern.Dash));
   connect(vAV5.port_b, vol[5].ports[1])
-                                       annotation (Line(points={{178,8},{
-          188,8},{188,-78},{80,-78},{80,-70},{78.6667,-70}},
+                                       annotation (Line(points={{178,8},{188,8},
+          {188,-78},{80,-78},{80,-70},{78.5,-70}},
                                          color={0,140,72},
       thickness=0.5,      pattern=LinePattern.Dash));
 
@@ -406,11 +431,9 @@ equation
   connect(AirNetWor.port_a, port_a_Air)
     annotation (Line(points={{-74,-28.2},{-88,-28.2},{-88,40},{-100,40}}, color={0,140,72},
       thickness=0.5));
-
   connect(AirNetWor.port_b, port_b_Air)
     annotation (Line(points={{-74,-45.2},{-80,-45.2},{-80,-60},{-100,-60}}, color={0,140,72},
       thickness=0.5));
-
   connect(AirNetWor.p, p) annotation (Line(
       points={{-42.5,-35},{-8,-35},{-8,-12},{210,-12}},
       color={0,0,127},
@@ -539,17 +562,68 @@ equation
     connect(senCO2[i].port, vol[i].ports[3]);
   end for;
   connect(senCO2.C, conMasVolFra.m) annotation (Line(
-      points={{98.8,-90},{103.4,-90}},
+      points={{102.8,-94},{107.4,-94}},
       color={0,0,127},
       smooth=Smooth.None));
   connect(conMasVolFra.V, gaiPPM.u)
-    annotation (Line(points={{116.6,-90},{124.8,-90}}, color={0,0,127}));
-  connect(gaiPPM.y, CO2Zon) annotation (Line(points={{138.6,-90},{166,-90},
-          {166,-94},{210,-94}}, color={0,0,127}));
+    annotation (Line(points={{120.6,-94},{128.8,-94}}, color={0,0,127}));
+  connect(gaiPPM.y, CO2Zon) annotation (Line(points={{142.6,-94},{210,-94}},
+                                color={0,0,127}));
+  for i in 1:4 loop
+    connect(infAir[i].ports[1], vol[i+1].ports[4]) annotation (Line(points={{58,-110},
+            {81.5,-110},{81.5,-70}},                                                                                            color={0,140,72},
+        pattern=LinePattern.Dash,
+        thickness=0.5));
+  end for;
+  connect(weaBus,infAir [1].weaBus) annotation (Line(
+      points={{0,-120},{0,-109.8},{38,-109.8}},
+      color={255,204,51},
+      thickness=0.5));
+  connect(weaBus,infAir [2].weaBus) annotation (Line(
+      points={{0,-120},{0,-109.8},{38,-109.8}},
+      color={255,204,51},
+      thickness=0.5));
+  connect(weaBus,infAir [3].weaBus) annotation (Line(
+      points={{0,-120},{0,-109.8},{38,-109.8}},
+      color={255,204,51},
+      thickness=0.5));
+  connect(weaBus,infAir [4].weaBus) annotation (Line(
+      points={{0,-120},{0,-109.8},{38,-109.8}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus.winSpe, winSpe_infAir[1].u) annotation (Line(
+      points={{0,-120},{0,-160},{-88,-160},{-88,-141},{-81.4,-141}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus.winSpe, winSpe_infAir[2].u);
+  connect(weaBus.winSpe, winSpe_infAir[3].u);
+  connect(weaBus.winSpe, winSpe_infAir[4].u);
+  for i in 1:4 loop
+    connect(m_flow_infAir[i].y, multiProduct[i].u[1]) annotation (Line(points={{-65,
+            -104},{-44,-104},{-44,-115.4},{-38,-115.4}},
+                                            color={0,0,127}));
+    connect(schFac_infAir[i].y, multiProduct[i].u[2]) annotation (Line(points={{-65,
+            -124},{-44,-124},{-44,-114},{-38,-114}},
+                                            color={0,0,127}));
+    connect(winSpe_infAir[i].y, multiProduct[i].u[3]) annotation (Line(points={{-65.3,
+            -141},{-44,-141},{-44,-112.6},{-38,-112.6}},
+                                            color={0,0,127}));
+  end for;
+  connect(multiProduct.y, infAir.m_flow_in) annotation (Line(points={{-24.98,-114},
+          {-18,-114},{-18,-102},{38,-102}}, color={0,0,127}));
     annotation (Placement(transformation(extent={{84,-82},{100,-98}})),
                 Placement(transformation(extent={{122,-98},{138,-82}})),
                 Line(points={{100.8,-90},{121.2,-90}}, color={0,0,127}),
-              Icon(coordinateSystem(preserveAspectRatio=false), graphics={
+              Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
+            {200,100}}),                                        graphics={
         Line(points={{-90,40},{80,40}}, color={0,127,255}),
         Line(points={{-90,-60},{80,-60}}, color={0,127,255}),
         Line(points={{80,40},{80,-60}}, color={0,127,255}),
@@ -608,7 +682,7 @@ equation
           extent={{-148,-110},{152,-70}},
           textColor={0,0,255},
           textString="%name")}),
-          Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
+          Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-100,-120},
             {200,100}})),
     Documentation(info="<html>
 <p>A hot water reheat coil is installed in each VAV terminal. The components and control systems of the VAV is shown in the figure below:</p>

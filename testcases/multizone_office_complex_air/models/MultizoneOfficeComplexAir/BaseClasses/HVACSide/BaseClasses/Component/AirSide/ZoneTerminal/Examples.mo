@@ -146,6 +146,7 @@ package Examples
          quantity=MediumAir.extraPropertiesNames) = fill(1E-2, MediumAir.nC)
       "Nominal value of zone air trace substances. (Set to typical order of magnitude.)"
      annotation (Dialog(tab="Initialization", enable=Medium.nC > 0));
+    parameter Modelica.Units.SI.MassFlowRate m_flow_lea[4]={0.206*1.2,0.137*1.2,0.206*1.2,0.137*1.2} "Air infiltration mass flow rates to four exterior zones";
 
     Buildings.Fluid.Sources.Boundary_pT souAir(
       p(displayUnit="Pa") = 100000 + PreAirDroMai1 + PreAirDroMai2 + PreAirDroMai3 + PreAirDroMai4 + PreAirDroBra5 + PreDroAir5,
@@ -157,11 +158,12 @@ package Examples
       redeclare package Medium = MediumAir,
       p(displayUnit="Pa") = 100000,
       nPorts=1,
-      T=299.15) annotation (Placement(transformation(extent={{-100,-40},{-80,-20}})));
+      T=299.15) annotation (Placement(transformation(extent={{-100,-26},{
+              -80,-6}})));
 
     Modelica.Blocks.Sources.Ramp Q_flow[5](duration=86400, height=1*1000*10)
-      annotation (Placement(transformation(extent={{-100,-68},{-80,-48}})));
-    FiveZoneVAV                                                     fivZonVAV(
+      annotation (Placement(transformation(extent={{-100,-60},{-80,-40}})));
+    FiveZoneVAV fivZonVAV(
       redeclare package MediumAir = MediumAir,
       redeclare package MediumWat = MediumWat,
       p_start=p_start,
@@ -169,6 +171,7 @@ package Examples
       X_start=X_start,
       C_start=C_start,
       C_nominal=C_nominal,
+      m_flow_lea=m_flow_lea,
       PreAirDroMai1=PreAirDroMai1,
       PreAirDroMai2=PreAirDroMai2,
       PreAirDroMai3=PreAirDroMai3,
@@ -212,7 +215,7 @@ package Examples
       PreDroAir5=PreDroAir5,
       PreDroWat5=PreDroWat5,
       eps5=eps5)
-      annotation (Placement(transformation(extent={{-28,-28},{18,22}})));
+      annotation (Placement(transformation(extent={{-28,-28},{48,16}})));
     Buildings.Fluid.Sources.Boundary_pT souWat(
       p(displayUnit="Pa") = 100000 + PreWatDroMai1 + PreWatDroMai2 + PreWatDroMai3 + PreWatDroMai4 + PreWatDroBra5 + PreDroWat5,
       nPorts=1,
@@ -223,37 +226,50 @@ package Examples
       nPorts=1,
       redeclare package Medium = MediumWat,
       T=299.15) annotation (Placement(transformation(extent={{20,70},{0,90}})));
-    Modelica.Blocks.Sources.BooleanExpression booleanExpression[5](y=true) annotation (Placement(transformation(extent={{-100,
-              -16},{-80,4}})));
+    Modelica.Blocks.Sources.BooleanExpression booleanExpression[5](y=true) annotation (Placement(transformation(extent={{-70,-14},
+              {-50,6}})));
     Modelica.Blocks.Sources.Ramp airFloRat[5](duration=86400, height=1)
       annotation (Placement(transformation(extent={{-100,70},{-80,90}})));
     Modelica.Blocks.Sources.Ramp yVal[5](
       duration=86400,
       height=-1,
       offset=1)
-      annotation (Placement(transformation(extent={{-100,10},{-80,30}})));
+      annotation (Placement(transformation(extent={{-100,12},{-80,32}})));
     Modelica.Blocks.Sources.Constant nPeo[5](k=20)
-      annotation (Placement(transformation(extent={{-100,-100},{-80,-80}})));
+      annotation (Placement(transformation(extent={{-100,-90},{-80,-70}})));
+    Buildings.BoundaryConditions.WeatherData.ReaderTMY3 weaDat(filNam=
+          Modelica.Utilities.Files.loadResource(
+          "modelica://Buildings/Resources/weatherdata/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.mos"),
+        computeWetBulbTemperature=true)  "Weather data reader"
+      annotation (Placement(transformation(extent={{-30,-60},{-10,-40}})));
   equation
 
-    connect(fivZonVAV.port_a_Air, souAir.ports[1]) annotation (Line(points={{-28,7},
-            {-74,7},{-74,50},{-80,50}},                                                                           color={0,127,255}));
-    connect(fivZonVAV.port_b_Air, sinAir.ports[1]) annotation (Line(points={{-28,-18},
-            {-72,-18},{-72,-30},{-80,-30}},                                                                                     color={0,127,255}));
-    connect(souWat.ports[1], fivZonVAV.port_a_Wat) annotation (Line(points={{-40,80},{-28,80},{-28,56},{-60,56},{-60,
-            22},{-14.2,22}},                                                                                                         color={0,127,255}));
+    connect(fivZonVAV.port_a_Air, souAir.ports[1]) annotation (Line(points={{-28,4},
+            {-38,4},{-38,50},{-80,50}},                                                                           color={0,127,255}));
+    connect(fivZonVAV.port_b_Air, sinAir.ports[1]) annotation (Line(points={{-28,-16},
+            {-80,-16}},                                                                                                         color={0,127,255}));
+    connect(souWat.ports[1], fivZonVAV.port_a_Wat) annotation (Line(points={{-40,80},
+            {-12.8,80},{-12.8,16}},                                                                                                  color={0,127,255}));
     connect(sinWat.ports[1], fivZonVAV.port_b_Wat) annotation (Line(points={{0,80},{
-            -10,80},{-20,80},{-20,36},{4,36},{4,22},{4.2,22}},                                                                             color={0,127,255}));
-    connect(Q_flow.y, fivZonVAV.Q_flow) annotation (Line(points={{-79,-58},{-40,-58},
-            {-40,-21.5},{-30.3,-21.5}}, color={0,0,127}));
-    connect(booleanExpression.y, fivZonVAV.On) annotation (Line(points={{-79,-6},{
-            -30.3,-6}},                                                                                           color={255,0,255}));
-    connect(yVal.y, fivZonVAV.yVal) annotation (Line(points={{-79,20},{-68,20},{-68,
-            12},{-30.3,12}}, color={0,0,127}));
+            -4,80},{-4,28},{7.46667,28},{7.46667,16}},                                                                                     color={0,127,255}));
+    connect(Q_flow.y, fivZonVAV.Q_flow) annotation (Line(points={{-79,-50},{-48,
+            -50},{-48,-18.8},{-30.5333,-18.8}},
+                                        color={0,0,127}));
+    connect(booleanExpression.y, fivZonVAV.On) annotation (Line(points={{-49,-4},
+            {-38,-4},{-38,-6.4},{-30.5333,-6.4}},                                                                 color={255,0,255}));
+    connect(yVal.y, fivZonVAV.yVal) annotation (Line(points={{-79,22},{-40,22},
+            {-40,8},{-30.5333,8}},
+                             color={0,0,127}));
     connect(airFloRat.y, fivZonVAV.airFloRatSet) annotation (Line(points={{-79,80},
-            {-66,80},{-66,18.5},{-30.3,18.5}}, color={0,0,127}));
-    connect(nPeo.y, fivZonVAV.nPeo) annotation (Line(points={{-79,-90},{-36,-90},{
-            -36,-28},{-30.3,-28}}, color={0,0,127}));
+            {-66,80},{-66,52},{-30.5333,52},{-30.5333,13.2}},
+                                               color={0,0,127}));
+    connect(nPeo.y, fivZonVAV.nPeo) annotation (Line(points={{-79,-80},{-42,-80},
+            {-42,-23.2},{-30.5333,-23.2}},
+                                   color={0,0,127}));
+    connect(weaDat.weaBus, fivZonVAV.weaBus) annotation (Line(
+        points={{-10,-50},{-2.66667,-50},{-2.66667,-28}},
+        color={255,204,51},
+        thickness=0.5));
     annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(coordinateSystem(preserveAspectRatio=false)),
       experiment(StopTime=259200, __Dymola_Algorithm="Dassl"));
   end FivZonVAVCO2;

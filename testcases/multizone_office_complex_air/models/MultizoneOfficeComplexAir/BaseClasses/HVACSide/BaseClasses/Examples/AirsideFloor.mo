@@ -246,7 +246,7 @@ model AirsideFloor
     annotation (Placement(transformation(extent={{60,60},{40,80}})));
 
   Modelica.Blocks.Sources.Ramp loa[5](duration=86400, height=1*1000*10)
-    annotation (Placement(transformation(extent={{0,-60},{20,-40}})));
+    annotation (Placement(transformation(extent={{40,-60},{20,-40}})));
   Modelica.Blocks.Sources.Constant zonCooTset[5](k=273.15 + 24)
     annotation (Placement(transformation(extent={{-98,44},{-82,60}})));
   Modelica.Blocks.Sources.Constant disTset(k=273.15 + 12.88)
@@ -260,18 +260,8 @@ model AirsideFloor
   Buildings.BoundaryConditions.WeatherData.ReaderTMY3 weaDat(filNam=
         Modelica.Utilities.Files.loadResource(
         "modelica://Buildings/Resources/weatherdata/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.mos"),
-      computeWetBulbTemperature=false) "Weather data reader"
-    annotation (Placement(transformation(extent={{30,-80},{50,-60}})));
-  Modelica.Blocks.Routing.RealPassThrough TOut(y(
-      final quantity="ThermodynamicTemperature",
-      final unit="K",
-      displayUnit="degC",
-      min=0))
-    annotation (Placement(transformation(extent={{72,-80},{92,-60}})));
-  Buildings.BoundaryConditions.WeatherData.Bus
-                                     weaBus
-    "Weather data bus"
-    annotation (Placement(transformation(extent={{50,-80},{70,-60}})));
+      computeWetBulbTemperature=true)  "Weather data reader"
+    annotation (Placement(transformation(extent={{-26,-60},{-6,-40}})));
   Modelica.Blocks.Sources.Constant nPeo[5](k=20)
     annotation (Placement(transformation(extent={{-100,-40},{-80,-20}})));
 equation
@@ -280,7 +270,7 @@ equation
   connect(airsideFloor.port_Exh_Air, sou.ports[2]) annotation (Line(points={{-24.625,
           -9.5},{-80,-9.5},{-80,1}}, color={0,127,255}));
   connect(sinCooWat.ports[1], airsideFloor.port_b_CooWat) annotation (Line(
-        points={{-60,70},{-52,70},{-52,40},{-7.4375,40},{-7.4375,-20}}, color={0,
+        points={{-60,70},{-52,70},{-52,40},{-8.375,40},{-8.375,-20}},   color={0,
           127,255}));
   connect(airsideFloor.port_a_CooWat, souCooWat.ports[1]) annotation (Line(
         points={{-3.6875,-20},{-3.6875,46},{-48,46},{-48,70},{-42,70}}, color={0,
@@ -289,9 +279,10 @@ equation
         points={{7.25,-20},{7.25,-20},{7.25,46},{24,46},{24,70},{20,70}}, color
         ={0,127,255}));
   connect(airsideFloor.port_b_HeaWat, sinHeaWat.ports[1]) annotation (Line(
-        points={{9.75,-20},{9.75,36},{34,36},{34,70},{40,70}}, color={0,127,255}));
+        points={{11.9375,-20},{11.9375,36},{34,36},{34,70},{40,70}},
+                                                               color={0,127,255}));
   connect(loa.y, airsideFloor.Q_flow) annotation (Line(
-      points={{21,-50},{24,-50},{24,-26},{4,-26},{4,-21.75},{3.5,-21.75}},
+      points={{19,-50},{3.5,-50},{3.5,-21.75}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(booleanExpression.y, airsideFloor.OnZon) annotation (Line(
@@ -299,17 +290,9 @@ equation
       color={255,0,255},
       pattern=LinePattern.Dash));
   connect(airsideFloor.OnFan, airsideFloor.OnZon) annotation (Line(
-      points={{-25.5625,-11.25},{-34,-11.25},{-34,-18.25},{-25.5625,-18.25}},
+      points={{-25.5625,-13},{-34,-13},{-34,-18.25},{-25.5625,-18.25}},
       color={255,0,255},
       pattern=LinePattern.Dash));
-  connect(weaDat.weaBus, weaBus) annotation (Line(
-      points={{50,-70},{54,-70},{54,-70},{60,-70}},
-      color={255,204,51},
-      thickness=0.5));
-  connect(TOut.u, weaBus.TDryBul)
-    annotation (Line(points={{70,-70},{60,-70}}, color={0,0,127}));
-  connect(TOut.y, airsideFloor.TOut) annotation (Line(points={{93,-70},{96,-70},
-          {96,-28},{-2,-28},{-2,-21.75},{-1.1875,-21.75}}, color={0,0,127}));
   connect(pSet.y, airsideFloor.pSet) annotation (Line(points={{-79,-70},{-40,
           -70},{-40,0},{-25.5625,0},{-25.5625,-0.75}}, color={0,0,127}));
   connect(zonCooTset.y, airsideFloor.zonCooTSet) annotation (Line(points={{
@@ -321,6 +304,10 @@ equation
           {-56,28},{-56,8},{-25.5625,8}}, color={0,0,127}));
   connect(nPeo.y, airsideFloor.nPeo) annotation (Line(points={{-79,-30},{-36,
           -30},{-36,-4.25},{-25.5625,-4.25}}, color={0,0,127}));
+  connect(weaDat.weaBus, airsideFloor.weaBus) annotation (Line(
+      points={{-6,-50},{1,-50},{1,-20}},
+      color={255,204,51},
+      thickness=0.5));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(coordinateSystem(
           preserveAspectRatio=false)),
     experiment(StopTime=86400));
