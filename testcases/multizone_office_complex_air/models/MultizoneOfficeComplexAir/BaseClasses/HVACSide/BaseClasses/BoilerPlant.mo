@@ -3,14 +3,15 @@ model BoilerPlant "Boiler hot water plant"
   replaceable package MediumHW =
      Modelica.Media.Interfaces.PartialMedium
     "Medium in the hot water side";
+  parameter Real alpha = 1  "Sizing factor for overall system design capacity and mass flow rate";
   parameter Integer n=2
     "Number of boilers";
   parameter Integer m=2
     "Number of pumps";
   parameter Real thrhol[:]= {0.95}
     "Threshold for boiler staging";
-  parameter Real Cap[:] = {2762738.20/n for i in linspace(1, n, n)} "Rated Plant Capacity";
-  parameter Modelica.Units.SI.MassFlowRate mHW_flow_nominal[:]={2762738.20/n/20
+  parameter Real Cap[:] = {4191000*alpha/n for i in linspace(1, n, n)} "Rated Plant Capacity";
+  parameter Modelica.Units.SI.MassFlowRate mHW_flow_nominal[:]={4191000*alpha/n/20
       /4200 for i in linspace(
       1,
       n,
@@ -205,6 +206,8 @@ MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.WaterSide.B
 MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.WaterSide.Control.PlantStageN</a> for a description of the boiler stage control. </p>
 </html>", revisions = "<html>
 <ul>
+<li>August 8, 2024, by Guowen Li, Xing Lu, Yan Chen: </li>
+<p>Adjusted system equipment sizing; Reduced nonlinear system warnings.</p>
 <li> August 17, 2023, by Xing Lu, Sen Huang, Lingzhe Wang:
 <p> First implementation.</p>
 </ul>

@@ -1,6 +1,7 @@
 within MultizoneOfficeComplexAir.BaseClasses.HVACSide;
 model HVAC "Full HVAC system that contains the air side and water side systems"
   extends MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Airside(
+      alpha=1,
       sou(nPorts=3),
       floor1(
       reaZonCor(zone="bot_floor_cor"),
@@ -41,16 +42,16 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
 
   parameter Modelica.Units.SI.MassFlowRate mFloRat1=-datChi[1].QEva_flow_nominal
       /4200/chiWatPla.dTCHW_nominal*chiWatPla.n/12
-    "mass flow rate for floor 1 (bottom floor)";
+    "CHW mass flow rate for floor 1 (bottom floor)";
   parameter Modelica.Units.SI.MassFlowRate mFloRat2=-datChi[1].QEva_flow_nominal
       /4200/chiWatPla.dTCHW_nominal*chiWatPla.n/12*10
-    "mass flow rate for floor 2 (middle floor)";
+    "CHW mass flow rate for floor 2 (middle floor)";
   parameter Modelica.Units.SI.MassFlowRate mFloRat3=-datChi[1].QEva_flow_nominal
       /4200/chiWatPla.dTCHW_nominal*chiWatPla.n/12
-    "mass flow rate for floor 3 (top floor)";
+    "CHW mass flow rate for floor 3 (top floor)";
 
   parameter Modelica.Units.SI.MassFlowRate mCHW_flow_nominal[:]={-datChi[1].QEva_flow_nominal
-      /4200/5.56 for i in linspace(
+      /4200/chiWatPla.dTCHW_nominal for i in linspace(
       1,
       3,
       3)} "Nominal mass flow rate at chilled water side";
@@ -67,8 +68,11 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
     "Medium model";
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.BoilerPlant
-    boiWatPla(secPumCon(conPI(k=0.001)), redeclare package MediumHW =
-        MediumHeaWat) "Boiler hot water plant"
+    boiWatPla(
+    mHW_flow_nominal={62/2*alpha for i in linspace(1, n, n)},
+              secPumCon(conPI(k=0.001)), redeclare package MediumHW =
+        MediumHeaWat,
+        alpha=alpha) "Boiler hot water plant"
     annotation (Placement(transformation(extent={{116,-110},{136,-90}})));
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.WaterSide.Network.PipeNetwork
@@ -76,10 +80,13 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
     PreDroBra2(displayUnit="Pa") = 0,
     PreDroBra3(displayUnit="Pa") = 0,
     PreDroMai1(displayUnit="Pa") = (79712/4),
-    PreDroMai2(displayUnit="Pa") = (79712/4),
-    mFloRat1=boiWatPla.Cap[1]/4190/boiWatPla.dTHW_nominal*boiWatPla.n/12,
-    mFloRat2=boiWatPla.Cap[1]/4190/boiWatPla.dTHW_nominal*boiWatPla.n/12*10,
-    mFloRat3=boiWatPla.Cap[1]/4190/boiWatPla.dTHW_nominal*boiWatPla.n/12,
+    PreDroMai2(displayUnit="Pa") = (79712/4/2),
+    mFloRat1=floor1.mWatFloRat1 + floor1.mWatFloRat2 + floor1.mWatFloRat3 +
+        floor1.mWatFloRat4 + floor1.mWatFloRat5,
+    mFloRat2=floor2.mWatFloRat1 + floor2.mWatFloRat2 + floor2.mWatFloRat3 +
+        floor2.mWatFloRat4 + floor2.mWatFloRat5,
+    mFloRat3=floor3.mWatFloRat1 + floor3.mWatFloRat2 + floor3.mWatFloRat3 +
+        floor3.mWatFloRat4 + floor3.mWatFloRat5,
     redeclare package Medium = MediumHeaWat,
     PreDroBra1(displayUnit="Pa") = (79712/4))
     "Hot water plant distribution network"
@@ -101,15 +108,16 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
     mFloRat1=mFloRat1,
     mFloRat2=mFloRat2,
     mFloRat3=mFloRat3,
-    PreDroBra1(displayUnit="Pa") = 0,
+    PreDroBra1(displayUnit="Pa") = PreDroCooWat,
     PreDroBra2(displayUnit="Pa") = 0,
     PreDroBra3(displayUnit="Pa") = 0,
-    PreDroMai1=PreDroCooWat*2,
-    PreDroMai2(displayUnit="Pa") = 0)
+    PreDroMai1=PreDroCooWat,
+    PreDroMai2(displayUnit="Pa") = PreDroCooWat/2)
                              "Chilled water plant distribution network"
     annotation (Placement(transformation(extent={{20,-88},{40,-108}})));
   Buildings.Fluid.Chillers.Data.ElectricEIR.ElectricEIRChiller_Trane_CVHE_1442kW_6_61COP_VSD
-    datChi[3](each QEva_flow_nominal=-2500000) "Chiller data record"
+    datChi[3](each QEva_flow_nominal=-5500000/3*alpha)
+                                               "Chiller data record"
                                                annotation (Placement(transformation(extent={{-52,
             -106},{-32,-86}})));
 
@@ -119,7 +127,8 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
   Modelica.Blocks.Sources.Constant TCHWSupSet(k=273.15 + 5.56)
     "Chilled water supply temperature setpoint"
     annotation (Placement(transformation(extent={{-82,-30},{-62,-10}})));
-  Modelica.Blocks.Sources.RealExpression PHWPum(y=sum(boiWatPla.pumSecHW.P))
+  Modelica.Blocks.Sources.RealExpression PHWPum(y=max(0, boiWatPla.pumSecHW.P[1])
+         + max(0, boiWatPla.pumSecHW.P[2]))
     "Hot water pump power consumption"
     annotation (Placement(transformation(extent={{114,-54},{134,-34}})));
   Modelica.Blocks.Sources.RealExpression PBoi(y=boiWatPla.mulBoi.boi[1].boi.QFue_flow
@@ -347,6 +356,8 @@ See the model <a href=\"modelica://MultizoneOfficeComplexAir.BaseClasses.HVACSid
 <p>The water side system controls include the chiller plant staging control, chilled water supply temperature control, secondary chilled water pump staging control, secondary chilled water loop static pressure control, cooling tower supply water temperature control, minimum condenser supply water temperature control, boiler staging control, boiler water temperature control, and boiler hot water loop static pressure control.</p>
 </html>", revisions = "<html>
 <ul>
+<li>August 8, 2024, by Guowen Li, Xing Lu, Yan Chen: </li>
+<p>Added CO2 and air infiltration features; Adjusted system equipment sizing; Reduced nonlinear system warnings.</p>
 <li> August 17, 2023, by Xing Lu, Sen Huang, Lingzhe Wang, Yan Chen:
 <p> First implementation.</p>
 </ul>
