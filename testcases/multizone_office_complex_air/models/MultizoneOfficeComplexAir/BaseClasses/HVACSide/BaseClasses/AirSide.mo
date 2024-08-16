@@ -188,7 +188,6 @@ model Airside "Air side system"
     redeclare package MediumHeaWat = MediumHeaWat,
     C_start=fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM
         /Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
-
     m_flow_lea={1*0.206*1.2,1*0.137*1.2,1*0.206*1.2,1*0.137*1.2},
     PreDroCoiAir=PreDroCoiAir,
     PreDroMixingBoxAir=PreDroMixingBoxAir,
@@ -264,7 +263,6 @@ model Airside "Air side system"
     redeclare package MediumHeaWat = MediumHeaWat,
     C_start=fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM
         /Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
-
     m_flow_lea={10*0.206*1.2,10*0.137*1.2,10*0.206*1.2,10*0.137*1.2},
     PreDroCoiAir=PreDroCoiAir,
     PreDroMixingBoxAir=PreDroMixingBoxAir,
@@ -340,7 +338,6 @@ model Airside "Air side system"
     redeclare package MediumHeaWat = MediumHeaWat,
     C_start=fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM
         /Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
-
     m_flow_lea={1*0.206*1.2,1*0.137*1.2,1*0.206*1.2,1*0.137*1.2},
     PreDroCoiAir=PreDroCoiAir,
     PreDroMixingBoxAir=PreDroMixingBoxAir,
@@ -415,7 +412,7 @@ model Airside "Air side system"
   Buildings.Fluid.Sources.Boundary_pT   sou[n](
     nPorts=3,
     redeclare package Medium = MediumAir,
-    each p(displayUnit="Pa") = 100000,
+    each p(displayUnit="Pa"),
     each C=fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM/
          Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
     use_T_in=true) "Source"
