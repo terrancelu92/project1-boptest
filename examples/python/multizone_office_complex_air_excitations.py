@@ -46,7 +46,7 @@ def run(plot=False):
                                                              start_time=0,
                                                              warmup_period=0,
                                                              length=7*24*3600,
-                                                             step=60)
+                                                             step=5*60)
 
     # POST-PROCESS RESULTS
     # --------------------
