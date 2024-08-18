@@ -409,13 +409,12 @@ model Airside "Air side system"
     "Zone air temperature setpoint controllers based on the occupancy signal"
     annotation (Placement(transformation(extent={{-2,90},{18,110}})));
 
-  Buildings.Fluid.Sources.Boundary_pT   sou[n](
+  Buildings.Fluid.Sources.Outside       sou[n](
     nPorts=3,
     redeclare package Medium = MediumAir,
-    each p(displayUnit="Pa"),
     each C=fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM/
-         Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
-    use_T_in=true) "Source"
+         Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC))
+                   "Source"
     annotation (Placement(transformation(extent={{40,30},{60,50}})));
 
   Modelica.Blocks.Math.Gain numOCCMulMidFlo[5](k=10)

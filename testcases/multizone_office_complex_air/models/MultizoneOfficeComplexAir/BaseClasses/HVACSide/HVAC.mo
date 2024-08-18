@@ -298,22 +298,6 @@ equation
       index=-1,
       extent={{-3,-6},{-3,-6}},
       horizontalAlignment=TextAlignment.Right));
-  connect(weaBus.TDryBul, sou[1].T_in) annotation (Line(
-      points={{40,-120},{12,-120},{12,44},{38,44}},
-      color={255,204,51},
-      thickness=0.5));
-  connect(weaBus.TDryBul, sou[2].T_in) annotation (Line(
-      points={{40,-120},{12,-120},{12,44},{38,44}},
-      color={255,204,51},
-      thickness=0.5), Text(
-      string="%first",
-      index=-1,
-      extent={{-6,3},{-6,3}},
-      horizontalAlignment=TextAlignment.Right));
-  connect(weaBus.TDryBul, sou[3].T_in) annotation (Line(
-      points={{40,-120},{12,-120},{12,44},{38,44}},
-      color={255,204,51},
-      thickness=0.5));
   connect(chiWatNet.p, reaChiWatSys.dp_in) annotation (Line(points={{41,-98},{
           52,-98},{52,-80},{-18,-80},{-18,-31.0769},{16,-31.0769}}, color={0,0,
           127}));
@@ -334,6 +318,17 @@ equation
   connect(chiWatPla.mCHW_tot, reaChiWatSys.mCHW_tot_in) annotation (Line(points
         ={{11,-105},{24,-105},{24,-20},{10,-20},{10,-27.6923},{16,-27.6923}},
         color={0,0,127}));
+  connect(weaBus, sou[1].weaBus) annotation (Line(
+      points={{40,-120},{14,-120},{14,40},{40,40},{40,40.2}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-3,6},{-3,6}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus, sou[2].weaBus);
+  connect(weaBus, sou[3].weaBus);
+
   annotation (experiment(
       StartTime=17280000,
       StopTime=17452800,
