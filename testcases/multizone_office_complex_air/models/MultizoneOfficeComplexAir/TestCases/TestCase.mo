@@ -3,33 +3,53 @@ model TestCase "Complex office building model that includes air side systems, wa
   extends Modelica.Icons.Example;
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.HVAC hva(
-    floor1(duaFanAirHanUni(
+    floor1(
+    duaFanAirHanUni(
         mixingBox(mixBox(
-            valRet(riseTime=15, y_start=1),
-            valExh(riseTime=15, y_start=1),
-            valFre(riseTime=15, y_start=1))),
+            valRet(riseTime=15, y_start=0.7),
+            valExh(riseTime=15, y_start=0.3),
+            valFre(riseTime=15, y_start=0.3))),
         retFan(varSpeFloMov(use_inputFilter=true, y_start=0)),
         supFan(varSpe(variableSpeed(zerSpe(k=0))), withoutMotor(varSpeFloMov(
                 use_inputFilter=true, y_start=0))),
-        cooCoi(val(use_inputFilter=true, y_start=0)))),
-    floor2(duaFanAirHanUni(
+        cooCoi(val(use_inputFilter=true, y_start=1)))),
+    floor2(
+    duaFanAirHanUni(
         mixingBox(mixBox(
-            valRet(riseTime=15, y_start=1),
-            valExh(riseTime=15, y_start=1),
-            valFre(riseTime=15, y_start=1))),
+            valRet(riseTime=15, y_start=0.7),
+            valExh(riseTime=15, y_start=0.3),
+            valFre(riseTime=15, y_start=0.3))),
         retFan(varSpeFloMov(use_inputFilter=true, y_start=0)),
         supFan(varSpe(variableSpeed(zerSpe(k=0))), withoutMotor(varSpeFloMov(
                 use_inputFilter=true, y_start=0))),
-        cooCoi(val(use_inputFilter=true, y_start=0)))),
-    floor3(duaFanAirHanUni(
+        cooCoi(val(use_inputFilter=true, y_start=1)))),
+    floor3(
+      PreAirDroMai1=0,
+      PreAirDroMai2=0,
+      PreAirDroMai3=0,
+      PreAirDroMai4=0,
+      PreAirDroBra1=0,
+      PreAirDroBra2=0,
+      PreAirDroBra3=0,
+      PreAirDroBra4=0,
+      PreAirDroBra5=0,
+           duaFanAirHanUni(
         mixingBox(mixBox(
-            valRet(riseTime=15, y_start=1),
-            valExh(riseTime=15, y_start=1),
-            valFre(riseTime=15, y_start=1))),
+            valRet(riseTime=15, y_start=0.7),
+            valExh(riseTime=15, y_start=0.3),
+            valFre(riseTime=15, y_start=0.3))),
         retFan(varSpeFloMov(use_inputFilter=true, y_start=0)),
         supFan(varSpe(variableSpeed(zerSpe(k=0))), withoutMotor(varSpeFloMov(
                 use_inputFilter=true, y_start=0))),
-        cooCoi(val(use_inputFilter=true, y_start=0)))))
+        cooCoi(val(use_inputFilter=true, y_start=1)))),
+    chiWatPla(cooTowWithByp(byp(valByp(y_start=0)), mulCooTowSys(ct(val(y_start
+                ={1,0,0})))),
+      pumCW(pumConSpe(m_flow_start={90.3859,0,0})),
+      pumPriCHW(pumConSpe(m_flow_start={78.5086,0,0})),
+      pumSecCHW(pum(varSpeFloMov(y_start={1,0})), val(y_start={1,0})),
+      mulChiSys(ch(valCHW(y_start={1,0,0}), valCW(y_start={1,0,0})))),
+    boiWatPla(mulBoi(boi(valCHW(y_start={1,0}))), pumSecHW(val(y_start={1,0}),
+          pum(varSpeFloMov(y_start={1,0})))))
     "Full HVAC system that contains the airside and waterside systems and controls"
     annotation (Placement(transformation(extent={{20,20},{-20,60}})));
 
@@ -58,7 +78,7 @@ equation
         coordinateSystem(preserveAspectRatio=false)),
     experiment(
       StopTime=31536000,
-      Interval=60,
+      Interval=3600,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>

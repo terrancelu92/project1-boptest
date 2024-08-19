@@ -16,8 +16,8 @@ model WithoutMotor
       motorEfficiency(eta=MotEff, V_flow=VolFloCur)),
     tau=TimCon,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
-    use_inputFilter=false)
-                annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
+    use_inputFilter=true,
+    y_start=1)  annotation (Placement(transformation(extent={{-10,-10},{10,10}})));
   Modelica.Fluid.Interfaces.FluidPort_a port_a(redeclare package Medium = Medium)
     "Fluid connector a (positive design flow direction is from port_a to port_b)"
     annotation (Placement(transformation(extent={{-110,-10},{-90,10}})));

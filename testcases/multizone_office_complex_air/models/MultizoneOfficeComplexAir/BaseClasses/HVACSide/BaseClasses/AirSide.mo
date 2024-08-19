@@ -181,7 +181,7 @@ model Airside "Air side system"
       MixingBox_Ti=600,
       Fan_k=0.001,
       Fan_Ti=600,
-      booleanExpression(y=if floor1.duaFanAirHanUni.TOut < 253.15 then floor1.duaFanAirHanUni.onFanOcc
+      booleanExpression(y=if floor1.duaFanAirHanUni.TOut < 273.15 + 10 then floor1.duaFanAirHanUni.onFanOcc
              else true)),
     fivZonVAV(vol(each V=200000)),
     redeclare package MediumAir = MediumAir,
@@ -256,7 +256,7 @@ model Airside "Air side system"
       MixingBox_Ti=600,
       Fan_k=0.001,
       Fan_Ti=600,
-      booleanExpression(y=if floor2.duaFanAirHanUni.TOut < 253.15 then floor2.duaFanAirHanUni.onFanOcc
+      booleanExpression(y=if floor2.duaFanAirHanUni.TOut < 273.15 + 10 then floor2.duaFanAirHanUni.onFanOcc
              else true)),
     fivZonVAV(vol(each V=200000)),
     redeclare package MediumAir = MediumAir,
@@ -331,7 +331,7 @@ model Airside "Air side system"
       MixingBox_Ti=600,
       Fan_k=0.001,
       Fan_Ti=600,
-      booleanExpression(y=if floor3.duaFanAirHanUni.TOut < 253.15 then floor3.duaFanAirHanUni.onFanOcc
+      booleanExpression(y=if floor3.duaFanAirHanUni.TOut < 273.15 + 10 then floor3.duaFanAirHanUni.onFanOcc
              else true)),
     fivZonVAV(vol(each V=200000)),
     redeclare package MediumAir = MediumAir,
