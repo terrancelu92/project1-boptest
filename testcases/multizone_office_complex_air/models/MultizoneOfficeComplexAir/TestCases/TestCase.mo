@@ -23,17 +23,7 @@ model TestCase "Complex office building model that includes air side systems, wa
         supFan(varSpe(variableSpeed(zerSpe(k=0))), withoutMotor(varSpeFloMov(
                 use_inputFilter=true, y_start=0))),
         cooCoi(val(use_inputFilter=true, y_start=1)))),
-    floor3(
-      PreAirDroMai1=0,
-      PreAirDroMai2=0,
-      PreAirDroMai3=0,
-      PreAirDroMai4=0,
-      PreAirDroBra1=0,
-      PreAirDroBra2=0,
-      PreAirDroBra3=0,
-      PreAirDroBra4=0,
-      PreAirDroBra5=0,
-           duaFanAirHanUni(
+    floor3(duaFanAirHanUni(
         mixingBox(mixBox(
             valRet(riseTime=15, y_start=0.7),
             valExh(riseTime=15, y_start=0.3),
