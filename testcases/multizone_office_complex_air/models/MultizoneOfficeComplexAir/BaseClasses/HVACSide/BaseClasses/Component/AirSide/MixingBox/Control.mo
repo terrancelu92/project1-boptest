@@ -41,7 +41,8 @@ package Control
       annotation (Placement(transformation(extent={{68,-60},{88,-40}})));
     Buildings.Controls.OBC.CDL.Continuous.Switch swi
       annotation (Placement(transformation(extent={{0,-60},{20,-40}})));
-    Modelica.Blocks.Sources.RealExpression realExpression1(y=DamMin)
+    Modelica.Blocks.Sources.RealExpression realExpression1(y=if TOut > 273.15
+           then DamMin else 0.05)
       annotation (Placement(transformation(extent={{-34,-68},{-14,-48}})));
   equation
     connect(pI.set, TMix) annotation (Line(

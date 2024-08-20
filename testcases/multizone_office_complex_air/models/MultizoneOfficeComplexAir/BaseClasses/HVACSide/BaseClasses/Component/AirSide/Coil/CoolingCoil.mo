@@ -4,7 +4,8 @@ model CoolingCoil "The model of the cooling coil"
     MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.AirSide.Coil.BaseClasses.WatCoil(      val(
         dpValve_nominal=PreDroWat, y_start=0.1),
                                     pI(
-      yMin=0.01,                       reverseActing=false, conPID(y_reset=1)));
+      yMin=0.01,                       reverseActing=false, conPID(y_reset=1)),
+    lim(uMin=0.01));
   parameter Real UA "Rated heat exchange coefficients";
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.AirSide.Coil.BaseClasses.WetCoil coi(
@@ -33,7 +34,7 @@ equation
       color={0,127,255},
       thickness=1));
   connect(coi.TAirLea,pI.mea)  annotation (Line(
-      points={{21.9,-17.2},{58,-17.2},{58,-60},{-52,-60},{-52,14},{-42,14}},
+      points={{21.9,-17.2},{58,-17.2},{58,-60},{-52,-60},{-52,14},{-62,14}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   annotation (Icon(graphics={

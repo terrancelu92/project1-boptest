@@ -47,50 +47,50 @@ model FiveZoneDuctNetwork
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
                                                     m_flow_nominal={mFloRat1 + mFloRat2 + mFloRat3 + mFloRat4 + mFloRat5,-mFloRat2-mFloRat3-mFloRat4 - mFloRat5,-
         mFloRat1}, redeclare package Medium = Medium,
-    dp_nominal={PreDroMai1/2,PreDroMai2/2,PreDroBra1/2})
+    dp_nominal={PreDroMai1/2,-PreDroMai2/2,-PreDroBra1/2})
     annotation (Placement(transformation(extent={{-90,30},{-70,50}})));
   Buildings.Fluid.FixedResistances.Junction junRet1(redeclare package
       Medium =                                                                 Medium,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,                         m_flow_nominal={mFloRat2 + mFloRat3 + mFloRat4 + mFloRat5,-mFloRat1-mFloRat2-mFloRat3-
         mFloRat4 - mFloRat5,mFloRat1},
-    dp_nominal={PreDroMai2/2,PreDroMai1/2,PreDroBra1/2})
+    dp_nominal={PreDroMai2/2,-PreDroMai1/2,PreDroBra1/2})
                                                 annotation (Placement(transformation(extent={{-70,-70},{-90,-50}})));
   Buildings.Fluid.FixedResistances.Junction junRet2( redeclare package
       Medium =                                                                  Medium,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,                          m_flow_nominal={mFloRat3 + mFloRat4 + mFloRat5,-mFloRat2-mFloRat3-
         mFloRat4 - mFloRat5,mFloRat2},
-    dp_nominal={PreDroMai3/2,PreDroMai2/2,PreDroBra2/2})
+    dp_nominal={PreDroMai3/2,-PreDroMai2/2,PreDroBra2/2})
                                                 annotation (Placement(transformation(extent={{-30,-70},{-50,-50}})));
   Buildings.Fluid.FixedResistances.Junction junSup2(
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
                                                     m_flow_nominal={mFloRat2 + mFloRat3 + mFloRat4 + mFloRat5,-mFloRat3-mFloRat4 - mFloRat5,-
         mFloRat2}, redeclare package Medium = Medium,
-    dp_nominal={PreDroMai2/2,PreDroMai3/2,PreDroBra2/2})
+    dp_nominal={PreDroMai2/2,-PreDroMai3/2,-PreDroBra2/2})
                       annotation (Placement(transformation(extent={{-50,30},{-30,50}})));
   Buildings.Fluid.FixedResistances.Junction junSup3(
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
                                                     m_flow_nominal={mFloRat3 + mFloRat4 + mFloRat5,-mFloRat4 - mFloRat5,-
         mFloRat3}, redeclare package Medium = Medium,
-    dp_nominal={PreDroMai3/2,PreDroMai4/2,PreDroBra3/2})
+    dp_nominal={PreDroMai3/2,-PreDroMai4/2,-PreDroBra3/2})
                                                 annotation (Placement(transformation(extent={{-10,30},{10,50}})));
   Buildings.Fluid.FixedResistances.Junction junRet3(redeclare package
       Medium =                                                                 Medium,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,                         m_flow_nominal={mFloRat4 + mFloRat5,-mFloRat3-
         mFloRat4 - mFloRat5,mFloRat3},
-    dp_nominal={PreDroMai4/2,PreDroMai3/2,PreDroBra3/2})
+    dp_nominal={PreDroMai4/2,-PreDroMai3/2,PreDroBra3/2})
                                                 annotation (Placement(transformation(extent={{10,-50},{-10,-70}})));
   Buildings.Fluid.FixedResistances.Junction junSup4(
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,
                                                     m_flow_nominal={mFloRat4 + mFloRat5,-mFloRat5,-mFloRat4}, redeclare
       package Medium =
                Medium,
-    dp_nominal={PreDroMai4/2,PreDroBra5/2,PreDroBra4/2})
+    dp_nominal={PreDroMai4/2,-PreDroBra5/2,-PreDroBra4/2})
                                                 annotation (Placement(transformation(extent={{30,30},{50,50}})));
   Buildings.Fluid.FixedResistances.Junction junRet4(redeclare package
       Medium =                                                                 Medium,
     energyDynamics=Modelica.Fluid.Types.Dynamics.FixedInitial,                         m_flow_nominal={mFloRat5,-mFloRat4 - mFloRat5,
         mFloRat4},
-    dp_nominal={PreDroBra5/2,PreDroMai4/2,PreDroBra4/2})
+    dp_nominal={PreDroBra5/2,-PreDroMai4/2,PreDroBra4/2})
                                                 annotation (Placement(transformation(extent={{50,-70},{30,-50}})));
 
   Modelica.Fluid.Interfaces.FluidPort_b port_b(redeclare package Medium =
