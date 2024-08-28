@@ -1,15 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-This script demonstrates a minimalistic example of testing a feedback controller
-using the scenario options with the prototype test case called "testcase1".
-
-"""
-"""
-This script demonstrates a minimalistic example of testing a feedback controller
-with the prototype test case called "testcase1".  It uses the testing
-interface implemented in interface.py and the concrete controller implemented
-in controllers/pid.py.
-
+This script is used for training dataset generation and post-process
+with the prototype test case called "multizone_office_complex_air".
+It uses the testing in controllers/perturb_multizone_office_complex_air.py.
 """
 
 # GENERAL PACKAGE IMPORT
@@ -53,7 +46,7 @@ def run(plot=False):
                                                              start_time=0,
                                                              warmup_period=0,
                                                              length=7*24*3600,
-                                                             step=60*60)
+                                                             step=5*60)
 
     # POST-PROCESS RESULTS
     # --------------------
