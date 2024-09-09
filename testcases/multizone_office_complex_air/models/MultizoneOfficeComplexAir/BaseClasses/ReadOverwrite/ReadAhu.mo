@@ -125,6 +125,49 @@ model ReadAhu "Collection of AHU measurements for BOPTEST"
     annotation (Placement(transformation(extent={{-50,244},{-30,264}})));
   Modelica.Blocks.Interfaces.BooleanInput occ_in "Occupancy status"
     annotation (Placement(transformation(extent={{-140,234},{-100,274}})));
+  Buildings.Utilities.IO.SignalExchange.Read CO2_AHUSup(
+    description="Supply air CO2 measurement for AHU",
+    KPIs=Buildings.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.None,
+    y(unit="ppm")) "Air CO2 concentration measurement"
+    annotation (Placement(transformation(extent={{0,-170},{20,-150}})));
+
+  Modelica.Blocks.Interfaces.RealInput CO2_AHUSup_in
+    "Volume fraction of CO2 (PPM)"
+    annotation (Placement(transformation(extent={{-140,-180},{-100,-140}})));
+  Buildings.Utilities.IO.SignalExchange.Read CO2_AHUFre(
+    description="Fresh air CO2 measurement for AHU",
+    KPIs=Buildings.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.None,
+    y(unit="ppm")) "Air CO2 concentration measurement"
+    annotation (Placement(transformation(extent={{0,-200},{20,-180}})));
+
+  Modelica.Blocks.Interfaces.RealInput CO2_AHUFre_in
+    "Volume fraction of CO2 (PPM)"
+    annotation (Placement(transformation(extent={{-140,-210},{-100,-170}})));
+  Buildings.Utilities.IO.SignalExchange.Read CO2_AHURet(
+    description="Return air CO2 measurement for AHU",
+    KPIs=Buildings.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.None,
+    y(unit="ppm")) "Air CO2 concentration measurement"
+    annotation (Placement(transformation(extent={{0,-230},{20,-210}})));
+
+  Modelica.Blocks.Interfaces.RealInput CO2_AHURet_in
+    "Volume fraction of CO2 (PPM)"
+    annotation (Placement(transformation(extent={{-140,-240},{-100,-200}})));
+  Buildings.Utilities.IO.SignalExchange.Read phiAHUSup(
+    description="Supply air relative humidity for AHU",
+    KPIs=Buildings.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.None,
+    y(unit="1")) "Supply air relative humidity"
+    annotation (Placement(transformation(extent={{0,-260},{20,-240}})));
+  Buildings.Utilities.IO.SignalExchange.Read phiAHURet(
+    description="Return air relative humidity for AHU",
+    KPIs=Buildings.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.None,
+    y(unit="1")) "Return air relative humidity"
+    annotation (Placement(transformation(extent={{0,-292},{20,-272}})));
+  Modelica.Blocks.Interfaces.RealInput phiAHUSup_in
+    "Supply air relative humidity measurement"
+    annotation (Placement(transformation(extent={{-140,-270},{-100,-230}})));
+  Modelica.Blocks.Interfaces.RealInput phiAHURet_in
+    "Return air relative humidity measurement"
+    annotation (Placement(transformation(extent={{-140,-302},{-100,-262}})));
 equation
   connect(TSup.u, TSup_in)
     annotation (Line(points={{-2,200},{-120,200}}, color={0,0,127}));
@@ -160,9 +203,19 @@ equation
     annotation (Line(points={{-29,254},{-2,254}}, color={0,0,127}));
   connect(booleanToReal.u, occ_in)
     annotation (Line(points={{-52,254},{-120,254}}, color={255,0,255}));
-  annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,
-            -180},{100,280}}), graphics={Rectangle(
-          extent={{-102,282},{106,-178}},
+  connect(CO2_AHUSup_in, CO2_AHUSup.u)
+    annotation (Line(points={{-120,-160},{-2,-160}}, color={0,0,127}));
+  connect(CO2_AHUFre_in, CO2_AHUFre.u)
+    annotation (Line(points={{-120,-190},{-2,-190}}, color={0,0,127}));
+  connect(CO2_AHURet_in, CO2_AHURet.u)
+    annotation (Line(points={{-120,-220},{-2,-220}}, color={0,0,127}));
+  connect(phiAHUSup.u, phiAHUSup_in)
+    annotation (Line(points={{-2,-250},{-120,-250}}, color={0,0,127}));
+  connect(phiAHURet.u, phiAHURet_in)
+    annotation (Line(points={{-2,-282},{-120,-282}}, color={0,0,127}));
+  annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-300},
+            {100,280}}),       graphics={Rectangle(
+          extent={{-102,282},{102,-300}},
           lineColor={0,0,0},
           fillColor={255,170,170},
           fillPattern=FillPattern.Solid),
@@ -174,5 +227,5 @@ AHU"),  Text(
           extent={{-156,290},{144,330}},
           textString="%name",
           textColor={0,0,255})}),Diagram(coordinateSystem(preserveAspectRatio=
-            false, extent={{-100,-160},{100,280}})));
+            false, extent={{-100,-300},{100,280}})));
 end ReadAhu;

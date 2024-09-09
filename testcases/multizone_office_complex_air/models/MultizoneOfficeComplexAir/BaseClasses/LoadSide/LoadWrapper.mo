@@ -40,6 +40,9 @@ model LoadWrapper "Load calculation in EnergyPlus using Spawn"
     usePrecompiledFMU=false) "Building model"
     annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
 
+  Modelica.Icons.SignalBus weaBus
+    annotation (Placement(transformation(extent={{-8,92},{8,108}}),
+        iconTransformation(extent={{-8,92},{8,108}})));
 equation
   connect(whoBui.Outdoor_Humidity, relHum) annotation (Line(points={{-38,0},{40,
           0},{40,-50},{110,-50}}, color={0,0,127}));
@@ -144,6 +147,14 @@ equation
       points={{-60,50},{-50,50},{-50,10}},
       color={255,204,51},
       thickness=0.5));
+  connect(whoBui.weaBus, weaBus) annotation (Line(
+      points={{-50,10},{-50,100},{0,100}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%second",
+      index=1,
+      extent={{-3,6},{-3,6}},
+      horizontalAlignment=TextAlignment.Right));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false), graphics={
           Rectangle(
           extent={{-100,100},{100,-100}},
@@ -159,9 +170,12 @@ equation
     Documentation(info="<html>
 <p>This is an EnergyPlus (V9.6) wrapper model that calculates the building&rsquo;s thermal loads with the boundary conditions. The inputs are the zone air temperatures from Modelica that is responsible for the airflow calculation (e.g., building infiltration) and HVAC system and controls.</p>
 <p>See the model <a href=\"modelica://MultizoneOfficeComplexAir.BaseClasses.LoadSide.BaseClasses.WholeBuildingEnergyPlus\">MultizoneOfficeComplexAir.BaseClasses.LoadSide.BaseClasses.WholeBuildingEnergyPlus</a> for the EnergyPlus model.</p>
-</html>", revisions = "<html>
+</html>", revisions="<html>
 <ul>
-<li> August 17, 2023, by Xing Lu, Sen Huang, Lingzhe Wang, Yan Chen:
-<p> First implementation.</p>
-</ul>"));
+<li>August 8, 2024, by Guowen Li, Xing Lu, Yan Chen: </li>
+<p>Added weather bus.</p>
+<li>August 17, 2023, by Xing Lu, Sen Huang, Lingzhe Wang, Yan Chen: </li>
+<p>First implementation.</p>
+</ul>
+</html>"));
 end LoadWrapper;

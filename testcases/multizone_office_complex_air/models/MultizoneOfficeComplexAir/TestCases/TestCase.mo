@@ -2,22 +2,18 @@ within MultizoneOfficeComplexAir.TestCases;
 model TestCase "Complex office building model that includes air side systems, water side systems from Modelica, and building thermal load calucation from EnergyPlus."
   extends Modelica.Icons.Example;
 
-  MultizoneOfficeComplexAir.BaseClasses.LoadSide.LoadWrapper loaEnePlu(building(
-        spawnExe="spawn-0.3.0-0fa49be497"))
-    "Load calculation in EnergyPlus using Spawn, note this version spawn-0.3.0-8d93151657 is specified for BOPTEST environment; Use spawn-0.3.0-0fa49be497 for Buildings library version"
-    annotation (Placement(transformation(extent={{-10,-50},{10,-30}})));
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.HVAC hva(
     floor1(duaFanAirHanUni(
-        mixBox(mixBox(
+        mixingBox(mixBox(
             valRet(riseTime=15, y_start=1),
-            valExh(riseTime=15, y_start=0),
+            valExh(riseTime=15, y_start=1),
             valFre(riseTime=15, y_start=0))),
         retFan(varSpeFloMov(use_inputFilter=true, y_start=0)),
         supFan(varSpe(variableSpeed(zerSpe(k=0))), withoutMotor(varSpeFloMov(
                 use_inputFilter=true, y_start=0))),
         cooCoi(val(use_inputFilter=true, y_start=0)))),
     floor2(duaFanAirHanUni(
-        mixBox(mixBox(
+        mixingBox(mixBox(
             valRet(riseTime=15, y_start=1),
             valExh(riseTime=15, y_start=0),
             valFre(riseTime=15, y_start=0))),
@@ -26,7 +22,7 @@ model TestCase "Complex office building model that includes air side systems, wa
                 use_inputFilter=true, y_start=0))),
         cooCoi(val(use_inputFilter=true, y_start=0)))),
     floor3(duaFanAirHanUni(
-        mixBox(mixBox(
+        mixingBox(mixBox(
             valRet(riseTime=15, y_start=1),
             valExh(riseTime=15, y_start=0),
             valFre(riseTime=15, y_start=0))),
@@ -35,25 +31,34 @@ model TestCase "Complex office building model that includes air side systems, wa
                 use_inputFilter=true, y_start=0))),
         cooCoi(val(use_inputFilter=true, y_start=0)))))
     "Full HVAC system that contains the airside and waterside systems and controls"
-    annotation (Placement(transformation(extent={{10,-10},{-10,10}})));
+    annotation (Placement(transformation(extent={{20,20},{-20,60}})));
+
+  MultizoneOfficeComplexAir.BaseClasses.LoadSide.LoadWrapper loaEnePlu(building(
+        spawnExe="spawn-0.3.0-0fa49be497"))
+    "Load calculation in EnergyPlus using Spawn, note this version spawn-0.3.0-8d93151657 is specified for BOPTEST environment; Use spawn-0.3.0-0fa49be497 for Buildings library version"
+    annotation (Placement(transformation(extent={{-20,-60},{20,-20}})));
 
 equation
-  connect(hva.occ, loaEnePlu.occ) annotation (Line(points={{11.4,8},{24,8},{24,
-          -48.4},{11,-48.4}}, color={0,0,127}));
-  connect(loaEnePlu.loa, hva.loa) annotation (Line(points={{11,-42},{22,-42},{
-          22,3},{11.4,3}}, color={0,0,127}));
-  connect(loaEnePlu.dryBul, hva.TDryBul) annotation (Line(points={{11,-34},{20,
-          -34},{20,-2},{11.4,-2}}, color={0,0,127}));
-  connect(loaEnePlu.wetBul, hva.TWetBul) annotation (Line(points={{11,-31},{18,
-          -31},{18,-6.85},{11.35,-6.85}}, color={0,0,127}));
-
-  connect(hva.TZon, loaEnePlu.T) annotation (Line(points={{-11,0},{-20,0},{-20,
-          -40},{-12,-40}}, color={0,0,127}));
+  connect(loaEnePlu.occ, hva.occ) annotation (Line(points={{22,-56.8},{22,-56},
+          {46,-56},{46,56},{22.8,56}},
+                              color={0,0,127}));
+  connect(loaEnePlu.loa, hva.loa) annotation (Line(points={{22,-44},{40,-44},{
+          40,50},{22.8,50}},
+                           color={0,0,127}));
+  connect(hva.TZon, loaEnePlu.T) annotation (Line(points={{-22,40},{-40,40},{
+          -40,-40},{-24,-40}},
+                           color={0,0,127}));
+  connect(loaEnePlu.numOcc, hva.numOcc) annotation (Line(points={{22,-36},{34,
+          -36},{34,44},{22.8,44}},   color={0,0,127}));
+  connect(loaEnePlu.weaBus, hva.weaBus) annotation (Line(
+      points={{0,-20},{0,20}},
+      color={255,204,51},
+      thickness=0.5));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
     experiment(
-      StopTime=172800,
-      __Dymola_NumberOfIntervals=1440,
+      StopTime=31536000,
+      Interval=60,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),
     Documentation(info="<html>
@@ -61,10 +66,12 @@ equation
 <p><span style=\"font-family: MS Shell Dlg 2;\">See the model <a href=\"modelica://MultizoneOfficeComplexAir.BaseClasses.HVACSide.HVAC\">MultizoneOfficeComplexAir.BaseClasses.HVACSide.HVAC</a> for a description of the HVAC system, and see the model <a href=\"modelica://MultizoneOfficeComplexAir.BaseClasses.LoadSide.LoadWrapper\">MultizoneOfficeComplexAir.BaseClasses.LoadSide.LoadWrapper</a> for a description of the building thermal load calculated by EnergyPlus. </span></p>
 <h4>Spawn Version</h4>
 <p>Please use version <i>spawn-0.3.0-8d93151657</i> for BOPTEST environment; and use version <i>spawn-0.3.0-0fa49be497</i> for running testcases with Modlelica Buildings library.</p>
-</html>", revisions = "<html>
+</html>", revisions="<html>
 <ul>
-<li> August 17, 2023, by Xing Lu, Sen Huang, Lingzhe Wang, Yan Chen:
-<p> First implementation.</p>
+<li>August 8, 2024, by Guowen Li, Xing Lu, Yan Chen: </li>
+<p>Added CO2 and air infiltration features; Adjusted system equipment sizing; Reduced nonlinear system warnings.</p>
+<li>August 17, 2023, by Xing Lu, Sen Huang, Lingzhe Wang, Yan Chen: </li>
+<p>First implementation.</p>
 </ul>
 </html>"),
     __Dymola_Commands(file="Resources/script/Testcase.mos"

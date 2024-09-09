@@ -3,15 +3,15 @@ model BoilerPlant "Boiler hot water plant"
   replaceable package MediumHW =
      Modelica.Media.Interfaces.PartialMedium
     "Medium in the hot water side";
+  parameter Real alpha = 1  "Sizing factor for overall system design capacity and mass flow rate";
   parameter Integer n=2
     "Number of boilers";
   parameter Integer m=2
     "Number of pumps";
   parameter Real thrhol[:]= {0.95}
     "Threshold for boiler staging";
-  parameter Real Cap[:] = {2762738.20/n for i in linspace(1, n, n)} "Rated Plant Capacity";
-  parameter Modelica.Units.SI.MassFlowRate mHW_flow_nominal[:]={2762738.20/n/20
-      /4200 for i in linspace(
+  parameter Real Cap[:] = {4191000*alpha/n for i in linspace(1, n, n)} "Rated Plant Capacity";
+  parameter Modelica.Units.SI.MassFlowRate mHW_flow_nominal[:]={62.4/n*alpha for i in linspace(
       1,
       n,
       n)} "Nominal mass flow rate at the hot water side";
@@ -24,9 +24,7 @@ model BoilerPlant "Boiler hot water plant"
     "Nominal pressure drop for the secondary hot water pump ";
   parameter Real v_flow_rate[m,:] = {{0.1*sum(mHW_flow_nominal)/m/996,0.6*sum(mHW_flow_nominal)/m/996,0.8*sum(mHW_flow_nominal)/m/996,sum(mHW_flow_nominal)/m/996,1.2*sum(mHW_flow_nominal)/m/996} for i in linspace(1,m,m)};
   parameter Real pressure[m,:] = {{2*dP_nominal,1.5*dP_nominal,1.1*dP_nominal,dP_nominal,0.75*dP_nominal} for i in linspace(1,m,m)};
-
-  parameter Real Motor_eta_Sec[m,:] = {{0.6,0.76,0.87,0.86,0.74} for i in linspace(1,m,m)}
-    "Motor efficiency";
+  parameter Real Motor_eta_Sec[m,:] = {{0.6,0.76,0.87,0.86,0.74} for i in linspace(1,m,m)} "Motor efficiency";
   parameter Real Hydra_eta_Sec[m,:] = {{1,1,1,1,1} for i in linspace(1,m,m)} "Hydraulic efficiency";
 
   Component.FlowMover.Pump.PumpSystem pumSecHW(
@@ -43,7 +41,9 @@ model BoilerPlant "Boiler hot water plant"
     dpValve_nominal={dP_nominal*0.25 for i in linspace(
         1,
         m,
-        m)}) annotation (Placement(transformation(extent={{10,20},{-10,40}})));
+        m)},
+    pum(varSpeFloMov(use_inputFilter=true)))
+             annotation (Placement(transformation(extent={{10,20},{-10,40}})));
   Modelica.Blocks.Math.RealToBoolean reaToBoolea
     annotation (Placement(transformation(extent={{-160,80},{-140,100}})));
   Modelica.Blocks.Sources.Constant On(k=1)
@@ -88,10 +88,10 @@ model BoilerPlant "Boiler hot water plant"
     annotation (Placement(transformation(extent={{-320,-20},{-280,20}}),
         iconTransformation(extent={{-140,-20},{-100,20}})));
 
-  Modelica.Blocks.Interfaces.RealOutput THWLea
-    "Temperature of the passing fluid"
-    annotation (Placement(transformation(extent={{240,-10},{260,10}}),
-        iconTransformation(extent={{100,-10},{120,10}})));
+  Modelica.Blocks.Interfaces.RealOutput THW_sup
+    "Temperature of the passing fluid" annotation (Placement(transformation(
+          extent={{240,-30},{260,-10}}), iconTransformation(extent={{100,-40},{
+            120,-20}})));
   Buildings.Fluid.Sensors.TemperatureTwoPort senTHWBuiLea(
     allowFlowReversal=true,
     redeclare package Medium = MediumHW,
@@ -121,6 +121,13 @@ model BoilerPlant "Boiler hot water plant"
     annotation (Placement(transformation(extent={{140,-120},{160,-100}})));
   Modelica.Blocks.Continuous.Integrator ETot
     annotation (Placement(transformation(extent={{180,-120},{200,-100}})));
+  Modelica.Blocks.Interfaces.RealOutput THW_ret
+    "Temperature of the passing fluid" annotation (Placement(transformation(
+          extent={{240,-10},{260,10}}), iconTransformation(extent={{100,-10},{
+            120,10}})));
+  Modelica.Blocks.Interfaces.RealOutput mHW_tot annotation (Placement(
+        transformation(extent={{240,50},{260,70}}), iconTransformation(extent={
+            {100,60},{120,80}})));
 equation
   connect(On.y, reaToBoolea.u)
     annotation (Line(points={{-239,90},{-162,90}}, color={0,0,127}));
@@ -146,9 +153,8 @@ equation
           {-120,90},{-139,90}}, color={255,0,255}));
   connect(secPumCon.dpMea, dp) annotation (Line(points={{58,56},{-180,56},{
           -180,0},{-300,0}}, color={0,0,127}));
-  connect(senTHWBuiEnt.T, THWLea) annotation (Line(
-      points={{64,-85},{64,0},{250,0}},
-      color={0,0,127}));
+  connect(senTHWBuiEnt.T, THW_sup) annotation (Line(points={{64,-85},{64,-56},{
+          220,-56},{220,-20},{250,-20}}, color={0,0,127}));
   connect(mulBoi.Rat, boiSta.sta) annotation (Line(points={{-60.3,-35.6},{-32,
           -35.6},{-32,34},{-92,34},{-92,62},{-82,62}}, color={0,0,127}));
   connect(boiSta.y, mulBoi.On) annotation (Line(points={{-59,70},{-42,70},{
@@ -181,6 +187,10 @@ equation
   connect(PTot.y,ETot. u) annotation (Line(
       points={{161,-110},{178,-110}},
       color={0,0,127}));
+  connect(senTHWBuiLea.T, THW_ret) annotation (Line(points={{120,33},{120,36},{
+          220,36},{220,0},{250,0}}, color={0,0,127}));
+  connect(senMasFlo.m_flow, mHW_tot) annotation (Line(points={{82,35.2},{100,
+          35.2},{100,60},{250,60}}, color={0,0,127}));
   annotation (__Dymola_Commands(file=
           "modelica://ChillerPlantSystem/Resources/Scripts/Dymola/LejeunePlant/ChillerPlantSystem.mos"
         "Simulate and plot"),
@@ -207,6 +217,8 @@ MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.WaterSide.B
 MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.WaterSide.Control.PlantStageN</a> for a description of the boiler stage control. </p>
 </html>", revisions = "<html>
 <ul>
+<li>August 8, 2024, by Guowen Li, Xing Lu, Yan Chen: </li>
+<p>Adjusted system equipment sizing; Reduced nonlinear system warnings.</p>
 <li> August 17, 2023, by Xing Lu, Sen Huang, Lingzhe Wang:
 <p> First implementation.</p>
 </ul>

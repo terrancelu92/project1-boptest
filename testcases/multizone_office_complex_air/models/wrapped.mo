@@ -177,6 +177,9 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealInput hva_oveHotWatSys_dp_set_u(unit="Pa", min=0.0, max=19130000.0) "Differential pressure setpoint";
 	Modelica.Blocks.Interfaces.BooleanInput hva_oveHotWatSys_dp_set_activate "Activation for Differential pressure setpoint";
 	// Out read
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_CO2_AHUFre_y(unit="ppm") = mod.hva.floor1.reaAhu.CO2_AHUFre.y "Fresh air CO2 measurement for AHU";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_CO2_AHURet_y(unit="ppm") = mod.hva.floor1.reaAhu.CO2_AHURet.y "Return air CO2 measurement for AHU";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_CO2_AHUSup_y(unit="ppm") = mod.hva.floor1.reaAhu.CO2_AHUSup.y "Supply air CO2 measurement for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_PFanTot_y(unit="W") = mod.hva.floor1.reaAhu.PFanTot.y "Total electrical power measurement of supply and return fans for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_TCooCoiRet_y(unit="K") = mod.hva.floor1.reaAhu.TCooCoiRet.y "Cooling coil return water temperature measurement for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_TCooCoiSup_y(unit="K") = mod.hva.floor1.reaAhu.TCooCoiSup.y "Cooling coil supply water temperature measurement for AHU";
@@ -189,8 +192,11 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_V_flow_sup_y(unit="m3/s") = mod.hva.floor1.reaAhu.V_flow_sup.y "Supply air flowrate measurement for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_dp_sup_y(unit="Pa") = mod.hva.floor1.reaAhu.dp_sup.y "Discharge pressure of supply fan for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_occ_y(unit="1") = mod.hva.floor1.reaAhu.occ.y "Occupancy status (1 occupied, 0 unoccupied)";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_phiAHURet_y(unit="1") = mod.hva.floor1.reaAhu.phiAHURet.y "Return air relative humidity for AHU";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_phiAHUSup_y(unit="1") = mod.hva.floor1.reaAhu.phiAHUSup.y "Supply air relative humidity for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_yCooVal_y(unit="1") = mod.hva.floor1.reaAhu.yCooVal.y "AHU cooling coil valve position measurement";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaAhu_yOA_y(unit="1") = mod.hva.floor1.reaAhu.yOA.y "AHU cooling coil valve position measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonCor_CO2Zon_y(unit="ppm") = mod.hva.floor1.reaZonCor.CO2Zon.y "Zone air CO2 measurement for zone bot_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonCor_TRoo_Coo_set_y(unit="K") = mod.hva.floor1.reaZonCor.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonebot_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonCor_TRoo_Hea_set_y(unit="K") = mod.hva.floor1.reaZonCor.TRoo_Hea_set.y "Zone temperature heating setpoint for zone bot_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonCor_TSup_y(unit="K") = mod.hva.floor1.reaZonCor.TSup.y "Discharge air temperature to zone measurement for zone bot_floor_cor";
@@ -201,6 +207,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonCor_yDam_y(unit="1") = mod.hva.floor1.reaZonCor.yDam.y "Damper position measurement for zone bot_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonCor_yHea_y(unit="1") = mod.hva.floor1.reaZonCor.yHea.y "Heating PID signal measurement for zone bot_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonCor_yReheaVal_y(unit="1") = mod.hva.floor1.reaZonCor.yReheaVal.y "Reheat valve position measurement for zone bot_floor_cor";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonEas_CO2Zon_y(unit="ppm") = mod.hva.floor1.reaZonEas.CO2Zon.y "Zone air CO2 measurement for zone bot_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonEas_TRoo_Coo_set_y(unit="K") = mod.hva.floor1.reaZonEas.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonebot_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonEas_TRoo_Hea_set_y(unit="K") = mod.hva.floor1.reaZonEas.TRoo_Hea_set.y "Zone temperature heating setpoint for zone bot_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonEas_TSup_y(unit="K") = mod.hva.floor1.reaZonEas.TSup.y "Discharge air temperature to zone measurement for zone bot_floor_eas";
@@ -211,6 +218,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonEas_yDam_y(unit="1") = mod.hva.floor1.reaZonEas.yDam.y "Damper position measurement for zone bot_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonEas_yHea_y(unit="1") = mod.hva.floor1.reaZonEas.yHea.y "Heating PID signal measurement for zone bot_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonEas_yReheaVal_y(unit="1") = mod.hva.floor1.reaZonEas.yReheaVal.y "Reheat valve position measurement for zone bot_floor_eas";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonNor_CO2Zon_y(unit="ppm") = mod.hva.floor1.reaZonNor.CO2Zon.y "Zone air CO2 measurement for zone bot_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonNor_TRoo_Coo_set_y(unit="K") = mod.hva.floor1.reaZonNor.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonebot_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonNor_TRoo_Hea_set_y(unit="K") = mod.hva.floor1.reaZonNor.TRoo_Hea_set.y "Zone temperature heating setpoint for zone bot_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonNor_TSup_y(unit="K") = mod.hva.floor1.reaZonNor.TSup.y "Discharge air temperature to zone measurement for zone bot_floor_nor";
@@ -221,6 +229,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonNor_yDam_y(unit="1") = mod.hva.floor1.reaZonNor.yDam.y "Damper position measurement for zone bot_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonNor_yHea_y(unit="1") = mod.hva.floor1.reaZonNor.yHea.y "Heating PID signal measurement for zone bot_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonNor_yReheaVal_y(unit="1") = mod.hva.floor1.reaZonNor.yReheaVal.y "Reheat valve position measurement for zone bot_floor_nor";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonSou_CO2Zon_y(unit="ppm") = mod.hva.floor1.reaZonSou.CO2Zon.y "Zone air CO2 measurement for zone bot_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonSou_TRoo_Coo_set_y(unit="K") = mod.hva.floor1.reaZonSou.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonebot_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonSou_TRoo_Hea_set_y(unit="K") = mod.hva.floor1.reaZonSou.TRoo_Hea_set.y "Zone temperature heating setpoint for zone bot_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonSou_TSup_y(unit="K") = mod.hva.floor1.reaZonSou.TSup.y "Discharge air temperature to zone measurement for zone bot_floor_sou";
@@ -231,6 +240,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonSou_yDam_y(unit="1") = mod.hva.floor1.reaZonSou.yDam.y "Damper position measurement for zone bot_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonSou_yHea_y(unit="1") = mod.hva.floor1.reaZonSou.yHea.y "Heating PID signal measurement for zone bot_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonSou_yReheaVal_y(unit="1") = mod.hva.floor1.reaZonSou.yReheaVal.y "Reheat valve position measurement for zone bot_floor_sou";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonWes_CO2Zon_y(unit="ppm") = mod.hva.floor1.reaZonWes.CO2Zon.y "Zone air CO2 measurement for zone bot_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonWes_TRoo_Coo_set_y(unit="K") = mod.hva.floor1.reaZonWes.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonebot_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonWes_TRoo_Hea_set_y(unit="K") = mod.hva.floor1.reaZonWes.TRoo_Hea_set.y "Zone temperature heating setpoint for zone bot_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonWes_TSup_y(unit="K") = mod.hva.floor1.reaZonWes.TSup.y "Discharge air temperature to zone measurement for zone bot_floor_wes";
@@ -241,6 +251,9 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonWes_yDam_y(unit="1") = mod.hva.floor1.reaZonWes.yDam.y "Damper position measurement for zone bot_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonWes_yHea_y(unit="1") = mod.hva.floor1.reaZonWes.yHea.y "Heating PID signal measurement for zone bot_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor1_reaZonWes_yReheaVal_y(unit="1") = mod.hva.floor1.reaZonWes.yReheaVal.y "Reheat valve position measurement for zone bot_floor_wes";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_CO2_AHUFre_y(unit="ppm") = mod.hva.floor2.reaAhu.CO2_AHUFre.y "Fresh air CO2 measurement for AHU";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_CO2_AHURet_y(unit="ppm") = mod.hva.floor2.reaAhu.CO2_AHURet.y "Return air CO2 measurement for AHU";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_CO2_AHUSup_y(unit="ppm") = mod.hva.floor2.reaAhu.CO2_AHUSup.y "Supply air CO2 measurement for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_PFanTot_y(unit="W") = mod.hva.floor2.reaAhu.PFanTot.y "Total electrical power measurement of supply and return fans for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_TCooCoiRet_y(unit="K") = mod.hva.floor2.reaAhu.TCooCoiRet.y "Cooling coil return water temperature measurement for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_TCooCoiSup_y(unit="K") = mod.hva.floor2.reaAhu.TCooCoiSup.y "Cooling coil supply water temperature measurement for AHU";
@@ -253,8 +266,11 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_V_flow_sup_y(unit="m3/s") = mod.hva.floor2.reaAhu.V_flow_sup.y "Supply air flowrate measurement for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_dp_sup_y(unit="Pa") = mod.hva.floor2.reaAhu.dp_sup.y "Discharge pressure of supply fan for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_occ_y(unit="1") = mod.hva.floor2.reaAhu.occ.y "Occupancy status (1 occupied, 0 unoccupied)";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_phiAHURet_y(unit="1") = mod.hva.floor2.reaAhu.phiAHURet.y "Return air relative humidity for AHU";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_phiAHUSup_y(unit="1") = mod.hva.floor2.reaAhu.phiAHUSup.y "Supply air relative humidity for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_yCooVal_y(unit="1") = mod.hva.floor2.reaAhu.yCooVal.y "AHU cooling coil valve position measurement";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaAhu_yOA_y(unit="1") = mod.hva.floor2.reaAhu.yOA.y "AHU cooling coil valve position measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonCor_CO2Zon_y(unit="ppm") = mod.hva.floor2.reaZonCor.CO2Zon.y "Zone air CO2 measurement for zone mid_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonCor_TRoo_Coo_set_y(unit="K") = mod.hva.floor2.reaZonCor.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonemid_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonCor_TRoo_Hea_set_y(unit="K") = mod.hva.floor2.reaZonCor.TRoo_Hea_set.y "Zone temperature heating setpoint for zone mid_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonCor_TSup_y(unit="K") = mod.hva.floor2.reaZonCor.TSup.y "Discharge air temperature to zone measurement for zone mid_floor_cor";
@@ -265,6 +281,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonCor_yDam_y(unit="1") = mod.hva.floor2.reaZonCor.yDam.y "Damper position measurement for zone mid_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonCor_yHea_y(unit="1") = mod.hva.floor2.reaZonCor.yHea.y "Heating PID signal measurement for zone mid_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonCor_yReheaVal_y(unit="1") = mod.hva.floor2.reaZonCor.yReheaVal.y "Reheat valve position measurement for zone mid_floor_cor";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonEas_CO2Zon_y(unit="ppm") = mod.hva.floor2.reaZonEas.CO2Zon.y "Zone air CO2 measurement for zone mid_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonEas_TRoo_Coo_set_y(unit="K") = mod.hva.floor2.reaZonEas.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonemid_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonEas_TRoo_Hea_set_y(unit="K") = mod.hva.floor2.reaZonEas.TRoo_Hea_set.y "Zone temperature heating setpoint for zone mid_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonEas_TSup_y(unit="K") = mod.hva.floor2.reaZonEas.TSup.y "Discharge air temperature to zone measurement for zone mid_floor_eas";
@@ -275,6 +292,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonEas_yDam_y(unit="1") = mod.hva.floor2.reaZonEas.yDam.y "Damper position measurement for zone mid_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonEas_yHea_y(unit="1") = mod.hva.floor2.reaZonEas.yHea.y "Heating PID signal measurement for zone mid_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonEas_yReheaVal_y(unit="1") = mod.hva.floor2.reaZonEas.yReheaVal.y "Reheat valve position measurement for zone mid_floor_eas";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonNor_CO2Zon_y(unit="ppm") = mod.hva.floor2.reaZonNor.CO2Zon.y "Zone air CO2 measurement for zone mid_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonNor_TRoo_Coo_set_y(unit="K") = mod.hva.floor2.reaZonNor.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonemid_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonNor_TRoo_Hea_set_y(unit="K") = mod.hva.floor2.reaZonNor.TRoo_Hea_set.y "Zone temperature heating setpoint for zone mid_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonNor_TSup_y(unit="K") = mod.hva.floor2.reaZonNor.TSup.y "Discharge air temperature to zone measurement for zone mid_floor_nor";
@@ -285,6 +303,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonNor_yDam_y(unit="1") = mod.hva.floor2.reaZonNor.yDam.y "Damper position measurement for zone mid_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonNor_yHea_y(unit="1") = mod.hva.floor2.reaZonNor.yHea.y "Heating PID signal measurement for zone mid_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonNor_yReheaVal_y(unit="1") = mod.hva.floor2.reaZonNor.yReheaVal.y "Reheat valve position measurement for zone mid_floor_nor";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonSou_CO2Zon_y(unit="ppm") = mod.hva.floor2.reaZonSou.CO2Zon.y "Zone air CO2 measurement for zone mid_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonSou_TRoo_Coo_set_y(unit="K") = mod.hva.floor2.reaZonSou.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonemid_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonSou_TRoo_Hea_set_y(unit="K") = mod.hva.floor2.reaZonSou.TRoo_Hea_set.y "Zone temperature heating setpoint for zone mid_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonSou_TSup_y(unit="K") = mod.hva.floor2.reaZonSou.TSup.y "Discharge air temperature to zone measurement for zone mid_floor_sou";
@@ -295,6 +314,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonSou_yDam_y(unit="1") = mod.hva.floor2.reaZonSou.yDam.y "Damper position measurement for zone mid_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonSou_yHea_y(unit="1") = mod.hva.floor2.reaZonSou.yHea.y "Heating PID signal measurement for zone mid_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonSou_yReheaVal_y(unit="1") = mod.hva.floor2.reaZonSou.yReheaVal.y "Reheat valve position measurement for zone mid_floor_sou";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonWes_CO2Zon_y(unit="ppm") = mod.hva.floor2.reaZonWes.CO2Zon.y "Zone air CO2 measurement for zone mid_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonWes_TRoo_Coo_set_y(unit="K") = mod.hva.floor2.reaZonWes.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonemid_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonWes_TRoo_Hea_set_y(unit="K") = mod.hva.floor2.reaZonWes.TRoo_Hea_set.y "Zone temperature heating setpoint for zone mid_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonWes_TSup_y(unit="K") = mod.hva.floor2.reaZonWes.TSup.y "Discharge air temperature to zone measurement for zone mid_floor_wes";
@@ -305,6 +325,9 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonWes_yDam_y(unit="1") = mod.hva.floor2.reaZonWes.yDam.y "Damper position measurement for zone mid_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonWes_yHea_y(unit="1") = mod.hva.floor2.reaZonWes.yHea.y "Heating PID signal measurement for zone mid_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor2_reaZonWes_yReheaVal_y(unit="1") = mod.hva.floor2.reaZonWes.yReheaVal.y "Reheat valve position measurement for zone mid_floor_wes";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_CO2_AHUFre_y(unit="ppm") = mod.hva.floor3.reaAhu.CO2_AHUFre.y "Fresh air CO2 measurement for AHU";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_CO2_AHURet_y(unit="ppm") = mod.hva.floor3.reaAhu.CO2_AHURet.y "Return air CO2 measurement for AHU";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_CO2_AHUSup_y(unit="ppm") = mod.hva.floor3.reaAhu.CO2_AHUSup.y "Supply air CO2 measurement for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_PFanTot_y(unit="W") = mod.hva.floor3.reaAhu.PFanTot.y "Total electrical power measurement of supply and return fans for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_TCooCoiRet_y(unit="K") = mod.hva.floor3.reaAhu.TCooCoiRet.y "Cooling coil return water temperature measurement for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_TCooCoiSup_y(unit="K") = mod.hva.floor3.reaAhu.TCooCoiSup.y "Cooling coil supply water temperature measurement for AHU";
@@ -317,8 +340,11 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_V_flow_sup_y(unit="m3/s") = mod.hva.floor3.reaAhu.V_flow_sup.y "Supply air flowrate measurement for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_dp_sup_y(unit="Pa") = mod.hva.floor3.reaAhu.dp_sup.y "Discharge pressure of supply fan for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_occ_y(unit="1") = mod.hva.floor3.reaAhu.occ.y "Occupancy status (1 occupied, 0 unoccupied)";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_phiAHURet_y(unit="1") = mod.hva.floor3.reaAhu.phiAHURet.y "Return air relative humidity for AHU";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_phiAHUSup_y(unit="1") = mod.hva.floor3.reaAhu.phiAHUSup.y "Supply air relative humidity for AHU";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_yCooVal_y(unit="1") = mod.hva.floor3.reaAhu.yCooVal.y "AHU cooling coil valve position measurement";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaAhu_yOA_y(unit="1") = mod.hva.floor3.reaAhu.yOA.y "AHU cooling coil valve position measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonCor_CO2Zon_y(unit="ppm") = mod.hva.floor3.reaZonCor.CO2Zon.y "Zone air CO2 measurement for zone top_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonCor_TRoo_Coo_set_y(unit="K") = mod.hva.floor3.reaZonCor.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonetop_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonCor_TRoo_Hea_set_y(unit="K") = mod.hva.floor3.reaZonCor.TRoo_Hea_set.y "Zone temperature heating setpoint for zone top_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonCor_TSup_y(unit="K") = mod.hva.floor3.reaZonCor.TSup.y "Discharge air temperature to zone measurement for zone top_floor_cor";
@@ -329,6 +355,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonCor_yDam_y(unit="1") = mod.hva.floor3.reaZonCor.yDam.y "Damper position measurement for zone top_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonCor_yHea_y(unit="1") = mod.hva.floor3.reaZonCor.yHea.y "Heating PID signal measurement for zone top_floor_cor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonCor_yReheaVal_y(unit="1") = mod.hva.floor3.reaZonCor.yReheaVal.y "Reheat valve position measurement for zone top_floor_cor";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonEas_CO2Zon_y(unit="ppm") = mod.hva.floor3.reaZonEas.CO2Zon.y "Zone air CO2 measurement for zone top_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonEas_TRoo_Coo_set_y(unit="K") = mod.hva.floor3.reaZonEas.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonetop_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonEas_TRoo_Hea_set_y(unit="K") = mod.hva.floor3.reaZonEas.TRoo_Hea_set.y "Zone temperature heating setpoint for zone top_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonEas_TSup_y(unit="K") = mod.hva.floor3.reaZonEas.TSup.y "Discharge air temperature to zone measurement for zone top_floor_eas";
@@ -339,6 +366,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonEas_yDam_y(unit="1") = mod.hva.floor3.reaZonEas.yDam.y "Damper position measurement for zone top_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonEas_yHea_y(unit="1") = mod.hva.floor3.reaZonEas.yHea.y "Heating PID signal measurement for zone top_floor_eas";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonEas_yReheaVal_y(unit="1") = mod.hva.floor3.reaZonEas.yReheaVal.y "Reheat valve position measurement for zone top_floor_eas";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonNor_CO2Zon_y(unit="ppm") = mod.hva.floor3.reaZonNor.CO2Zon.y "Zone air CO2 measurement for zone top_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonNor_TRoo_Coo_set_y(unit="K") = mod.hva.floor3.reaZonNor.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonetop_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonNor_TRoo_Hea_set_y(unit="K") = mod.hva.floor3.reaZonNor.TRoo_Hea_set.y "Zone temperature heating setpoint for zone top_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonNor_TSup_y(unit="K") = mod.hva.floor3.reaZonNor.TSup.y "Discharge air temperature to zone measurement for zone top_floor_nor";
@@ -349,6 +377,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonNor_yDam_y(unit="1") = mod.hva.floor3.reaZonNor.yDam.y "Damper position measurement for zone top_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonNor_yHea_y(unit="1") = mod.hva.floor3.reaZonNor.yHea.y "Heating PID signal measurement for zone top_floor_nor";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonNor_yReheaVal_y(unit="1") = mod.hva.floor3.reaZonNor.yReheaVal.y "Reheat valve position measurement for zone top_floor_nor";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonSou_CO2Zon_y(unit="ppm") = mod.hva.floor3.reaZonSou.CO2Zon.y "Zone air CO2 measurement for zone top_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonSou_TRoo_Coo_set_y(unit="K") = mod.hva.floor3.reaZonSou.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonetop_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonSou_TRoo_Hea_set_y(unit="K") = mod.hva.floor3.reaZonSou.TRoo_Hea_set.y "Zone temperature heating setpoint for zone top_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonSou_TSup_y(unit="K") = mod.hva.floor3.reaZonSou.TSup.y "Discharge air temperature to zone measurement for zone top_floor_sou";
@@ -359,6 +388,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonSou_yDam_y(unit="1") = mod.hva.floor3.reaZonSou.yDam.y "Damper position measurement for zone top_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonSou_yHea_y(unit="1") = mod.hva.floor3.reaZonSou.yHea.y "Heating PID signal measurement for zone top_floor_sou";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonSou_yReheaVal_y(unit="1") = mod.hva.floor3.reaZonSou.yReheaVal.y "Reheat valve position measurement for zone top_floor_sou";
+	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonWes_CO2Zon_y(unit="ppm") = mod.hva.floor3.reaZonWes.CO2Zon.y "Zone air CO2 measurement for zone top_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonWes_TRoo_Coo_set_y(unit="K") = mod.hva.floor3.reaZonWes.TRoo_Coo_set.y "Zone temperature cooling setpoint for zonetop_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonWes_TRoo_Hea_set_y(unit="K") = mod.hva.floor3.reaZonWes.TRoo_Hea_set.y "Zone temperature heating setpoint for zone top_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonWes_TSup_y(unit="K") = mod.hva.floor3.reaZonWes.TSup.y "Discharge air temperature to zone measurement for zone top_floor_wes";
@@ -369,13 +399,17 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonWes_yDam_y(unit="1") = mod.hva.floor3.reaZonWes.yDam.y "Damper position measurement for zone top_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonWes_yHea_y(unit="1") = mod.hva.floor3.reaZonWes.yHea.y "Heating PID signal measurement for zone top_floor_wes";
 	Modelica.Blocks.Interfaces.RealOutput hva_floor3_reaZonWes_yReheaVal_y(unit="1") = mod.hva.floor3.reaZonWes.yReheaVal.y "Reheat valve position measurement for zone top_floor_wes";
-	Modelica.Blocks.Interfaces.RealOutput hva_reaChiWatSys_TW_y(unit="K") = mod.hva.reaChiWatSys.TW.y "Chilled water temperature measurement";
-	Modelica.Blocks.Interfaces.RealOutput hva_reaChiWatSys_dp_y(unit="K") = mod.hva.reaChiWatSys.dp.y "Differential pressure of chilled/hot water measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_reaChiWatSys_TCHW_ret_y(unit="K") = mod.hva.reaChiWatSys.TCHW_ret.y "Chilled water return temperature measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_reaChiWatSys_TCHW_sup_y(unit="K") = mod.hva.reaChiWatSys.TCHW_sup.y "Chilled water supply temperature measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_reaChiWatSys_dp_y(unit="Pa") = mod.hva.reaChiWatSys.dp.y "Differential pressure of chilled/hot water measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_reaChiWatSys_mCHW_tot_y(unit="kg/s") = mod.hva.reaChiWatSys.mCHW_tot.y "Total chilled water mass flow rate ";
 	Modelica.Blocks.Interfaces.RealOutput hva_reaChiWatSys_reaPChi_y(unit="W") = mod.hva.reaChiWatSys.reaPChi.y "Multiple chiller power consumption";
 	Modelica.Blocks.Interfaces.RealOutput hva_reaChiWatSys_reaPCooTow_y(unit="W") = mod.hva.reaChiWatSys.reaPCooTow.y "Multiple cooling tower power consumption";
 	Modelica.Blocks.Interfaces.RealOutput hva_reaChiWatSys_reaPPum_y(unit="W") = mod.hva.reaChiWatSys.reaPPum.y "Chilled water plant pump power consumption";
-	Modelica.Blocks.Interfaces.RealOutput hva_reaHotWatSys_TW_y(unit="K") = mod.hva.reaHotWatSys.TW.y "Chilled water temperature measurement";
-	Modelica.Blocks.Interfaces.RealOutput hva_reaHotWatSys_dp_y(unit="K") = mod.hva.reaHotWatSys.dp.y "Differential pressure of chilled/hot water measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_reaHotWatSys_THW_ret_y(unit="K") = mod.hva.reaHotWatSys.THW_ret.y "Hot water return temperature measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_reaHotWatSys_THW_sup_y(unit="K") = mod.hva.reaHotWatSys.THW_sup.y "Chilled water temperature measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_reaHotWatSys_dp_y(unit="Pa") = mod.hva.reaHotWatSys.dp.y "Differential pressure of chilled/hot water measurement";
+	Modelica.Blocks.Interfaces.RealOutput hva_reaHotWatSys_mHW_tot_y(unit="kg/s") = mod.hva.reaHotWatSys.mHW_tot.y "Total hot water mass flow rate ";
 	Modelica.Blocks.Interfaces.RealOutput hva_reaHotWatSys_reaPBoi_y(unit="W") = mod.hva.reaHotWatSys.reaPBoi.y "Multiple gas power consumption";
 	Modelica.Blocks.Interfaces.RealOutput hva_reaHotWatSys_reaPPum_y(unit="W") = mod.hva.reaHotWatSys.reaPPum.y "Chilled water plant pump power consumption";
 	Modelica.Blocks.Interfaces.RealOutput loaEnePlu_weaSta_reaWeaCeiHei_y(unit="m") = mod.loaEnePlu.weaSta.reaWeaCeiHei.y "Cloud cover ceiling height measurement";

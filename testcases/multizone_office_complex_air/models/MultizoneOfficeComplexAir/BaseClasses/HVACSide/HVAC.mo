@@ -1,6 +1,7 @@
 within MultizoneOfficeComplexAir.BaseClasses.HVACSide;
 model HVAC "Full HVAC system that contains the air side and water side systems"
   extends MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Airside(
+      alpha=1.25,
       sou(nPorts=3),
       floor1(
       reaZonCor(zone="bot_floor_cor"),
@@ -12,7 +13,8 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
       oveZonSou(zone="bot_floor_sou"),
       oveZonEas(zone="bot_floor_eas"),
       oveZonNor(zone="bot_floor_nor"),
-      oveZonWes(zone="bot_floor_wes")),
+      oveZonWes(zone="bot_floor_wes"),
+      final mWatFloRat=mFloRat1),
       floor2(
       reaZonCor(zone="mid_floor_cor"),
       reaZonSou(zone="mid_floor_sou"),
@@ -23,7 +25,8 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
       oveZonSou(zone="mid_floor_sou"),
       oveZonEas(zone="mid_floor_eas"),
       oveZonNor(zone="mid_floor_nor"),
-      oveZonWes(zone="mid_floor_wes")),
+      oveZonWes(zone="mid_floor_wes"),
+      final mWatFloRat=mFloRat2),
       floor3(
       reaZonCor(zone="top_floor_cor"),
       reaZonSou(zone="top_floor_sou"),
@@ -34,10 +37,21 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
       oveZonSou(zone="top_floor_sou"),
       oveZonEas(zone="top_floor_eas"),
       oveZonNor(zone="top_floor_nor"),
-      oveZonWes(zone="top_floor_wes")));
+      oveZonWes(zone="top_floor_wes"),
+      final mWatFloRat=mFloRat3));
+
+  parameter Modelica.Units.SI.MassFlowRate mFloRat1=-datChi[1].QEva_flow_nominal
+      /4200/chiWatPla.dTCHW_nominal*chiWatPla.n/12
+    "CHW mass flow rate for floor 1 (bottom floor)";
+  parameter Modelica.Units.SI.MassFlowRate mFloRat2=-datChi[1].QEva_flow_nominal
+      /4200/chiWatPla.dTCHW_nominal*chiWatPla.n/12*10
+    "CHW mass flow rate for floor 2 (middle floor)";
+  parameter Modelica.Units.SI.MassFlowRate mFloRat3=-datChi[1].QEva_flow_nominal
+      /4200/chiWatPla.dTCHW_nominal*chiWatPla.n/12
+    "CHW mass flow rate for floor 3 (top floor)";
 
   parameter Modelica.Units.SI.MassFlowRate mCHW_flow_nominal[:]={-datChi[1].QEva_flow_nominal
-      /4200/5.56 for i in linspace(
+      /4200/chiWatPla.dTCHW_nominal for i in linspace(
       1,
       3,
       3)} "Nominal mass flow rate at chilled water side";
@@ -55,21 +69,22 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.BoilerPlant
     boiWatPla(secPumCon(conPI(k=0.001)), redeclare package MediumHW =
-        MediumHeaWat) "Boiler hot water plant"
-    annotation (Placement(transformation(extent={{120,-110},{140,-90}})));
+        MediumHeaWat,
+        alpha=alpha) "Boiler hot water plant"
+    annotation (Placement(transformation(extent={{116,-110},{136,-90}})));
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.WaterSide.Network.PipeNetwork
     boiWatNet(
     PreDroBra2(displayUnit="Pa") = 0,
     PreDroBra3(displayUnit="Pa") = 0,
     PreDroMai1(displayUnit="Pa") = (79712/4),
-    PreDroMai2(displayUnit="Pa") = (79712/4),
-    mFloRat1=mWatFloRat1[1] + mWatFloRat2[1] + mWatFloRat3[1] + mWatFloRat4[1] +
-        mWatFloRat5[1],
-    mFloRat2=mWatFloRat1[2] + mWatFloRat2[2] + mWatFloRat3[2] + mWatFloRat4[2] +
-        mWatFloRat5[2],
-    mFloRat3=mWatFloRat1[3] + mWatFloRat2[3] + mWatFloRat3[3] + mWatFloRat4[3] +
-        mWatFloRat5[3],
+    PreDroMai2(displayUnit="Pa") = (79712/4/2),
+    mFloRat1=floor1.mWatFloRat1 + floor1.mWatFloRat2 + floor1.mWatFloRat3 +
+        floor1.mWatFloRat4 + floor1.mWatFloRat5,
+    mFloRat2=floor2.mWatFloRat1 + floor2.mWatFloRat2 + floor2.mWatFloRat3 +
+        floor2.mWatFloRat4 + floor2.mWatFloRat5,
+    mFloRat3=floor3.mWatFloRat1 + floor3.mWatFloRat2 + floor3.mWatFloRat3 +
+        floor3.mWatFloRat4 + floor3.mWatFloRat5,
     redeclare package Medium = MediumHeaWat,
     PreDroBra1(displayUnit="Pa") = (79712/4))
     "Hot water plant distribution network"
@@ -83,22 +98,24 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
     mCHW_flow_nominal=mCHW_flow_nominal,
     mCW_flow_nominal=mCW_flow_nominal,
     secPumCon(conPI(k=0.000001, Ti=240))) "Chilled water plant"
-    annotation (Placement(transformation(extent={{-10,-112},{10,-92}})));
+    annotation (Placement(transformation(extent={{-10,-108},{10,-88}})));
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.WaterSide.Network.PipeNetwork
     chiWatNet(
     redeclare package Medium = MediumCHW,
-    mFloRat1=-datChi[1].QEva_flow_nominal/4200/5.56,
-    mFloRat2=-datChi[1].QEva_flow_nominal/4200/5.56,
-    mFloRat3=-datChi[1].QEva_flow_nominal/4200/5.56,
+    mFloRat1=mFloRat1,
+    mFloRat2=mFloRat2,
+    mFloRat3=mFloRat3,
     PreDroBra1(displayUnit="Pa") = PreDroCooWat,
     PreDroBra2(displayUnit="Pa") = 0,
     PreDroBra3(displayUnit="Pa") = 0,
     PreDroMai1=PreDroCooWat,
-    PreDroMai2=PreDroCooWat) "Chilled water plant distribution network"
-    annotation (Placement(transformation(extent={{20,-90},{40,-110}})));
+    PreDroMai2(displayUnit="Pa") = PreDroCooWat/2)
+                             "Chilled water plant distribution network"
+    annotation (Placement(transformation(extent={{20,-88},{40,-108}})));
   Buildings.Fluid.Chillers.Data.ElectricEIR.ElectricEIRChiller_Trane_CVHE_1442kW_6_61COP_VSD
-    datChi[3](each QEva_flow_nominal=-2500000) "Chiller data record"
+    datChi[3](each QEva_flow_nominal=-5740000/3*alpha, each COP_nominal=5.06)
+                                               "Chiller data record"
                                                annotation (Placement(transformation(extent={{-52,
             -106},{-32,-86}})));
 
@@ -108,16 +125,13 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
   Modelica.Blocks.Sources.Constant TCHWSupSet(k=273.15 + 5.56)
     "Chilled water supply temperature setpoint"
     annotation (Placement(transformation(extent={{-82,-30},{-62,-10}})));
-  Modelica.Blocks.Interfaces.RealInput TWetBul
-    "Entering air wet bulb temperature"
-    annotation (Placement(transformation(extent={{-128,-82},{-100,-54}}),
-        iconTransformation(extent={{-127,-83},{-100,-54}})));
-  Modelica.Blocks.Sources.RealExpression PHWPum(y=sum(boiWatPla.pumSecHW.P))
+  Modelica.Blocks.Sources.RealExpression PHWPum(y=max(0, boiWatPla.pumSecHW.P[1])
+         + max(0, boiWatPla.pumSecHW.P[2]))
     "Hot water pump power consumption"
-    annotation (Placement(transformation(extent={{120,-54},{140,-34}})));
+    annotation (Placement(transformation(extent={{114,-54},{134,-34}})));
   Modelica.Blocks.Sources.RealExpression PBoi(y=boiWatPla.mulBoi.boi[1].boi.QFue_flow
          + boiWatPla.mulBoi.boi[2].boi.QFue_flow) "Boiler gas consumption"
-    annotation (Placement(transformation(extent={{120,-70},{140,-50}})));
+    annotation (Placement(transformation(extent={{114,-70},{134,-50}})));
 
   Modelica.Blocks.Sources.Constant THWSupSet(k=273.15 + 80)
     "Hot water supply temperature setpoint"
@@ -125,15 +139,15 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
 
   Modelica.Blocks.Sources.RealExpression PCHWPum(y=chiWatPla.PConSpePum.y +
         chiWatPla.PVarSpePum.y) "Chilled water plant pump power consumption"
-    annotation (Placement(transformation(extent={{-16,-56},{4,-36}})));
+    annotation (Placement(transformation(extent={{-16,-54},{4,-34}})));
 
   Modelica.Blocks.Sources.RealExpression PChi(y=chiWatPla.PCh.y)
     "Multiple chiller power consumption"
-    annotation (Placement(transformation(extent={{-16,-70},{4,-50}})));
+    annotation (Placement(transformation(extent={{-16,-68},{4,-48}})));
 
   Modelica.Blocks.Sources.RealExpression PCooTow(y=chiWatPla.PCooTow.y)
     "Cooling tower power consumption"
-    annotation (Placement(transformation(extent={{-16,-86},{4,-66}})));
+    annotation (Placement(transformation(extent={{-16,-84},{4,-64}})));
 
   ReadOverwrite.ReadChilledWater reaChiWatSys
     annotation (Placement(transformation(extent={{18,-48},{38,-26}})));
@@ -144,7 +158,7 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
     annotation (Placement(transformation(extent={{-80,-96},{-60,-76}})));
   Modelica.Blocks.Sources.Constant dpHotWatStaSet(k=478250*0.25)
     "Secondary hot water loop static Pressure setpoint"
-    annotation (Placement(transformation(extent={{40,-80},{60,-60}})));
+    annotation (Placement(transformation(extent={{40,-74},{60,-54}})));
   ReadOverwrite.WriteWaterPlant oveChiWatSys(TW_set(u(
         unit="K",
         min=278.15,
@@ -161,14 +175,18 @@ model HVAC "Full HVAC system that contains the air side and water side systems"
         min=0,
         max=19130000)))
     annotation (Placement(transformation(extent={{70,-36},{90,-14}})));
+  Modelica.Icons.SignalBus weaBus
+    annotation (Placement(transformation(extent={{32,-128},{48,-112}}),
+        iconTransformation(extent={{-8,-108},{8,-92}})));
+
 equation
   connect(chiWatNet.ports_a[1], floor1.port_b_CooWat) annotation (Line(
-      points={{40,-91.1333},{40,-94},{106,-94},{106,6},{130.563,6},{130.563,20}},
+      points={{40,-90.4667},{40,-94},{104,-94},{104,6},{129.625,6},{129.625,20}},
       color={0,127,225},
       thickness=1));
   connect(floor1.port_a_CooWat, chiWatNet.ports_b[1]) annotation (Line(
-      points={{134.313,20},{134.313,0},{112,0},{112,-102},{72,-102},{72,
-          -101.933},{40,-101.933}},
+      points={{134.312,20},{134.312,2},{108,2},{108,-102},{72,-102},{72,
+          -101.267},{40,-101.267}},
       color={0,127,225},
       thickness=1));
 
@@ -177,12 +195,13 @@ equation
   connect(chiWatNet.ports_a[3], floor3.port_b_CooWat);
   connect(floor3.port_a_CooWat, chiWatNet.ports_b[3]);
   connect(boiWatNet.ports_a[1], floor1.port_b_HeaWat) annotation (Line(
-      points={{176,-93.1333},{196,-93.1333},{196,6},{154,6},{154,20},{147.75,20}},
+      points={{176,-94.4667},{196,-94.4667},{196,6},{154,6},{154,20},{149.938,
+          20}},
       color={238,46,47},
       thickness=1));
 
   connect(boiWatNet.ports_b[1], floor1.port_a_HeaWat) annotation (Line(
-      points={{176,-103.933},{192,-103.933},{192,0},{150,0},{150,20},{145.25,20}},
+      points={{176,-105.267},{192,-105.267},{192,0},{150,0},{150,20},{145.25,20}},
       color={238,46,47},
       thickness=1));
 
@@ -192,67 +211,129 @@ equation
   connect(boiWatNet.ports_b[3], floor3.port_a_HeaWat);
 
   connect(chiWatPla.port_a, chiWatNet.port_b) annotation (Line(
-      points={{10,-96},{16,-96},{16,-94},{20,-94}},
+      points={{10,-92},{20,-92}},
       color={0,127,255},
       thickness=1));
   connect(chiWatNet.port_a, chiWatPla.port_b) annotation (Line(
-      points={{20,-104},{16,-104},{16,-106},{10,-106}},
+      points={{20,-102},{10,-102}},
       color={0,127,255},
       thickness=1));
-  connect(chiWatNet.p, chiWatPla.dpMea) annotation (Line(points={{41,-100},{54,
-          -100},{54,-120},{-16,-120},{-16,-94},{-11.6,-94}}, color={0,0,127}));
-  connect(chiWatPla.TCWSet, TCWSupSet.y) annotation (Line(points={{-11.6,-106},
-          {-20,-106},{-20,-50},{-59,-50}},
+  connect(chiWatNet.p, chiWatPla.dpMea) annotation (Line(points={{41,-98},{52,
+          -98},{52,-80},{-16,-80},{-16,-90},{-11.6,-90}},    color={0,0,127}));
+  connect(chiWatPla.TCWSet, TCWSupSet.y) annotation (Line(points={{-11.6,-102},
+          {-20,-102},{-20,-50},{-59,-50}},
                                       color={0,0,127}));
-  connect(chiWatPla.TWetBul, TWetBul) annotation (Line(points={{-11.6,-110},{-92,
-          -110},{-92,-68},{-114,-68}}, color={0,0,127}));
   connect(boiWatPla.port_a, boiWatNet.port_b) annotation (Line(
-      points={{140,-96},{140,-96},{156,-96}},
+      points={{136,-96},{156,-96}},
       color={238,46,47},
       thickness=1));
   connect(boiWatNet.port_a, boiWatPla.port_b) annotation (Line(
-      points={{156,-106},{140,-106},{140,-106}},
+      points={{156,-106},{136,-106}},
       color={238,46,47},
       thickness=1));
-  connect(boiWatNet.p,boiWatPla.dp)  annotation (Line(points={{177,-102},{182,
-          -102},{182,-120},{110,-120},{110,-100},{118,-100}},
-                                                            color={0,0,127}));
+  connect(boiWatNet.p,boiWatPla.dp)  annotation (Line(points={{177,-102},{182,-102},
+          {182,-118},{110,-118},{110,-100},{114,-100}},     color={0,0,127}));
 
-  connect(PCHWPum.y, reaChiWatSys.PPum_in) annotation (Line(points={{5,-46},{8,
-          -46},{8,-38},{16,-38}}, color={0,0,127}));
-  connect(PChi.y, reaChiWatSys.PChi_in) annotation (Line(points={{5,-60},{10,
-          -60},{10,-42},{16,-42}}, color={0,0,127}));
-  connect(PCooTow.y, reaChiWatSys.PCooTow_in) annotation (Line(points={{5,-76},
-          {12,-76},{12,-45},{16,-45}}, color={0,0,127}));
-  connect(PBoi.y, reaHotWatSys.PBoi_in) annotation (Line(points={{141,-60},{150,
-          -60},{150,-42},{158,-42}}, color={0,0,127}));
-  connect(PHWPum.y, reaHotWatSys.PPum_in) annotation (Line(points={{141,-44},{
-          150,-44},{150,-38},{158,-38}}, color={0,0,127}));
+  connect(PCHWPum.y, reaChiWatSys.PPum_in) annotation (Line(points={{5,-44},{8,
+          -44},{8,-40.3846},{16,-40.3846}},
+                                  color={0,0,127}));
+  connect(PChi.y, reaChiWatSys.PChi_in) annotation (Line(points={{5,-58},{10,
+          -58},{10,-43.7692},{16,-43.7692}},
+                                   color={0,0,127}));
+  connect(PCooTow.y, reaChiWatSys.PCooTow_in) annotation (Line(points={{5,-74},
+          {12,-74},{12,-46.3077},{16,-46.3077}},
+                                       color={0,0,127}));
+  connect(PBoi.y, reaHotWatSys.PBoi_in) annotation (Line(points={{135,-60},{150,
+          -60},{150,-46.1667},{158,-46.1667}},
+                                     color={0,0,127}));
+  connect(PHWPum.y, reaHotWatSys.PPum_in) annotation (Line(points={{135,-44},{
+          150,-44},{150,-42.5},{158,-42.5}},
+                                         color={0,0,127}));
   connect(TCHWSupSet.y, oveChiWatSys.TW_set_in)
     annotation (Line(points={{-61,-20},{-52,-20}}, color={0,0,127}));
   connect(oveChiWatSys.TW_set_out, chiWatPla.TCHWSet) annotation (Line(points={{-29,-20},
-          {-22,-20},{-22,-102},{-11.6,-102}},           color={0,0,127}));
-  connect(oveChiWatSys.dp_set_out, chiWatPla.dpSet) annotation (Line(points={{-29,
-          -30},{-24,-30},{-24,-97.8},{-11.6,-97.8}}, color={0,0,127}));
+          {-22,-20},{-22,-98},{-11.6,-98}},             color={0,0,127}));
+  connect(oveChiWatSys.dp_set_out, chiWatPla.dpSet) annotation (Line(points={{-29,-30},
+          {-24,-30},{-24,-93.8},{-11.6,-93.8}},      color={0,0,127}));
   connect(dpChiWatStaSet.y, oveChiWatSys.dp_set_in) annotation (Line(points={{
           -59,-86},{-56,-86},{-56,-30},{-52,-30}}, color={0,0,127}));
-  connect(oveHotWatSys.TW_set_out, boiWatPla.THWSet) annotation (Line(points={{
-          91,-20},{100,-20},{100,-94},{118,-94}}, color={0,0,127}));
-  connect(dpHotWatStaSet.y, oveHotWatSys.dp_set_in) annotation (Line(points={{
-          61,-70},{64,-70},{64,-30},{68,-30}}, color={0,0,127}));
-  connect(oveHotWatSys.dp_set_out, boiWatPla.dpSet) annotation (Line(points={{
-          91,-30},{96,-30},{96,-106},{118,-106}}, color={0,0,127}));
-  connect(oveChiWatSys.dp_set_out, reaChiWatSys.dp_in)
-    annotation (Line(points={{-29,-30},{16,-30}}, color={0,0,127}));
-  connect(oveChiWatSys.TW_set_out, reaChiWatSys.TW_in) annotation (Line(points=
-          {{-29,-20},{-22,-20},{-22,-34},{16,-34}}, color={0,0,127}));
-  connect(oveHotWatSys.TW_set_out, reaHotWatSys.TW_in) annotation (Line(points=
-          {{91,-20},{150,-20},{150,-34},{158,-34}}, color={0,0,127}));
-  connect(oveHotWatSys.dp_set_out, reaHotWatSys.dp_in)
-    annotation (Line(points={{91,-30},{158,-30}}, color={0,0,127}));
+  connect(oveHotWatSys.TW_set_out, boiWatPla.THWSet) annotation (Line(points={{91,-20},
+          {100,-20},{100,-94},{114,-94}},         color={0,0,127}));
+  connect(dpHotWatStaSet.y, oveHotWatSys.dp_set_in) annotation (Line(points={{61,-64},
+          {64,-64},{64,-30},{68,-30}},         color={0,0,127}));
+  connect(oveHotWatSys.dp_set_out, boiWatPla.dpSet) annotation (Line(points={{91,-30},
+          {96,-30},{96,-106},{114,-106}},         color={0,0,127}));
   connect(THWSupSet.y, oveHotWatSys.TW_set_in)
     annotation (Line(points={{61,-20},{68,-20}}, color={0,0,127}));
 
+  connect(weaBus.TWetBul, chiWatPla.TWetBul) annotation (Line(
+      points={{40,-120},{-18,-120},{-18,-106},{-11.6,-106}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus, floor1.weaBus) annotation (Line(
+      points={{40,-120},{139,-120},{139,20}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-3,-6},{-3,-6}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus, floor2.weaBus) annotation (Line(
+      points={{40,-120},{139,-120},{139,20}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-3,-6},{-3,-6}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus, floor3.weaBus) annotation (Line(
+      points={{40,-120},{139,-120},{139,20}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-3,-6},{-3,-6}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus.TDryBul, sou[1].T_in) annotation (Line(
+      points={{40,-120},{12,-120},{12,44},{38,44}},
+      color={255,204,51},
+      thickness=0.5));
+  connect(weaBus.TDryBul, sou[2].T_in) annotation (Line(
+      points={{40,-120},{12,-120},{12,44},{38,44}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus.TDryBul, sou[3].T_in) annotation (Line(
+      points={{40,-120},{12,-120},{12,44},{38,44}},
+      color={255,204,51},
+      thickness=0.5));
+  connect(chiWatNet.p, reaChiWatSys.dp_in) annotation (Line(points={{41,-98},{
+          52,-98},{52,-80},{-18,-80},{-18,-31.0769},{16,-31.0769}}, color={0,0,
+          127}));
+  connect(boiWatNet.p, reaHotWatSys.dp_in) annotation (Line(points={{177,-102},
+          {182,-102},{182,-60},{154,-60},{154,-31.5},{158,-31.5}}, color={0,0,
+          127}));
+  connect(chiWatPla.TCHW_ret, reaChiWatSys.TCHW_ret_in) annotation (Line(points={{11,-96},
+          {16,-96},{16,-62},{6,-62},{6,-33.6154},{16,-33.6154}},          color
+        ={0,0,127}));
+  connect(chiWatPla.TCHW_sup, reaChiWatSys.TCHW_sup_in) annotation (Line(points={{11,-99},
+          {18,-99},{18,-60},{8,-60},{8,-37},{16,-37}},          color={0,0,127}));
+  connect(boiWatPla.THW_ret, reaHotWatSys.THW_ret_in) annotation (Line(points={{137,
+          -100},{144,-100},{144,-35.1667},{158,-35.1667}},      color={0,0,127}));
+  connect(boiWatPla.THW_sup, reaHotWatSys.THW_sup_in) annotation (Line(points={{137,
+          -103},{146,-103},{146,-38.8333},{158,-38.8333}},      color={0,0,127}));
+  connect(boiWatPla.mHW_tot, reaHotWatSys.mHW_tot_in) annotation (Line(points={{137,-93},
+          {142,-93},{142,-27.8333},{158,-27.8333}},           color={0,0,127}));
+  connect(chiWatPla.mCHW_tot, reaChiWatSys.mCHW_tot_in) annotation (Line(points={{11,-105},
+          {12,-105},{12,-28},{14,-28},{14,-27.6923},{16,-27.6923}},
+        color={0,0,127}));
   annotation (experiment(
       StartTime=17280000,
       StopTime=17452800,
@@ -290,6 +371,8 @@ See the model <a href=\"modelica://MultizoneOfficeComplexAir.BaseClasses.HVACSid
 <p>The water side system controls include the chiller plant staging control, chilled water supply temperature control, secondary chilled water pump staging control, secondary chilled water loop static pressure control, cooling tower supply water temperature control, minimum condenser supply water temperature control, boiler staging control, boiler water temperature control, and boiler hot water loop static pressure control.</p>
 </html>", revisions = "<html>
 <ul>
+<li>August 8, 2024, by Guowen Li, Xing Lu, Yan Chen: </li>
+<p>Added CO2 and air infiltration features; Adjusted system equipment sizing; Reduced nonlinear system warnings.</p>
 <li> August 17, 2023, by Xing Lu, Sen Huang, Lingzhe Wang, Yan Chen:
 <p> First implementation.</p>
 </ul>

@@ -1,5 +1,6 @@
 within MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses;
 model Airside "Air side system"
+  parameter Real alpha = 1  "Sizing factor for overall system design capacity and mass flow rate";
   parameter Integer n =  3  "Number of floors";
   parameter Modelica.Units.SI.Pressure PreDroCoiAir=50
     "Pressure drop in the air side";
@@ -16,31 +17,23 @@ model Airside "Air side system"
        + mAirFloRat2[1] + mAirFloRat3[1] + mAirFloRat4[1] + mAirFloRat5[1])/1.2
       *0.5,(mAirFloRat1[1] + mAirFloRat2[1] + mAirFloRat3[1] + mAirFloRat4[1]
        + mAirFloRat5[1])/1.2*0.7,(mAirFloRat1[1] + mAirFloRat2[1] + mAirFloRat3
-      [1] + mAirFloRat4[1] + mAirFloRat5[1])/1.2,(mAirFloRat1[1] + mAirFloRat2[
-      1] + mAirFloRat3[1] + mAirFloRat4[1] + mAirFloRat5[1])/1.2*2},{(
+      [1] + mAirFloRat4[1] + mAirFloRat5[1])/1.2*0.9,(mAirFloRat1[1] + mAirFloRat2[
+      1] + mAirFloRat3[1] + mAirFloRat4[1] + mAirFloRat5[1])/1.2*1.2},{(
       mAirFloRat1[2] + mAirFloRat2[2] + mAirFloRat3[2] + mAirFloRat4[2] +
       mAirFloRat5[2])/1.2*0.5,(mAirFloRat1[2] + mAirFloRat2[2] + mAirFloRat3[2]
        + mAirFloRat4[2] + mAirFloRat5[2])/1.2*0.7,(mAirFloRat1[2] + mAirFloRat2
-      [2] + mAirFloRat3[2] + mAirFloRat4[2] + mAirFloRat5[2])/1.2,(mAirFloRat1[
+      [2] + mAirFloRat3[2] + mAirFloRat4[2] + mAirFloRat5[2])/1.2*0.9,(mAirFloRat1[
       2] + mAirFloRat2[2] + mAirFloRat3[2] + mAirFloRat4[2] + mAirFloRat5[2])/
-      1.2*2},{(mAirFloRat1[3] + mAirFloRat2[3] + mAirFloRat3[3] + mAirFloRat4[3]
+      1.2*1.2},{(mAirFloRat1[3] + mAirFloRat2[3] + mAirFloRat3[3] + mAirFloRat4[3]
        + mAirFloRat5[3])/1.2*0.5,(mAirFloRat1[3] + mAirFloRat2[3] + mAirFloRat3
       [3] + mAirFloRat4[3] + mAirFloRat5[3])/1.2*0.7,(mAirFloRat1[3] +
-      mAirFloRat2[3] + mAirFloRat3[3] + mAirFloRat4[3] + mAirFloRat5[3])/1.2,(
+      mAirFloRat2[3] + mAirFloRat3[3] + mAirFloRat4[3] + mAirFloRat5[3])/1.2*0.9,(
       mAirFloRat1[3] + mAirFloRat2[3] + mAirFloRat3[3] + mAirFloRat4[3] +
-      mAirFloRat5[3])/1.2*2}} "Volume flow rate curve";
-  parameter Real HydEff[n,:] = {{0.93*0.65,0.93*0.7,0.93,0.93*0.6} for i in linspace(1,n,n)} "Hydraulic efficiency";
-  parameter Real MotEff[n,:] = {{0.6045*0.65,0.6045*0.7,0.6045,0.6045*0.6} for i in linspace(1,n,n)} "Motor efficiency";
-  parameter Modelica.Units.SI.Pressure SupPreCur[n,:]={{1400,1000,700,700*0.5}
-      for i in linspace(
-      1,
-      n,
-      n)} "Pressure curve";
-  parameter Modelica.Units.SI.Pressure RetPreCur[n,:]={{600,400,200,100} for i in
-          linspace(
-      1,
-      n,
-      n)} "Pressure curve";
+      mAirFloRat5[3])/1.2*1.2}} "Volume flow rate curve";
+  parameter Real HydEff[n,:] = {{0.9,0.9,0.9,0.9} for i in linspace(1,n,n)} "Hydraulic efficiency";
+  parameter Real MotEff[n,:] = {{0.8,0.8,0.8,0.8} for i in linspace(1,n,n)} "Motor efficiency";
+  parameter Modelica.Units.SI.Pressure SupPreCur[n,:]={{1400,1000,700,700*0.5} for i in linspace(1,n,n)} "Pressure curve";
+  parameter Modelica.Units.SI.Pressure RetPreCur[n,:]={{600,400,200,100} for i in linspace(1,n,n)} "Pressure curve";
   parameter Modelica.Units.SI.Pressure PreAirDroMai1=140
     "Pressure drop 1 across the duct";
   parameter Modelica.Units.SI.Pressure PreAirDroMai2=140
@@ -102,6 +95,12 @@ model Airside "Air side system"
   parameter Modelica.Units.SI.MassFlowRate mWatFloRat5[n]={mAirFloRat5[1]*0.3*(
       35 - 12.88)/4.2/20,mAirFloRat5[2]*0.3*(35 - 12.88)/4.2/20,mAirFloRat5[3]*
       0.3*(35 - 12.88)/4.2/20} "mass flow rate for vav 5";
+  parameter Modelica.Units.SI.MassFlowRate mWatFloRatBot=26.7*alpha
+    "mass flow rate for cooling coil chilled water in floor 1";
+  parameter Modelica.Units.SI.MassFlowRate mWatFloRatMid=267*alpha
+    "mass flow rate for cooling coil chilled water in floor 2";
+  parameter Modelica.Units.SI.MassFlowRate mWatFloRatTop=26.7*alpha
+    "mass flow rate for cooling coil chilled water in floor 3";
   parameter Modelica.Units.SI.Pressure PreDroAir1=200
     "Pressure drop in the air side of vav 1";
   parameter Modelica.Units.SI.Pressure PreDroWat1=79712/2
@@ -132,21 +131,47 @@ model Airside "Air side system"
     "Pressure drop in the water side of vav 1";
   parameter Modelica.Units.SI.Efficiency eps5(max=1) = 0.8
     "Heat exchanger effectiveness of vav 1";
-  final parameter Real alpha = 0.8  "Sizing factor";
 
-  package MediumAir = Buildings.Media.Air "Medium model for air";
+  //package MediumAir = Buildings.Media.Air "Medium model for air";
+  package MediumAir = Buildings.Media.Air(extraPropertiesNames={"CO2"}) "Buildings library air media package with CO2";
   package MediumCHW = Buildings.Media.Water "Medium model for chilled water";
   package MediumHeaWat = Buildings.Media.Water "Medium model for heating water";
 
   Modelica.Blocks.Interfaces.RealInput loa[15] "Load from external calculator"
     annotation (Placement(transformation(extent={{-128,46},{-100,74}}),
-        iconTransformation(extent={{-128,16},{-100,44}})));
+        iconTransformation(extent={{-128,36},{-100,64}})));
   Modelica.Blocks.Interfaces.RealOutput TZon[15] "Zone air temperature"
    annotation (Placement(transformation(extent={{200,-10},{220,10}}),
-                        iconTransformation(extent={{100,-10},{120,10}})));
-  Modelica.Blocks.Interfaces.RealInput TDryBul "Zone air dry bulb temperature"
-   annotation (Placement(transformation(extent={{-128,-14},{-100,14}}),
-                              iconTransformation(extent={{-128,-34},{-100,-6}})));
+                              iconTransformation(extent={{100,-10},{120,10}})));
+  Modelica.Blocks.Interfaces.RealInput numOcc[15] "Number of occupant"
+   annotation (Placement(transformation(extent={{-128,6},{-100,34}}),
+                              iconTransformation(extent={{-128,6},{-100,34}})));
+
+  Modelica.Blocks.Sources.Constant TSupAirSet[n](k=273.15 + 12.88)
+    "AHU supply air temperature setpoint"
+    annotation (Placement(transformation(extent={{-60,60},{-40,80}})));
+  Modelica.Blocks.Sources.Constant dpStaSet[n](k=400)
+    "AHU static ressure setpoint"
+    annotation (Placement(transformation(extent={{-60,30},{-40,50}})));
+  Modelica.Blocks.Sources.BooleanExpression onZon[n](each y=reaToBooOcc.y)
+    "Zone VAV terminal on signal"
+    annotation (Placement(transformation(extent={{40,66},{60,86}})));
+
+  Modelica.Blocks.Routing.BooleanReplicator booRep(nout=15)
+    "Replicate the Occ signal to 15 zones"
+    annotation (Placement(transformation(extent={{-30,90},{-10,110}})));
+  Modelica.Blocks.Interfaces.RealInput occ "Occupancy signal"
+    annotation (Placement(transformation(extent={{-128,86},{-100,114}}),
+        iconTransformation(extent={{-128,66},{-100,94}})));
+  Modelica.Blocks.Math.RealToBoolean reaToBooOcc
+    "Convert real signal to boolean signal for occupancy signal"
+    annotation (Placement(transformation(extent={{-60,90},{-40,110}})));
+  Modelica.Blocks.Continuous.FirstOrder firOrd(T=1)
+    "First order to smooth the occupancy signal"
+    annotation (Placement(transformation(extent={{-90,90},{-70,110}})));
+  Modelica.Blocks.Math.Gain loaMulMidFlo[5](k=10)
+    "Load multiplier for ten floors modelled as one middle floor"
+    annotation (Placement(transformation(extent={{-94,54},{-82,66}})));
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.AirsideFloor
     floor1(
@@ -156,14 +181,17 @@ model Airside "Air side system"
       MixingBox_Ti=600,
       Fan_k=0.001,
       Fan_Ti=600,
-      booleanExpression(y=if floor1.duaFanAirHanUni.TOut < 283.15 then floor1.duaFanAirHanUni.On
+      booleanExpression(y=if floor1.duaFanAirHanUni.TOut < 283.15 then floor1.duaFanAirHanUni.onFanOcc
              else true)),
-    fivZonVAV(vol(V=200000)),
+    fivZonVAV(vol(each V=200000)),
     redeclare package MediumAir = MediumAir,
     redeclare package MediumHeaWat = MediumHeaWat,
+    C_start=fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM
+        /Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
+    m_flow_lea={1*0.206*1.2,1*0.137*1.2,1*0.206*1.2,1*0.137*1.2},
     PreDroCoiAir=PreDroCoiAir,
     PreDroMixingBoxAir=PreDroMixingBoxAir,
-    PreDroCooWat=PreDroCooWat,
+    PreDroCooWat=PreDroCooWat/2,
     TemEcoHig=TemEcoHig,
     TemEcoLow=TemEcoLow,
     MixingBoxDamMin=MixingBoxDamMin,
@@ -216,7 +244,8 @@ model Airside "Air side system"
     PreDroAir5=PreDroAir5,
     PreDroWat5=PreDroWat5,
     eps5=eps5,
-    redeclare package MediumCooWat = MediumCHW)
+    redeclare package MediumCooWat = MediumCHW,
+    mWatFloRat=mWatFloRatBot)
     annotation (Placement(transformation(extent={{114,20},{164,62}})));
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.AirsideFloor
@@ -227,14 +256,17 @@ model Airside "Air side system"
       MixingBox_Ti=600,
       Fan_k=0.001,
       Fan_Ti=600,
-      booleanExpression(y=if floor2.duaFanAirHanUni.TOut < 283.15 then floor2.duaFanAirHanUni.On
+      booleanExpression(y=if floor2.duaFanAirHanUni.TOut < 283.15 then floor2.duaFanAirHanUni.onFanOcc
              else true)),
-    fivZonVAV(vol(V=200000)),
+    fivZonVAV(vol(each V=200000)),
     redeclare package MediumAir = MediumAir,
     redeclare package MediumHeaWat = MediumHeaWat,
+    C_start=fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM
+        /Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
+    m_flow_lea={10*0.206*1.2,10*0.137*1.2,10*0.206*1.2,10*0.137*1.2},
     PreDroCoiAir=PreDroCoiAir,
     PreDroMixingBoxAir=PreDroMixingBoxAir,
-    PreDroCooWat=PreDroCooWat,
+    PreDroCooWat=PreDroCooWat/2,
     TemEcoHig=TemEcoHig,
     TemEcoLow=TemEcoLow,
     MixingBoxDamMin=MixingBoxDamMin,
@@ -287,7 +319,8 @@ model Airside "Air side system"
     PreDroAir5=PreDroAir5,
     PreDroWat5=PreDroWat5,
     eps5=eps5,
-    redeclare package MediumCooWat = MediumCHW)
+    redeclare package MediumCooWat = MediumCHW,
+    mWatFloRat=mWatFloRatMid)
     annotation (Placement(transformation(extent={{114,20},{164,62}})));
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.AirsideFloor
@@ -298,11 +331,14 @@ model Airside "Air side system"
       MixingBox_Ti=600,
       Fan_k=0.001,
       Fan_Ti=600,
-      booleanExpression(y=if floor3.duaFanAirHanUni.TOut < 283.15 then floor3.duaFanAirHanUni.On
+      booleanExpression(y=if floor3.duaFanAirHanUni.TOut < 283.15 then floor3.duaFanAirHanUni.onFanOcc
              else true)),
-    fivZonVAV(vol(V=200000)),
+    fivZonVAV(vol(each V=200000)),
     redeclare package MediumAir = MediumAir,
     redeclare package MediumHeaWat = MediumHeaWat,
+    C_start=fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM
+        /Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
+    m_flow_lea={1*0.206*1.2,1*0.137*1.2,1*0.206*1.2,1*0.137*1.2},
     PreDroCoiAir=PreDroCoiAir,
     PreDroMixingBoxAir=PreDroMixingBoxAir,
     PreDroCooWat=PreDroCooWat,
@@ -358,25 +394,9 @@ model Airside "Air side system"
     PreDroAir5=PreDroAir5,
     PreDroWat5=PreDroWat5,
     eps5=eps5,
-    redeclare package MediumCooWat = MediumCHW) "Top Floor"
+    redeclare package MediumCooWat = MediumCHW,
+    mWatFloRat=mWatFloRatTop) "Top Floor"
     annotation (Placement(transformation(extent={{114,20},{164,62}})));
-
-  Buildings.Fluid.Sources.Boundary_pT   sou[n](
-    nPorts=3,
-    redeclare package Medium = MediumAir,
-    each p(displayUnit="Pa") = 100000,
-    use_T_in=true) "Source"
-    annotation (Placement(transformation(extent={{40,30},{60,50}})));
-
-  Modelica.Blocks.Sources.Constant TSupAirSet[n](k=273.15 + 12.88)
-    "AHU supply air temperature setpoint"
-    annotation (Placement(transformation(extent={{-70,46},{-50,66}})));
-  Modelica.Blocks.Sources.Constant dpStaSet[n](k=400)
-    "AHU static ressure setpoint"
-    annotation (Placement(transformation(extent={{-70,16},{-50,36}})));
-  Modelica.Blocks.Sources.BooleanExpression onZon[n](each y=true)
-    "Zone VAV terminal on signal"
-    annotation (Placement(transformation(extent={{40,62},{60,82}})));
 
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.AirSide.AirHandlingUnit.BaseClasses.ZoneSetpoint
     TZonAirSet[15](
@@ -385,57 +405,51 @@ model Airside "Air side system"
         1,
         15,
         15)},
-    setpoint_off={{273.15 + 26.7,273.15 + 15.6} for i in linspace(
-        1,
-        15,
-        15)})
+    setpoint_off={{273.15 + 26.7,273.15 + 15.6} for i in linspace(1, 15, 15)})
     "Zone air temperature setpoint controllers based on the occupancy signal"
     annotation (Placement(transformation(extent={{-2,90},{18,110}})));
-  Modelica.Blocks.Routing.BooleanReplicator booRep(nout=15)
-    "Replicate the Occ signal to 15 zones"
-    annotation (Placement(transformation(extent={{-30,90},{-10,110}})));
-  Modelica.Blocks.Interfaces.RealInput occ "Occupancy signal"
-    annotation (Placement(transformation(extent={{-128,86},{-100,114}}),
-        iconTransformation(extent={{-128,66},{-100,94}})));
-  Modelica.Blocks.Math.RealToBoolean reaToBooOcc
-    "Convert real signal to boolean signal for occupancy signal"
-    annotation (Placement(transformation(extent={{-60,90},{-40,110}})));
-  Modelica.Blocks.Continuous.FirstOrder firOrd(T=1)
-    "First order to smooth the occupancy signal"
-    annotation (Placement(transformation(extent={{-90,90},{-70,110}})));
-  Modelica.Blocks.Math.Gain loaMulMidFlo[5](k=10) "Load multiplier"
-    annotation (Placement(transformation(extent={{-94,54},{-82,66}})));
-equation
 
-   connect(sou[1].T_in, TDryBul)
-   annotation (Line(points={{38,44},{-38,44},{-38,1.77636e-15},{-114,
-          1.77636e-15}},  color={0,0,127}));
-   connect(floor1.port_Exh_Air, sou[1].ports[1]) annotation (Line(
-      points={{113.375,30.5},{90,30.5},{90,42.6667},{60,42.6667}},
+  Buildings.Fluid.Sources.Boundary_pT   sou[n](
+    nPorts=3,
+    redeclare package Medium = MediumAir,
+    each p(displayUnit="Pa") = 100000,
+    each C=fill(400e-6*Modelica.Media.IdealGases.Common.SingleGasesData.CO2.MM/
+         Modelica.Media.IdealGases.Common.SingleGasesData.Air.MM, MediumAir.nC),
+    use_T_in=true) "Source"
+    annotation (Placement(transformation(extent={{40,30},{60,50}})));
+
+  Modelica.Blocks.Math.Gain numOCCMulMidFlo[5](k=10)
+    "Occupant multiplier for ten floors modelled as one middle floor"
+    annotation (Placement(transformation(extent={{-94,14},{-82,26}})));
+
+equation
+  connect(floor1.port_Exh_Air, sou[1].ports[1]) annotation (Line(
+      points={{113.375,30.5},{90,30.5},{90,38.6667},{60,38.6667}},
       color={0,140,72},
       thickness=0.5));
-   connect(floor1.port_Fre_Air, sou[1].ports[2]) annotation (Line(
+  connect(floor1.port_Fre_Air, sou[1].ports[2]) annotation (Line(
       points={{114,44.5},{90,44.5},{90,40},{60,40}},
       color={0,140,72},
       thickness=0.5));
-  connect(dpStaSet[1].y, floor1.pSet) annotation (Line(points={{-49,26},{102,26},
-          {102,39.25},{112.438,39.25}}, color={0,0,127}));
-  connect(TSupAirSet[1].y, floor1.disTSet) annotation (Line(points={{-49,56},{
-          102,56},{102,48},{112.438,48}}, color={0,0,127}));
-  connect(reaToBooOcc.y, floor1.OnFan) annotation (Line(points={{-39,100},{-36,
-          100},{-36,86},{106,86},{106,28.75},{112.438,28.75}},
-                                                      color={255,0,255}));
-  connect(floor1.OnZon, onZon[1].y) annotation (Line(points={{112.438,21.75},{
-          108,21.75},{108,22},{104,22},{104,72},{61,72}},
-                                                      color={255,0,255}));
+  connect(dpStaSet[1].y, floor1.pSet) annotation (Line(points={{-39,40},{0,40},
+          {0,26},{108,26},{108,39.25},{112.438,39.25}},
+                                        color={0,0,127}));
+  connect(TSupAirSet[1].y, floor1.disTSet) annotation (Line(points={{-39,70},{
+          108,70},{108,48},{112.438,48}}, color={0,0,127}));
+  connect(reaToBooOcc.y, floor1.onFanOcc) annotation (Line(points={{-39,100},{
+          -36,100},{-36,86},{106,86},{106,27},{112.438,27}}, color={255,0,255}));
+  connect(floor1.onZon, onZon[1].y) annotation (Line(points={{112.438,21.75},{
+          104,21.75},{104,76},{61,76}},               color={255,0,255}));
+
    for j in 1:5 loop
     connect(loa[(1 - 1)*5 + j], floor1.Q_flow[j]);
     connect(floor1.TZon[j], TZon[(1-1)*5+j]);
     connect(TZonAirSet[(1 - 1)*5 + j].SetPoi[1], floor1.zonCooTSet[j])
-      annotation (Line(points={{20,99},{96,99},{96,55},{112.438,55}}, color={0,
+      annotation (Line(points={{20,99.5},{96,99.5},{96,55},{112.438,55}},
+                                                                      color={0,
             0,127}));
     connect(TZonAirSet[(1 - 1)*5 + j].SetPoi[2], floor1.zonHeaTSet[j])
-      annotation (Line(points={{20,101},{96,101},{96,51.5},{112.438,51.5}},
+      annotation (Line(points={{20,100.5},{96,100.5},{96,51.5},{112.438,51.5}},
           color={0,0,127}));
    end for;
 
@@ -443,13 +457,14 @@ equation
     connect(loa[(2 - 1)*5 + i], loaMulMidFlo[i].u)
       annotation (Line(points={{-114,60},{-95.2,60}}, color={0,0,127}));
    end for;
-   connect(sou[2].T_in, TDryBul);
-   connect(floor2.port_Exh_Air, sou[2].ports[1]);
-   connect(floor2.port_Fre_Air, sou[2].ports[2]);
+
+  connect(floor2.port_Exh_Air, sou[2].ports[1]);
+  connect(floor2.port_Fre_Air, sou[2].ports[2]);
   connect(dpStaSet[2].y, floor2.pSet);
   connect(TSupAirSet[2].y, floor2.disTSet);
-  connect(reaToBooOcc.y, floor2.OnFan);
-  connect(floor2.OnZon, onZon[2].y);
+  connect(reaToBooOcc.y, floor2.onFanOcc);
+  connect(floor2.onZon, onZon[2].y);
+
    for j in 1:5 loop
     connect(loaMulMidFlo[j].y, floor2.Q_flow[j]) annotation (Line(points={{-81.4,
             60},{-78,60},{-78,-4},{142,-4},{142,18.25},{141.5,18.25}},
@@ -459,34 +474,40 @@ equation
     connect(TZonAirSet[(2 - 1)*5 + j].SetPoi[2], floor2.zonHeaTSet[j]);
    end for;
 
-   connect(sou[3].T_in, TDryBul);
-   connect(floor3.port_Exh_Air, sou[3].ports[1]);
-   connect(floor3.port_Fre_Air, sou[3].ports[2]);
+  connect(floor3.port_Exh_Air, sou[3].ports[1]);
+  connect(floor3.port_Fre_Air, sou[3].ports[2]);
   connect(dpStaSet[3].y, floor3.pSet);
   connect(TSupAirSet[3].y, floor3.disTSet);
-  connect(reaToBooOcc.y, floor3.OnFan);
-  connect(floor3.OnZon, onZon[3].y);
+  connect(reaToBooOcc.y, floor3.onFanOcc);
+  connect(floor3.onZon, onZon[3].y);
+
    for j in 1:5 loop
     connect(loa[(3 - 1)*5 + j], floor3.Q_flow[j]);
     connect(floor3.TZon[j], TZon[(3-1)*5+j]);
     connect(TZonAirSet[(3 - 1)*5 + j].SetPoi[1], floor3.zonCooTSet[j]);
     connect(TZonAirSet[(3 - 1)*5 + j].SetPoi[2], floor3.zonHeaTSet[j]);
    end for;
+
   connect(booRep.y, TZonAirSet.Occ)
     annotation (Line(points={{-9,100},{-4,100}}, color={255,0,255}));
-  connect(floor1.TOut, TDryBul) annotation (Line(points={{136.813,18.25},{
-          136.813,0},{-84,0},{-84,1.77636e-15},{-114,1.77636e-15}},
-                                color={0,0,127}));
-  connect(floor2.TOut, TDryBul);
-  connect(floor3.TOut, TDryBul);
   connect(firOrd.y, reaToBooOcc.u)
     annotation (Line(points={{-69,100},{-62,100}}, color={0,0,127}));
   connect(firOrd.u,occ)
     annotation (Line(points={{-92,100},{-114,100}}, color={0,0,127}));
-
   connect(reaToBooOcc.y, booRep.u)
     annotation (Line(points={{-39,100},{-32,100}}, color={255,0,255}));
-
+  connect(numOcc[1:5], floor1.nPeo) annotation (Line(points={{-114,17.2},{-114,
+          20},{-100,20},{-100,8},{92,8},{92,35.75},{112.438,35.75}},
+                                                        color={0,0,127}));
+  connect(numOcc[11:15], floor3.nPeo) annotation (Line(points={{-114,26.5333},{
+          -114,20},{-100,20},{-100,10},{92,10},{92,35.75},{112.438,35.75}},
+                                                                 color={0,0,127}));
+  connect(numOcc[6:10], numOCCMulMidFlo.u) annotation (Line(points={{-114,
+          21.8667},{-114,20},{-95.2,20}},
+                                 color={0,0,127}));
+  connect(numOCCMulMidFlo.y, floor2.nPeo) annotation (Line(points={{-81.4,20},{
+          92,20},{92,35.75},{112.438,35.75}},
+                                           color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}),                                        graphics={
           Rectangle(

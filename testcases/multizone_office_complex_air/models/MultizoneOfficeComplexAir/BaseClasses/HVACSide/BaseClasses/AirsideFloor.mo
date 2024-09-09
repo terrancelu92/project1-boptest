@@ -2,6 +2,7 @@ within MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses;
 model AirsideFloor "Thermal zones and corresponding air side HVAC systems"
 
   replaceable package MediumAir = Modelica.Media.Interfaces.PartialMedium "Medium for the air";
+  //replaceable package MediumAir = Buildings.Media.Air(extraPropertiesNames={"CO2"}) "Buildings library air media package with CO2";
 
   replaceable package MediumHeaWat =
       Modelica.Media.Interfaces.PartialMedium "Medium for the heating water";
@@ -116,6 +117,10 @@ model AirsideFloor "Thermal zones and corresponding air side HVAC systems"
   parameter Modelica.Units.SI.MassFlowRate mWatFloRat5
     "mass flow rate for vav 5";
 
+  parameter Modelica.Units.SI.MassFlowRate mWatFloRat=(mAirFloRat1 + mAirFloRat2 + mAirFloRat3 + mAirFloRat4 +
+        mAirFloRat5)*(30 - 12.88)/4.2/6
+    "mass flow rate for cooling coil chilled water";
+
   parameter Modelica.Units.SI.Pressure PreDroAir1
     "Pressure drop in the air side of vav 1";
   parameter Modelica.Units.SI.Pressure PreDroWat1
@@ -151,8 +156,31 @@ model AirsideFloor "Thermal zones and corresponding air side HVAC systems"
   parameter Modelica.Units.SI.Efficiency eps5(max=1) = 0.8
     "Heat exchanger effectiveness of vav 5";
 
+  // Initialization
+  parameter MediumAir.AbsolutePressure p_start = MediumAir.p_default
+    "Start value of zone air pressure"
+    annotation(Dialog(tab = "Initialization"));
+  parameter MediumAir.Temperature T_start=MediumAir.T_default
+    "Start value of zone air temperature"
+    annotation(Dialog(tab = "Initialization"));
+  parameter MediumAir.MassFraction X_start[MediumAir.nX](
+       quantity=MediumAir.substanceNames) = MediumAir.X_default
+    "Start value of zone air mass fractions m_i/m"
+    annotation (Dialog(tab="Initialization", enable=Medium.nXi > 0));
+  parameter MediumAir.ExtraProperty C_start[MediumAir.nC](
+       quantity=MediumAir.extraPropertiesNames)=fill(0, MediumAir.nC)
+    "Start value of zone air trace substances"
+    annotation (Dialog(tab="Initialization", enable=Medium.nC > 0));
+  parameter MediumAir.ExtraProperty C_nominal[MediumAir.nC](
+       quantity=MediumAir.extraPropertiesNames) = fill(1E-2, MediumAir.nC)
+    "Nominal value of zone air trace substances. (Set to typical order of magnitude.)"
+   annotation (Dialog(tab="Initialization", enable=Medium.nC > 0));
+
+  parameter Modelica.Units.SI.MassFlowRate m_flow_lea[4]={0.206*1.2,0.137*1.2,0.206*1.2,0.137*1.2} "Air infiltration mass flow rates to four exterior zones";
+
   MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.AirSide.AirHandlingUnit.DuaFanAirHanUnit
     duaFanAirHanUni(
+    mWatFloRat=mWatFloRat,
     numTemp=5,
     redeclare package MediumAir = MediumAir,
     redeclare package MediumWat = MediumCooWat,
@@ -176,8 +204,6 @@ model AirsideFloor "Thermal zones and corresponding air side HVAC systems"
     TemEcoHig=TemEcoHig,
     TemEcoLow=TemEcoLow,
     MixingBoxDamMin=MixingBoxDamMin,
-    mWatFloRat=(mAirFloRat1 + mAirFloRat2 + mAirFloRat3 + mAirFloRat4 +
-        mAirFloRat5)*(30 - 12.88)/4.2/6,
     mFreAirFloRat=(mAirFloRat1 + mAirFloRat2 + mAirFloRat3 + mAirFloRat4 +
         mAirFloRat5)*0.3,
     UA=-(mAirFloRat1 + mAirFloRat2 + mAirFloRat3 + mAirFloRat4 + mAirFloRat5)*(
@@ -192,6 +218,12 @@ model AirsideFloor "Thermal zones and corresponding air side HVAC systems"
     fivZonVAV(
     redeclare package MediumAir = MediumAir,
     redeclare package MediumWat = MediumHeaWat,
+    p_start=p_start,
+    T_start=T_start,
+    X_start=X_start,
+    C_start=C_start,
+    C_nominal=C_nominal,
+    m_flow_lea=m_flow_lea,
     PreAirDroMai1=PreAirDroMai1,
     PreAirDroMai2=PreAirDroMai2,
     PreAirDroMai3=PreAirDroMai3,
@@ -236,41 +268,39 @@ model AirsideFloor "Thermal zones and corresponding air side HVAC systems"
     PreDroWat5=PreDroWat5,
     eps5=eps5)
     annotation (Placement(transformation(extent={{30,-18},{66,-46}})));
-  Modelica.Fluid.Interfaces.FluidPort_b port_b_CooWat(redeclare package Medium
-      = MediumCooWat)
+  Modelica.Fluid.Interfaces.FluidPort_b port_b_CooWat(redeclare package Medium =
+        MediumCooWat)
     "Fluid connector b (positive design flow direction is from port_a to port_b)"
-    annotation (Placement(transformation(extent={{-64,-110},{-44,-90}}),
-        iconTransformation(extent={{-64,-110},{-44,-90}})));
-  Modelica.Fluid.Interfaces.FluidPort_a port_a_CooWat(redeclare package Medium
-      = MediumCooWat)
+    annotation (Placement(transformation(extent={{-70,-110},{-50,-90}}),
+        iconTransformation(extent={{-70,-110},{-50,-90}})));
+  Modelica.Fluid.Interfaces.FluidPort_a port_a_CooWat(redeclare package Medium =
+        MediumCooWat)
     "Fluid connector a (positive design flow direction is from port_a to port_b)"
     annotation (Placement(transformation(extent={{-40,-110},{-20,-90}}),
         iconTransformation(extent={{-40,-110},{-20,-90}})));
-  Modelica.Fluid.Interfaces.FluidPort_a port_a_HeaWat(redeclare package Medium
-      = MediumHeaWat)
+  Modelica.Fluid.Interfaces.FluidPort_a port_a_HeaWat(redeclare package Medium =
+        MediumHeaWat)
     "Second port, typically outlet"
     annotation (Placement(transformation(extent={{30,-110},{50,-90}}),
         iconTransformation(extent={{30,-110},{50,-90}})));
-  Modelica.Fluid.Interfaces.FluidPort_b port_b_HeaWat(redeclare package Medium
-      = MediumHeaWat)
+  Modelica.Fluid.Interfaces.FluidPort_b port_b_HeaWat(redeclare package Medium =
+        MediumHeaWat)
     "Second port, typically outlet"
-    annotation (Placement(transformation(extent={{46,-110},{66,-90}}),
-        iconTransformation(extent={{46,-110},{66,-90}})));
-  Modelica.Fluid.Interfaces.FluidPort_b port_Exh_Air(redeclare package Medium
-      =                                                                         MediumAir)
+    annotation (Placement(transformation(extent={{60,-110},{80,-90}}),
+        iconTransformation(extent={{60,-110},{80,-90}})));
+  Modelica.Fluid.Interfaces.FluidPort_b port_Exh_Air(redeclare package Medium = MediumAir)
     "Fluid connector b (positive design flow direction is from port_a to port_b)"
     annotation (Placement(transformation(extent={{-174,-50},{-154,-30}})));
-  Modelica.Fluid.Interfaces.FluidPort_a port_Fre_Air(redeclare package Medium
-      =                                                                         MediumAir)
+  Modelica.Fluid.Interfaces.FluidPort_a port_Fre_Air(redeclare package Medium = MediumAir)
     "Fluid connector b (positive design flow direction is from port_a to port_b)"
     annotation (Placement(transformation(extent={{-170,30},{-150,50}})));
   Modelica.Blocks.Routing.BooleanReplicator booleanReplicator(nout=5)
     annotation (Placement(transformation(extent={{-140,-96},{-126,-84}})));
-  Modelica.Blocks.Interfaces.BooleanInput OnFan
-    "Connector of Boolean input signal"
-    annotation (Placement(transformation(extent={{-180,-60},{-160,-40}}),
-        iconTransformation(extent={{-180,-60},{-160,-40}})));
-  Modelica.Blocks.Interfaces.BooleanInput OnZon
+  Modelica.Blocks.Interfaces.BooleanInput onFanOcc
+    "Fan On signal during occupied period" annotation (Placement(transformation(
+          extent={{-180,-70},{-160,-50}}), iconTransformation(extent={{-180,-70},
+            {-160,-50}})));
+  Modelica.Blocks.Interfaces.BooleanInput onZon
     "Connector of Boolean input signal"
     annotation (Placement(transformation(extent={{-180,-100},{-160,-80}}),
         iconTransformation(extent={{-180,-100},{-160,-80}})));
@@ -301,14 +331,6 @@ model AirsideFloor "Thermal zones and corresponding air side HVAC systems"
     "Connector of setpoint input signal" annotation (Placement(
         transformation(extent={{-180,70},{-160,90}}), iconTransformation(
           extent={{-180,70},{-160,90}})));
-  Modelica.Blocks.Interfaces.RealInput TOut
-    "Connector of setpoint input signal" annotation (Placement(transformation(
-        extent={{10,-10},{-10,10}},
-        rotation=-90,
-        origin={-14,-110}),          iconTransformation(
-        extent={{10,-10},{-10,10}},
-        rotation=-90,
-        origin={-14,-110})));
   ReadOverwrite.ReadAhu reaAhu
     annotation (Placement(transformation(extent={{28,2},{48,66}})));
   Buildings.Utilities.IO.SignalExchange.Overwrite TSupAirSet(description=
@@ -337,7 +359,7 @@ model AirsideFloor "Thermal zones and corresponding air side HVAC systems"
     zonVAVCon[5](
     each MinFlowRateSetPoi=0.3,
     each HeatingFlowRateSetPoi=0.5,
-    heaCon(Ti=60, yMin=0.01),
+    heaCon(Ti=60, yMin=0.005),
     cooCon(k=11, Ti=60))
     "Zone terminal VAV controller (airflow rate, reheat valve)l "
     annotation (Placement(transformation(extent={{-14,118},{6,138}})));
@@ -358,19 +380,26 @@ model AirsideFloor "Thermal zones and corresponding air side HVAC systems"
       nout=5)
     annotation (Placement(transformation(extent={{-72,68},{-52,88}})));
 
+  Modelica.Blocks.Interfaces.RealInput nPeo[5] "Number of occupant" annotation (
+     Placement(transformation(extent={{-180,-28},{-160,-8}}),
+        iconTransformation(extent={{-180,-20},{-160,0}})));
+  Modelica.Icons.SignalBus weaBus
+    annotation (Placement(transformation(extent={{-8,-108},{8,-92}}),
+        iconTransformation(extent={{-8,-108},{8,-92}})));
+
 equation
   connect(fivZonVAV.port_a_Air, duaFanAirHanUni.port_b_Air) annotation (
       Line(
-      points={{30,-37.6},{-10,-37.6},{-10,-22},{-20,-22},{-20,1},{-50,1}},
+      points={{30,-38.3636},{-20,-38.3636},{-20,-0.181818},{-50,-0.181818}},
       color={0,140,72},
       thickness=0.5));
   connect(fivZonVAV.port_b_Air, duaFanAirHanUni.port_a_Air) annotation (
       Line(
-      points={{30,-23.6},{16,-23.6},{16,-4},{-50,-4},{-50,11.4}},
+      points={{30,-25.6364},{16,-25.6364},{16,12},{-50,12},{-50,9.27273}},
       color={0,140,72},
       thickness=0.5));
   connect(duaFanAirHanUni.port_b_Wat, port_b_CooWat) annotation (Line(
-      points={{-69.6,-12},{-70,-12},{-70,-66},{-54,-66},{-54,-100}},
+      points={{-69.6,-12},{-70,-12},{-70,-66},{-60,-66},{-60,-100}},
       color={0,127,255},
       thickness=1));
   connect(duaFanAirHanUni.port_a_Wat, port_a_CooWat) annotation (Line(
@@ -378,344 +407,426 @@ equation
       color={0,127,255},
       thickness=1));
   connect(fivZonVAV.port_a_Wat, port_a_HeaWat) annotation (Line(
-      points={{40.8,-46},{40,-46},{40,-100}},
+      points={{37.2,-46},{40,-46},{40,-100}},
       color={255,0,0},
       thickness=1));
   connect(fivZonVAV.port_b_Wat, port_b_HeaWat) annotation (Line(
-      points={{55.2,-46},{56,-46},{56,-100}},
+      points={{46.8,-46},{70,-46},{70,-100}},
       color={255,0,0},
       thickness=1));
   connect(duaFanAirHanUni.port_Exh_Air, port_Exh_Air) annotation (Line(
-      points={{-78.28,1},{-114,1},{-114,-40},{-164,-40}},
+      points={{-78.28,-0.181818},{-114,-0.181818},{-114,-40},{-164,-40}},
       color={0,140,72},
       thickness=0.5));
   connect(duaFanAirHanUni.port_Fre_Air, port_Fre_Air) annotation (Line(
-      points={{-78,-6.8},{-114,-6.8},{-114,40},{-160,40}},
+      points={{-78,-7.27273},{-114,-7.27273},{-114,40},{-160,40}},
       color={0,140,72},
       thickness=0.5));
-  connect(booleanReplicator.y, fivZonVAV.On) annotation (Line(
-      points={{-125.3,-90},{0,-90},{0,-30.32},{28.2,-30.32}},
+  connect(booleanReplicator.y,fivZonVAV.on)  annotation (Line(
+      points={{-125.3,-90},{4,-90},{4,-31.7455},{28.8,-31.7455}},
       color={255,0,255}));
-  connect(fivZonVAV.p, duaFanAirHanUni.pMea) annotation (Line(points={{67.8,
-          -19.4},{70,-19.4},{70,-16},{-88,-16},{-88,-11.22},{-79.4,-11.22}},
+  connect(fivZonVAV.p, duaFanAirHanUni.pMea) annotation (Line(points={{55.2,
+          -21.8182},{70,-21.8182},{70,-16},{-88,-16},{-88,-11.2909},{-79.4,
+          -11.2909}},
         color={0,0,127}));
-  connect(fivZonVAV.TZon, duaFanAirHanUni.zonT) annotation (Line(points={{
-          67.8,-40.4},{84,-40.4},{84,-64},{-104,-64},{-104,6.2},{-79.4,6.2}},
+  connect(fivZonVAV.TZon, duaFanAirHanUni.zonT) annotation (Line(points={{55.2,
+          -38.3636},{84,-38.3636},{84,-64},{-104,-64},{-104,4.54545},{-79.4,
+          4.54545}},
         color={0,0,127}));
 
-  connect(OnFan, duaFanAirHanUni.On) annotation (Line(points={{-170,-50},{-108,
-          -50},{-108,14},{-79.4,14}}, color={255,0,255}));
-  connect(booleanReplicator.u, OnZon) annotation (Line(
+  connect(onFanOcc, duaFanAirHanUni.onFanOcc) annotation (Line(points={{-170,
+          -60},{-108,-60},{-108,11.6364},{-79.4,11.6364}}, color={255,0,255}));
+  connect(booleanReplicator.u,onZon)  annotation (Line(
       points={{-141.4,-90},{-170,-90}},
       color={255,0,255}));
   connect(fivZonVAV.Q_flow, Q_flow) annotation (Line(
-      points={{28.2,-20.8},{2,-20.8},{2,-70},{16,-70},{16,-110}},
+      points={{28.8,-23.8545},{2,-23.8545},{2,-70},{16,-70},{16,-110}},
       color={0,0,127}));
   connect(fivZonVAV.TZon, TZon) annotation (Line(
-      points={{67.8,-40.4},{146,-40.4},{146,0},{170,0}},
+      points={{55.2,-38.3636},{146,-38.3636},{146,0},{170,0}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(port_a_CooWat, port_a_CooWat) annotation (Line(points={{-30,-100},
           {-30,-100}},     color={0,127,255}));
-  connect(duaFanAirHanUni.TOut, TOut) annotation (Line(points={{-79.4,11.4},
-          {-112,11.4},{-112,-74},{-14,-74},{-14,-110}}, color={0,0,127}));
 
-  connect(OnFan, reaAhu.occ_in) annotation (Line(points={{-170,-50},{-112,-50},
-          {-112,62},{26,62},{26,62.3826}}, color={255,0,255}));
+  connect(onFanOcc, reaAhu.occ_in) annotation (Line(points={{-170,-60},{-112,
+          -60},{-112,62},{26,62},{26,63.131}},
+                                        color={255,0,255}));
   connect(duaFanAirHanUni.TSupAir, reaAhu.TSup_in) annotation (Line(
-      points={{-48.6,-4.2},{-34,-4.2},{-34,54.8696},{26,54.8696}},
+      points={{-48.6,-4.90909},{-34,-4.90909},{-34,57.1724},{26,57.1724}},
       color={0,0,127},
       pattern=LinePattern.Dash));
 
   connect(duaFanAirHanUni.TMixAir, reaAhu.TMix_in) annotation (Line(
-      points={{-48.6,-2.64},{-48.6,-4},{-32,-4},{-32,50.6957},{26,50.6957}},
+      points={{-48.6,-3.49091},{-48.6,-4},{-32,-4},{-32,53.8621},{26,53.8621}},
       color={0,0,127},
       pattern=LinePattern.Dash));
 
   connect(duaFanAirHanUni.TRetAir, reaAhu.TRet_in) annotation (Line(
-      points={{-48.6,8.02},{-28,8.02},{-28,46.5217},{26,46.5217}},
+      points={{-48.6,6.2},{-28,6.2},{-28,50.5517},{26,50.5517}},
       color={0,0,127},
       pattern=LinePattern.Dash));
 
   connect(duaFanAirHanUni.V_flowSupAir, reaAhu.V_flow_sup_in) annotation (
       Line(
-      points={{-48.6,-1.08},{-26,-1.08},{-26,42.3478},{26,42.3478}},
+      points={{-48.6,-2.07273},{-26,-2.07273},{-26,47.2414},{26,47.2414}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(duaFanAirHanUni.V_flowRetAir, reaAhu.V_flow_ret_in) annotation (
       Line(
-      points={{-48.6,9.58},{-30,9.58},{-30,38.1739},{26,38.1739}},
+      points={{-48.6,7.61818},{-30,7.61818},{-30,43.931},{26,43.931}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(duaFanAirHanUni.yDamOutAir, reaAhu.yOA_in) annotation (Line(
-      points={{-48.6,-11.22},{-24,-11.22},{-24,34.2783},{26,34.2783}},
+      points={{-48.6,-11.2909},{-24,-11.2909},{-24,40.8414},{26,40.8414}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(duaFanAirHanUni.pMea, reaAhu.dp_in) annotation (Line(
-      points={{-79.4,-11.22},{-22,-11.22},{-22,29.8261},{26,29.8261}},
+      points={{-79.4,-11.2909},{-22,-11.2909},{-22,37.3103},{26,37.3103}},
       color={0,0,127},
       pattern=LinePattern.Dash));
 
   connect(duaFanAirHanUni.PFan, reaAhu.PFanTot_in) annotation (Line(
-      points={{-48.6,4.64},{-20,4.64},{-20,25.6522},{26,25.6522}},
+      points={{-48.6,3.12727},{-20,3.12727},{-20,34},{26,34}},
       color={0,0,127},
       pattern=LinePattern.Dash));
 
   connect(duaFanAirHanUni.TSupCHW, reaAhu.TCooCoiSup_in) annotation (Line(
-      points={{-48.6,-9.4},{-18,-9.4},{-18,21.4783},{26,21.4783}},
+      points={{-48.6,-9.63636},{-18,-9.63636},{-18,30.6897},{26,30.6897}},
       color={0,0,127},
       pattern=LinePattern.Dash));
 
   connect(duaFanAirHanUni.TRetCHW, reaAhu.TCooCoiRet_in) annotation (Line(
-      points={{-48.6,2.82},{-16,2.82},{-16,17.3043},{26,17.3043}},
+      points={{-48.6,1.47273},{-16,1.47273},{-16,27.3793},{26,27.3793}},
       color={0,0,127},
       pattern=LinePattern.Dash));
 
   connect(reaAhu.yCooVal_in, duaFanAirHanUni.yCooVal) annotation (Line(
-      points={{26,13.1304},{-14,13.1304},{-14,6.2},{-48.6,6.2}},
+      points={{26,24.069},{-14,24.069},{-14,4.54545},{-48.6,4.54545}},
       color={0,0,127},
       pattern=LinePattern.Dash));
 
   connect(duaFanAirHanUni.V_flowOutAir, reaAhu.V_flow_OA_in) annotation (
       Line(
-      points={{-48.6,-6.8},{-48.6,-4},{-12,-4},{-12,10},{26,10},{26,8.95652}},
+      points={{-48.6,-7.27273},{-48.6,-6},{-12,-6},{-12,16},{26,16},{26,20.7586}},
       color={0,0,127},
       pattern=LinePattern.Dash));
 
   connect(TSupAirSet.y, reaAhu.TSup_set_in) annotation (Line(
-      points={{-127.4,60},{26,60},{26,58.2087}},
+      points={{-127.4,60},{26,60},{26,59.8207}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(disTSet, TSupAirSet.u)
     annotation (Line(points={{-170,60},{-141.2,60}}, color={0,0,127}));
-  connect(TSupAirSet.y, duaFanAirHanUni.disTSet) annotation (Line(points={{
-          -127.4,60},{-110,60},{-110,3.6},{-79.4,3.6}}, color={0,0,127}));
+  connect(TSupAirSet.y, duaFanAirHanUni.disTSet) annotation (Line(points={{-127.4,
+          60},{-110,60},{-110,2.18182},{-79.4,2.18182}},color={0,0,127}));
   connect(pSet, dpSet.u)
     annotation (Line(points={{-170,10},{-141.2,10}}, color={0,0,127}));
-  connect(dpSet.y, duaFanAirHanUni.pSet) annotation (Line(points={{-127.4,
-          10},{-110,10},{-110,8.8},{-79.4,8.8}}, color={0,0,127}));
+  connect(dpSet.y, duaFanAirHanUni.pSet) annotation (Line(points={{-127.4,10},{
+          -110,10},{-110,6.90909},{-79.4,6.90909}},
+                                                 color={0,0,127}));
   connect(fivZonVAV.yDam[1], reaZonCor.yDam_in) annotation (Line(
-      points={{67.8,-35.08},{88,-35.08},{88,141},{98,141}},
+      points={{55.2,-34.5455},{88,-34.5455},{88,141.125},{98,141.125}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.yDam[2], reaZonSou.yDam_in) annotation (Line(
-      points={{67.8,-35.64},{88,-35.64},{88,77},{98,77}},
+      points={{55.2,-34.8},{88,-34.8},{88,77.125},{98,77.125}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.yDam[3], reaZonEas.yDam_in) annotation (Line(
-      points={{67.8,-36.2},{88,-36.2},{88,13},{98,13}},
+      points={{55.2,-35.0545},{88,-35.0545},{88,13.125},{98,13.125}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.yDam[4], reaZonNor.yDam_in) annotation (Line(
-      points={{67.8,-36.76},{128,-36.76},{128,109},{138,109}},
+      points={{55.2,-35.3091},{128,-35.3091},{128,109.125},{138,109.125}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.yDam[5], reaZonWes.yDam_in) annotation (Line(
-      points={{67.8,-37.32},{128,-37.32},{128,47},{138,47}},
+      points={{55.2,-35.5636},{128,-35.5636},{128,47.125},{138,47.125}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.yReaHea[1], reaZonCor.yReheaVal_in) annotation (Line(
-      points={{67.8,-30.88},{92,-30.88},{92,138},{98,138}},
+      points={{55.2,-31.4909},{92,-31.4909},{92,138.5},{98,138.5}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.yReaHea[2], reaZonSou.yReheaVal_in) annotation (Line(
-      points={{67.8,-31.44},{92,-31.44},{92,74},{98,74}},
+      points={{55.2,-31.7455},{92,-31.7455},{92,74.5},{98,74.5}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.yReaHea[3], reaZonEas.yReheaVal_in) annotation (Line(
-      points={{67.8,-32},{92,-32},{92,10},{98,10}},
+      points={{55.2,-32},{92,-32},{92,10.5},{98,10.5}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.yReaHea[4], reaZonNor.yReheaVal_in) annotation (Line(
-      points={{67.8,-32.56},{130,-32.56},{130,106},{138,106}},
+      points={{55.2,-32.2545},{130,-32.2545},{130,106.5},{138,106.5}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.yReaHea[5], reaZonWes.yReheaVal_in) annotation (Line(
-      points={{67.8,-33.12},{130,-33.12},{130,44},{138,44}},
+      points={{55.2,-32.5091},{130,-32.5091},{130,44.5},{138,44.5}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.TZon[1], reaZonCor.TZon_in) annotation (Line(
-      points={{67.8,-39.28},{84,-39.28},{84,135},{98,135}},
+      points={{55.2,-37.8545},{84,-37.8545},{84,135.875},{98,135.875}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.TZon[2], reaZonSou.TZon_in) annotation (Line(
-      points={{67.8,-39.84},{84,-39.84},{84,71},{98,71}},
+      points={{55.2,-38.1091},{84,-38.1091},{84,71.875},{98,71.875}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.TZon[3], reaZonEas.TZon_in) annotation (Line(
-      points={{67.8,-40.4},{84,-40.4},{84,7},{98,7}},
+      points={{55.2,-38.3636},{84,-38.3636},{84,7.875},{98,7.875}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.TZon[4], reaZonNor.TZon_in) annotation (Line(
-      points={{67.8,-40.96},{126,-40.96},{126,103},{138,103}},
+      points={{55.2,-38.6182},{126,-38.6182},{126,103.875},{138,103.875}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.TZon[5], reaZonWes.TZon_in) annotation (Line(
-      points={{67.8,-41.52},{126,-41.52},{126,41},{138,41}},
+      points={{55.2,-38.8727},{126,-38.8727},{126,41.875},{138,41.875}},
       color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(fivZonVAV.TSup[1], reaZonCor.TSup_in) annotation (Line(points={{67.8,
-          -43.48},{94,-43.48},{94,132},{98,132}},      color={0,0,127}));
-  connect(fivZonVAV.TSup[2], reaZonSou.TSup_in) annotation (Line(points={{
-          67.8,-44.04},{94,-44.04},{94,68},{98,68}}, color={0,0,127}));
-  connect(fivZonVAV.TSup[3], reaZonEas.TSup_in) annotation (Line(points={{
-          67.8,-44.6},{94,-44.6},{94,4},{98,4}}, color={0,0,127}));
+  connect(fivZonVAV.TSup[1], reaZonCor.TSup_in) annotation (Line(points={{55.2,
+          -41.1636},{94,-41.1636},{94,133.25},{98,133.25}},
+                                                       color={0,0,127}));
+  connect(fivZonVAV.TSup[2], reaZonSou.TSup_in) annotation (Line(points={{55.2,
+          -41.4182},{94,-41.4182},{94,69.25},{98,69.25}},
+                                                     color={0,0,127}));
+  connect(fivZonVAV.TSup[3], reaZonEas.TSup_in) annotation (Line(points={{55.2,
+          -41.6727},{94,-41.6727},{94,5.25},{98,5.25}},
+                                                 color={0,0,127}));
   connect(fivZonVAV.TSup[4], reaZonNor.TSup_in) annotation (Line(
-      points={{67.8,-45.16},{132,-45.16},{132,100},{138,100}},
+      points={{55.2,-41.9273},{132,-41.9273},{132,101.25},{138,101.25}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.TSup[5], reaZonWes.TSup_in) annotation (Line(
-      points={{67.8,-45.72},{134,-45.72},{134,38},{138,38}},
+      points={{55.2,-42.1818},{134,-42.1818},{134,39.25},{138,39.25}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow[1], reaZonCor.V_flow_in) annotation (Line(
-      points={{67.8,-22.48},{82,-22.48},{82,129.2},{98,129.2}},
+      points={{55.2,-24.8727},{82,-24.8727},{82,130.8},{98,130.8}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow[2], reaZonSou.V_flow_in) annotation (Line(
-      points={{67.8,-23.04},{82,-23.04},{82,65.2},{98,65.2}},
+      points={{55.2,-25.1273},{82,-25.1273},{82,66.8},{98,66.8}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow[3], reaZonEas.V_flow_in) annotation (Line(
-      points={{67.8,-23.6},{82,-23.6},{82,1.2},{98,1.2}},
+      points={{55.2,-25.3818},{82,-25.3818},{82,2.8},{98,2.8}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow[4], reaZonNor.V_flow_in) annotation (Line(
-      points={{67.8,-24.16},{124,-24.16},{124,97.2},{138,97.2}},
+      points={{55.2,-25.6364},{124,-25.6364},{124,98.8},{138,98.8}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow[5], reaZonWes.V_flow_in) annotation (Line(
-      points={{67.8,-24.72},{124,-24.72},{124,35.2},{138,35.2}},
+      points={{55.2,-25.8909},{124,-25.8909},{124,36.8},{138,36.8}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow_set[1], reaZonCor.Vflow_set_in) annotation (Line(
-      points={{67.8,-26.68},{80,-26.68},{80,126.6},{98,126.6}},
+      points={{55.2,-28.1818},{80,-28.1818},{80,128.525},{98,128.525}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow_set[2], reaZonSou.Vflow_set_in) annotation (Line(
-      points={{67.8,-27.24},{80,-27.24},{80,62.6},{98,62.6}},
+      points={{55.2,-28.4364},{80,-28.4364},{80,64.525},{98,64.525}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow_set[3], reaZonEas.Vflow_set_in) annotation (Line(
-      points={{67.8,-27.8},{80,-27.8},{80,-1.4},{98,-1.4}},
+      points={{55.2,-28.6909},{80,-28.6909},{80,0.525},{98,0.525}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow_set[4], reaZonNor.Vflow_set_in) annotation (Line(
-      points={{67.8,-28.36},{122,-28.36},{122,94.6},{138,94.6}},
+      points={{55.2,-28.9455},{122,-28.9455},{122,96.525},{138,96.525}},
       color={0,0,127},
       pattern=LinePattern.Dash));
   connect(fivZonVAV.Vflow_set[5], reaZonWes.Vflow_set_in) annotation (Line(
-      points={{67.8,-28.92},{124,-28.92},{124,32.6},{138,32.6}},
+      points={{55.2,-29.2},{124,-29.2},{124,34.525},{138,34.525}},
       color={0,0,127},
       pattern=LinePattern.Dash));
-  connect(zonVAVCon.yValPos, fivZonVAV.yVal) annotation (Line(points={{7,122},
-          {6,122},{6,-40.4},{28.2,-40.4}},      color={0,0,127}));
+  connect(zonVAVCon.yValPos, fivZonVAV.yVal) annotation (Line(points={{7,122},{
+          6,122},{6,-40.9091},{28.8,-40.9091}}, color={0,0,127}));
   connect(zonVAVCon.yAirFlowSet, fivZonVAV.airFloRatSet) annotation (Line(
-        points={{7,126},{8,126},{8,-44.04},{28.2,-44.04}}, color={0,0,127}));
-  connect(zonVAVCon.yHea, fivZonVAV.yHea) annotation (Line(points={{7,132},
-          {8,132},{8,-32.84},{28.2,-32.84}}, color={0,0,127}));
-  connect(zonVAVCon.yCoo, fivZonVAV.yCoo) annotation (Line(points={{7,136},
-          {10,136},{10,-35.64},{28.2,-35.64}}, color={0,0,127}));
-  connect(zonVAVCon.T, fivZonVAV.TZon) annotation (Line(points={{-16,128},{
-          -26,128},{-26,98},{88,98},{88,-40.4},{67.8,-40.4}}, color={0,0,
+        points={{7,126},{8,126},{8,-44.2182},{28.8,-44.2182}},
+                                                           color={0,0,127}));
+  connect(zonVAVCon.yHea, fivZonVAV.yHea) annotation (Line(points={{7,132},{8,
+          132},{8,-34.0364},{28.8,-34.0364}},color={0,0,127}));
+  connect(zonVAVCon.yCoo, fivZonVAV.yCoo) annotation (Line(points={{7,136},{10,
+          136},{10,-36.5818},{28.8,-36.5818}}, color={0,0,127}));
+  connect(zonVAVCon.T, fivZonVAV.TZon) annotation (Line(points={{-16,128},{-26,
+          128},{-26,98},{88,98},{88,-38.3636},{55.2,-38.3636}},
+                                                              color={0,0,
           127}));
-  connect(zonHeaTSet[1], oveZonCor.TZonHeaSet_in) annotation (Line(points={
-          {-170,72},{-150,72},{-150,192},{-122,192}}, color={0,0,127}));
-  connect(zonHeaTSet[2], oveZonSou.TZonHeaSet_in) annotation (Line(points={
-          {-170,76},{-150,76},{-150,164},{-122,164}}, color={0,0,127}));
+  connect(zonHeaTSet[1], oveZonCor.TZonHeaSet_in) annotation (Line(points={{-170,76},
+          {-150,76},{-150,192},{-122,192}},           color={0,0,127}));
+  connect(zonHeaTSet[2], oveZonSou.TZonHeaSet_in) annotation (Line(points={{-170,78},
+          {-150,78},{-150,164},{-122,164}},           color={0,0,127}));
   connect(zonHeaTSet[3], oveZonEas.TZonHeaSet_in) annotation (Line(points={
           {-170,80},{-150,80},{-150,136},{-122,136}}, color={0,0,127}));
-  connect(zonHeaTSet[4], oveZonNor.TZonHeaSet_in) annotation (Line(points={
-          {-170,84},{-150,84},{-150,112},{-122,112}}, color={0,0,127}));
-  connect(zonHeaTSet[5], oveZonWes.TZonHeaSet_in) annotation (Line(points={
-          {-170,88},{-150,88},{-150,84},{-122,84}}, color={0,0,127}));
-  connect(zonCooTSet[1], oveZonCor.TZonCooSet_in) annotation (Line(points={
-          {-170,92},{-154,92},{-154,184},{-122,184}}, color={0,0,127}));
-  connect(zonCooTSet[2], oveZonSou.TZonCooSet_in) annotation (Line(points={
-          {-170,96},{-154,96},{-154,156},{-122,156}}, color={0,0,127}));
+  connect(zonHeaTSet[4], oveZonNor.TZonHeaSet_in) annotation (Line(points={{-170,82},
+          {-150,82},{-150,112},{-122,112}},           color={0,0,127}));
+  connect(zonHeaTSet[5], oveZonWes.TZonHeaSet_in) annotation (Line(points={{-170,84},
+          {-150,84},{-150,84},{-122,84}},           color={0,0,127}));
+  connect(zonCooTSet[1], oveZonCor.TZonCooSet_in) annotation (Line(points={{-170,96},
+          {-154,96},{-154,184},{-122,184}},           color={0,0,127}));
+  connect(zonCooTSet[2], oveZonSou.TZonCooSet_in) annotation (Line(points={{-170,98},
+          {-154,98},{-154,156},{-122,156}},           color={0,0,127}));
   connect(zonCooTSet[3], oveZonEas.TZonCooSet_in) annotation (Line(points={
           {-170,100},{-154,100},{-154,128},{-122,128}}, color={0,0,127}));
   connect(zonCooTSet[4], oveZonNor.TZonCooSet_in)
-    annotation (Line(points={{-170,104},{-122,104}}, color={0,0,127}));
-  connect(zonCooTSet[5], oveZonWes.TZonCooSet_in) annotation (Line(points={
-          {-170,108},{-150,108},{-150,76},{-122,76}}, color={0,0,127}));
+    annotation (Line(points={{-170,102},{-146,102},{-146,104},{-122,104}},
+                                                     color={0,0,127}));
+  connect(zonCooTSet[5], oveZonWes.TZonCooSet_in) annotation (Line(points={{-170,
+          104},{-150,104},{-150,76},{-122,76}},       color={0,0,127}));
   connect(oveZonCor.TZonHeaSet_out, TZonHeaSet.u[1]) annotation (Line(
-        points={{-99,192},{-76,192},{-76,174.4},{-72,174.4}}, color={0,0,
+        points={{-99,192},{-76,192},{-76,175.2},{-72,175.2}}, color={0,0,
           127}));
   connect(oveZonSou.TZonHeaSet_out, TZonHeaSet.u[2]) annotation (Line(
-        points={{-99,164},{-76,164},{-76,175.2},{-72,175.2}}, color={0,0,
+        points={{-99,164},{-76,164},{-76,175.6},{-72,175.6}}, color={0,0,
           127}));
   connect(oveZonEas.TZonHeaSet_out, TZonHeaSet.u[3]) annotation (Line(
         points={{-99,136},{-76,136},{-76,176},{-72,176}}, color={0,0,127}));
   connect(oveZonNor.TZonHeaSet_out, TZonHeaSet.u[4]) annotation (Line(
-        points={{-99,112},{-76,112},{-76,176.8},{-72,176.8}}, color={0,0,
+        points={{-99,112},{-76,112},{-76,176.4},{-72,176.4}}, color={0,0,
           127}));
   connect(oveZonWes.TZonHeaSet_out, TZonHeaSet.u[5]) annotation (Line(
-        points={{-99,84},{-76,84},{-76,176},{-72,176},{-72,177.6}}, color={
+        points={{-99,84},{-76,84},{-76,176},{-72,176},{-72,176.8}}, color={
           0,0,127}));
   connect(TZonHeaSet.y, zonVAVCon.THeaSet) annotation (Line(points={{-48,
           176},{-24,176},{-24,122},{-16,122}}, color={0,0,127}));
   connect(oveZonCor.TZonCooSet_out, TZonCooSet.u[1]) annotation (Line(
-        points={{-99,184},{-80,184},{-80,76.4},{-74,76.4}}, color={0,0,127}));
+        points={{-99,184},{-80,184},{-80,77.2},{-74,77.2}}, color={0,0,127}));
   connect(oveZonSou.TZonCooSet_out, TZonCooSet.u[2]) annotation (Line(
-        points={{-99,156},{-80,156},{-80,77.2},{-74,77.2}}, color={0,0,127}));
+        points={{-99,156},{-80,156},{-80,77.6},{-74,77.6}}, color={0,0,127}));
   connect(oveZonEas.TZonCooSet_out, TZonCooSet.u[3]) annotation (Line(
         points={{-99,128},{-80,128},{-80,78},{-74,78}}, color={0,0,127}));
   connect(oveZonNor.TZonCooSet_out, TZonCooSet.u[4]) annotation (Line(
-        points={{-99,104},{-80,104},{-80,78.8},{-74,78.8}}, color={0,0,127}));
+        points={{-99,104},{-80,104},{-80,78.4},{-74,78.4}}, color={0,0,127}));
   connect(oveZonWes.TZonCooSet_out, TZonCooSet.u[5]) annotation (Line(
-        points={{-99,76},{-80,76},{-80,79.6},{-74,79.6}}, color={0,0,127}));
+        points={{-99,76},{-80,76},{-80,78.8},{-74,78.8}}, color={0,0,127}));
   connect(TZonCooSet.y, zonVAVCon.TCooSet) annotation (Line(points={{-50,78},
           {-28,78},{-28,134},{-16,134}}, color={0,0,127}));
-  connect(TZonCooSet.y, duaFanAirHanUni.cooTSet) annotation (Line(points={{
-          -50,78},{-50,58},{-110,58},{-110,-4.2},{-79.4,-4.2}}, color={0,0,
+  connect(TZonCooSet.y, duaFanAirHanUni.cooTSet) annotation (Line(points={{-50,78},
+          {-50,58},{-110,58},{-110,-4.90909},{-79.4,-4.90909}}, color={0,0,
           127}));
-  connect(TZonHeaSet.y, duaFanAirHanUni.heaTSet) annotation (Line(points={{
-          -48,176},{-48,60},{-106,60},{-106,-9.4},{-79.4,-9.4}}, color={0,0,
+  connect(TZonHeaSet.y, duaFanAirHanUni.heaTSet) annotation (Line(points={{-48,176},
+          {-48,60},{-106,60},{-106,-9.63636},{-79.4,-9.63636}},  color={0,0,
           127}));
   connect(TZonHeaSet.y[1], reaZonCor.TRoo_Hea_set_in) annotation (Line(
-        points={{-48,174.4},{76,174.4},{76,123.8},{98,123.8}}, color={0,0,
+        points={{-48,175.2},{76,175.2},{76,126.075},{98,126.075}},
+                                                               color={0,0,
           127}));
   connect(TZonHeaSet.y[2], reaZonSou.TRoo_Hea_set_in) annotation (Line(
-        points={{-48,175.2},{76,175.2},{76,59.8},{98,59.8}}, color={0,0,127}));
+        points={{-48,175.6},{76,175.6},{76,62.075},{98,62.075}},
+                                                             color={0,0,127}));
   connect(TZonHeaSet.y[3], reaZonEas.TRoo_Hea_set_in) annotation (Line(
-        points={{-48,176},{76,176},{76,-4.2},{98,-4.2}}, color={0,0,127}));
+        points={{-48,176},{76,176},{76,-1.925},{98,-1.925}},
+                                                         color={0,0,127}));
   connect(TZonHeaSet.y[4], reaZonNor.TRoo_Hea_set_in) annotation (Line(
-        points={{-48,176.8},{76,176.8},{76,91.8},{138,91.8}}, color={0,0,
+        points={{-48,176.4},{76,176.4},{76,94.075},{138,94.075}},
+                                                              color={0,0,
           127}));
   connect(TZonHeaSet.y[5], reaZonWes.TRoo_Hea_set_in) annotation (Line(
-        points={{-48,177.6},{78,177.6},{78,29.8},{138,29.8}}, color={0,0,
+        points={{-48,176.8},{78,176.8},{78,32.075},{138,32.075}},
+                                                              color={0,0,
           127}));
   connect(TZonCooSet.y[1], reaZonCor.TRoo_Coo_set_in) annotation (Line(
-        points={{-50,76.4},{70,76.4},{70,120.6},{98,120.6}}, color={0,0,127}));
+        points={{-50,77.2},{70,77.2},{70,123.275},{98,123.275}},
+                                                             color={0,0,127}));
   connect(TZonCooSet.y[2], reaZonSou.TRoo_Coo_set_in) annotation (Line(
-        points={{-50,77.2},{70,77.2},{70,56.6},{98,56.6}}, color={0,0,127}));
+        points={{-50,77.6},{70,77.6},{70,59.275},{98,59.275}},
+                                                           color={0,0,127}));
   connect(TZonCooSet.y[3], reaZonEas.TRoo_Coo_set_in) annotation (Line(
-        points={{-50,78},{70,78},{70,-7.4},{98,-7.4}}, color={0,0,127}));
+        points={{-50,78},{70,78},{70,-4.725},{98,-4.725}},
+                                                       color={0,0,127}));
   connect(TZonCooSet.y[4], reaZonNor.TRoo_Coo_set_in) annotation (Line(
-        points={{-50,78.8},{70,78.8},{70,88.6},{138,88.6}}, color={0,0,127}));
+        points={{-50,78.4},{70,78.4},{70,91.275},{138,91.275}},
+                                                            color={0,0,127}));
   connect(TZonCooSet.y[5], reaZonWes.TRoo_Coo_set_in) annotation (Line(
-        points={{-50,79.6},{70,79.6},{70,26.6},{138,26.6}}, color={0,0,127}));
+        points={{-50,78.8},{70,78.8},{70,29.275},{138,29.275}},
+                                                            color={0,0,127}));
   connect(zonVAVCon[1].yCoo, reaZonCor.yCoo_in) annotation (Line(points={{7,136},
-          {68,136},{68,118},{98,118}},      color={0,0,127}));
+          {68,136},{68,121},{98,121}},      color={0,0,127}));
   connect(zonVAVCon[2].yCoo, reaZonSou.yCoo_in) annotation (Line(points={{7,136},
-          {68,136},{68,54},{98,54}},      color={0,0,127}));
+          {68,136},{68,57},{98,57}},      color={0,0,127}));
   connect(zonVAVCon[3].yCoo, reaZonEas.yCoo_in) annotation (Line(points={{7,136},
-          {68,136},{68,-10},{98,-10}},      color={0,0,127}));
+          {68,136},{68,-7},{98,-7}},        color={0,0,127}));
   connect(zonVAVCon[4].yCoo, reaZonNor.yCoo_in) annotation (Line(points={{7,136},
-          {70,136},{70,86},{138,86}},      color={0,0,127}));
+          {70,136},{70,89},{138,89}},      color={0,0,127}));
   connect(zonVAVCon[5].yCoo, reaZonWes.yCoo_in) annotation (Line(points={{7,136},
-          {68,136},{68,24},{138,24}},      color={0,0,127}));
+          {68,136},{68,27},{138,27}},      color={0,0,127}));
   connect(zonVAVCon[1].yHea, reaZonCor.yHea_in) annotation (Line(points={{7,132},
-          {66,132},{66,115},{98,115}},      color={0,0,127}));
+          {66,132},{66,118.375},{98,118.375}},
+                                            color={0,0,127}));
   connect(zonVAVCon[2].yHea, reaZonSou.yHea_in) annotation (Line(points={{7,132},
-          {66,132},{66,51},{98,51}},      color={0,0,127}));
+          {66,132},{66,54.375},{98,54.375}},
+                                          color={0,0,127}));
   connect(zonVAVCon[3].yHea, reaZonEas.yHea_in) annotation (Line(points={{7,132},
-          {66,132},{66,-13},{98,-13}},      color={0,0,127}));
+          {66,132},{66,-9.625},{98,-9.625}},color={0,0,127}));
   connect(zonVAVCon[4].yHea, reaZonNor.yHea_in) annotation (Line(points={{7,132},
-          {66,132},{66,83},{138,83}},      color={0,0,127}));
+          {66,132},{66,86.375},{138,86.375}},
+                                           color={0,0,127}));
   connect(zonVAVCon[5].yHea, reaZonWes.yHea_in) annotation (Line(points={{7,132},
-          {66,132},{66,21},{138,21}},      color={0,0,127}));
+          {66,132},{66,24.375},{138,24.375}},
+                                           color={0,0,127}));
+  connect(nPeo, fivZonVAV.nPeo)
+    annotation (Line(points={{-170,-18},{-70,-18},{-70,-21.0545},{28.8,-21.0545}},
+                                                     color={0,0,127}));
+  connect(fivZonVAV.CO2Zon[1], reaZonCor.CO2Zon_in) annotation (Line(
+      points={{55.2,-44.2182},{90,-44.2182},{90,115.75},{98,115.75}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(fivZonVAV.CO2Zon[2], reaZonSou.CO2Zon_in) annotation (Line(
+      points={{55.2,-44.4727},{78,-44.4727},{78,-44},{90,-44},{90,52},{98,52},{
+          98,51.75}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(fivZonVAV.CO2Zon[3], reaZonEas.CO2Zon_in) annotation (Line(
+      points={{55.2,-44.7273},{90,-44.7273},{90,-12},{98,-12},{98,-12.25}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(fivZonVAV.CO2Zon[4], reaZonNor.CO2Zon_in) annotation (Line(
+      points={{55.2,-44.9818},{134,-44.9818},{134,83.75},{138,83.75}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(fivZonVAV.CO2Zon[5], reaZonWes.CO2Zon_in) annotation (Line(
+      points={{55.2,-45.2364},{134,-45.2364},{134,22},{138,22},{138,21.75}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(duaFanAirHanUni.CO2_AHUSupAir, reaAhu.CO2_AHUSup_in) annotation (Line(
+      points={{-48.6,14.2364},{22,14.2364},{22,17.4483},{26,17.4483}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(duaFanAirHanUni.CO2_AHUFreAir, reaAhu.CO2_AHUFre_in) annotation (Line(
+      points={{-48.6,12.8182},{20,12.8182},{20,14.1379},{26,14.1379}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(duaFanAirHanUni.CO2_AHURetAir, reaAhu.CO2_AHURet_in) annotation (Line(
+      points={{-48.6,11.6364},{18,11.6364},{18,10.8276},{26,10.8276}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(weaBus, fivZonVAV.weaBus) annotation (Line(
+      points={{0,-100},{0,-18},{42,-18}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(weaBus.TDryBul, duaFanAirHanUni.TOut) annotation (Line(
+      points={{0,-100},{0,-60},{-100,-60},{-100,9.27273},{-79.4,9.27273}},
+      color={255,204,51},
+      thickness=0.5), Text(
+      string="%first",
+      index=-1,
+      extent={{-6,3},{-6,3}},
+      horizontalAlignment=TextAlignment.Right));
+  connect(duaFanAirHanUni.phiSupAir, reaAhu.phiAHUSup_in) annotation (Line(
+      points={{-48.6,18.7273},{18,18.7273},{18,7.51724},{26,7.51724}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
+  connect(duaFanAirHanUni.phiRetAir, reaAhu.phiAHURet_in) annotation (Line(
+      points={{-48.6,16.6},{16,16.6},{16,3.98621},{26,3.98621}},
+      color={0,0,127},
+      pattern=LinePattern.Dash));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-160,
             -100},{160,140}}),                                  graphics={
         Rectangle(
@@ -752,6 +863,8 @@ MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.AirSide.Zon
 MultizoneOfficeComplexAir.BaseClasses.HVACSide.BaseClasses.Component.AirSide.ZoneTerminal.Controls.ZonCon</a> for a description of the zone terminal VAV controller. </p>
 </html>", revisions = "<html>
 <ul>
+<li> August 8, 2024, by Guowen Li, Xing Lu, Yan Chen: </li>
+<p> Added CO2 and air infiltration features; Adjusted system equipment sizing; Reduced nonlinear system warnings.</p>
 <li> August 17, 2023, by Xing Lu, Sen Huang, Lingzhe Wang:
 <p> First implementation.</p>
 </ul>
