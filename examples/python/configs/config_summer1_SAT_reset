@@ -1,0 +1,14 @@
+{
+   "start_day": 232,
+   "simulation_duration_days": 5,
+   "step": 60,
+   "reset_frequency": 5,
+   "resets": {            
+       "dat1": "configs/floor1_dat_reset_convention.config",
+	   "dat2": "configs/floor2_dat_reset_convention.config",
+	   "dat3": "configs/floor3_dat_reset_convention.config"
+   },
+   "controller": {
+
+   }
+}

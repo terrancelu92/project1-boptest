@@ -1,0 +1,10 @@
+{
+   "start_day": 118,
+   "simulation_duration_days":62,
+   "step": 60,
+   "reset_frequency": 5,
+   "resets": {
+   },
+   "controller": {
+   }
+}
