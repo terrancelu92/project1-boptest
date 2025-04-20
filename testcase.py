@@ -22,6 +22,7 @@ import uuid
 import os
 import json
 import array as a
+import pandas as pd
 
 class TestCase(object):
     '''Class that implements the test case.
@@ -74,8 +75,8 @@ class TestCase(object):
         # Get building area
         self.area = self.config_json['area']
         # Get available control inputs and outputs
-        self.input_names = self.fmu.get_model_variables(causality = 2).keys()
-        self.output_names = self.fmu.get_model_variables(causality = 3).keys()
+        self.input_names = list(self.fmu.get_model_variables(causality = 2).keys())
+        self.output_names = list(self.fmu.get_model_variables(causality = 3).keys())
         self.forecast_names = list(self.data.keys())
         # Set default communication step
         self.set_step(self.config_json['step'])
@@ -83,8 +84,6 @@ class TestCase(object):
         self.__initilize_data()
         # Set default fmu simulation options
         self.options = self.fmu.simulate_options()
-        self.options['CVode_options']['rtol'] = 1e-6
-        self.options['CVode_options']['store_event_points'] = False
         self.options['filter'] = self.output_names + self.input_names
         # Instantiate a KPI calculator for the test case
         self.cal = KPI_Calculator(testcase=self)
@@ -159,7 +158,13 @@ class TestCase(object):
         # Set fmu initialization option
         self.options['initialize'] = self.initialize_fmu
         # Set sample rate
-        self.options['ncp'] = int((end_time-start_time)/30)
+        step = end_time - start_time
+        if step >= 30:
+            self.options['ncp'] = int((end_time-start_time)/30)
+        elif step == 0:
+            pass
+        elif (step < 30) and (step > 0):
+            self.options['ncp'] = int((end_time-start_time)/step)
         # Simulate fmu
         try:
             res = self.fmu.simulate(start_time=start_time,
@@ -203,8 +208,12 @@ class TestCase(object):
         for key in self.y.keys():
             self.y[key] = res[key][-1]
             if store:
-                for x in res[key][i:]:
-                    self.y_store[key].append(x)
+                # Handle initialization of cs fmu generating multiple points for the same time
+                if res['time'][0] == res['time'][-1]:
+                    self.y_store[key].append(res[key][-1])
+                else:
+                    for x in res[key][i:]:
+                        self.y_store[key].append(x)
         # Store control signals (will be baseline if not activated, test controller input if activated)
         for key in self.u.keys():
             # Replace '_u' and '_y' for key used to collect data and don't overwrite time
@@ -216,8 +225,12 @@ class TestCase(object):
                 key_data = key
             self.u[key] = res[key_data][-1]
             if store:
-                for x in res[key_data][i:]:
-                    self.u_store[key].append(x)
+                # Handle initialization of cs fmu generating multiple points for the same time
+                if res['time'][0] == res['time'][-1]:
+                    self.u_store[key].append(res[key_data][-1])
+                else:
+                    for x in res[key_data][i:]:
+                        self.u_store[key].append(x)
 
     def advance(self, u):
         '''Advances the test case model simulation forward one step.
@@ -347,6 +360,8 @@ class TestCase(object):
                 # Check if scenario is over
                 if self.start_time >= self.end_time:
                     self.scenario_end = True
+                    # store results
+                    self.store_results()
                 # Log and return
                 logging.info(message)
                 return status, message, payload
@@ -1130,27 +1145,17 @@ class TestCase(object):
         dash_server = os.environ['BOPTEST_DASHBOARD_SERVER']
         # Create payload
         uid = str(uuid.uuid4())
-        payload = {
-          "results": [
-            {
-              "uid": uid,
-              "dateRun": str(datetime.now(tz=pytz.UTC)),
-              "boptestVersion": self.version,
-              "isShared": True,
-              "controlStep": str(self.get_step()[2]),
-              "account": {
+        test_results = self._get_test_results()
+        api_parameters = {
+            "uid": uid,
+            "isShared": True,
+            "account": {
                 "apiKey": api_key
-              },
-              "forecastParameters":{},
-              "tags": tags,
-              "kpis": self.get_kpis()[2],
-              "scenario": self.add_forecast_uncertainty(self.keys_to_camel_case(self.get_scenario()[2])),
-              "buildingType": {
-                "uid": self.get_name()[2]['name']
-              }
-            }
-          ]
+            },
+            "tags": tags,
         }
+        test_results.update(api_parameters)
+        payload = {"results":[test_results]}
         dash_url = "%s/api/results" % dash_server
         # Post to dashboard
         if not unit_test:
@@ -1314,6 +1319,58 @@ class TestCase(object):
         z.update(self.u)
 
         return z
+
+    def _get_test_results(self):
+        '''Collect test results and information into a dictionary.
+
+        Returns
+        -------
+        results: dict
+            Dictionary of test specific results and information.
+
+        '''
+
+        results = {
+            "dateRun": str(datetime.now(tz=pytz.UTC)),
+            "boptestVersion": self.version,
+            "controlStep": str(self.get_step()[2]),
+            "forecastParameters":{},
+            "kpis": self.get_kpis()[2],
+            "scenario": self.add_forecast_uncertainty(self.keys_to_camel_case(self.get_scenario()[2])),
+            "buildingType": {
+                "uid": self.get_name()[2]['name'],
+            }
+        }
+
+        return results
+
+    def store_results(self):
+        '''Stores results from scenario in working directory as json and csv.
+
+        When run with Service, the result will be packed in the result tarball and
+        be retrieveable with the test_id.
+
+        Returns
+        -------
+        None
+
+        '''
+
+        file_name = "results"
+        # get results_json
+        results_json = self._get_test_results()
+        # store results_json
+        with open(file_name + ".json", "w") as outfile:
+            json.dump(results_json, outfile)
+        # get list of results, need to use output metadata so duplicate inputs are removed
+        result_list = self.input_names + list(self.outputs_metadata.keys())
+        # get results trajectories
+        results = self.get_results(result_list, self.initial_time, self.end_time)[2]
+        # convert to dataframe with time as index
+        results_df = pd.DataFrame.from_dict(results)
+        results_df.index = results_df['time']
+        # store results csv
+        results_df.to_csv(file_name + ".csv")
 
     def to_camel_case(self, snake_str):
         components = snake_str.split('_')
