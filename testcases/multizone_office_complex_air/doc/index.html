@@ -19,12 +19,18 @@
 <h4>Architecture</h4>
 <p>
     The layout is representative of the large commercial office building
-    stock and is consistent with the building prototypes. The test case is
+    stock and is consistent with the building prototypes. 
+	The test case is
     located in Chicago, IL and based on the DOE Reference Large Office Building
-    Model (Constructed In or After 1980). The original model has 12 floors with a basement.
-	For simplicity, the middle 10 floors are treated as identical and are modeled as a single representative floor,
-	resulting in three modeled floors (ground, middle, and top), each served by a dedicated AHU.
-	The ground floor is assumed to be adiabatic with the basement.
+    Model (Constructed In or After 1980). 
+	The original model comprises 12 floors plus a basement. 
+	For simplicity, in the standalone EnergyPlus simulation, the ten central floors are collapsed into a single “middle” floor using a zone multiplier of 10, 
+	and EnergyPlus computes that floor’s thermal loads internally. 
+	In this Spawn-of-EnergyPlus model, EnergyPlus calculates all the loads for that representative middle floor and exports them to Modelica, 
+	where the HVAC system is scaled to ten times the single-floor load, consolidating all ten floors into one “giant” middle floor.
+	Therefore, the building is reduced to three floors (ground, middle, and top), each served by its own AHU, with the ground floor’s base treated as adiabatic.
+
+
 </p>
 <p>
     The represented floor has five zones, with four perimeter zones and one core zone.
