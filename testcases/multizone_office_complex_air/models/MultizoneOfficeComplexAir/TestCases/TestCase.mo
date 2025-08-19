@@ -14,20 +14,24 @@ model TestCase "Complex office building model that includes air side systems, wa
 equation
   connect(loaEnePlu.yHvaOpe, hva.occ) annotation (Line(points={{22,-56.8},{22,-56},
           {46,-56},{46,56},{22.8,56}}, color={0,0,127}));
-  connect(loaEnePlu.QLoa, hva.QLoa) annotation (Line(points={{22,-44},{40,-44},
-          {40,50},{22.8,50}}, color={0,0,127}));
+  connect(loaEnePlu.QLoa, hva.QLoa) annotation (Line(points={{22,-43.6},{40,
+          -43.6},{40,50},{22.8,50}},
+                              color={0,0,127}));
   connect(hva.TZon, loaEnePlu.TZonAir) annotation (Line(points={{-22,40},{-40,
           40},{-40,-40},{-24,-40}}, color={0,0,127}));
-  connect(loaEnePlu.numOcc, hva.numOcc) annotation (Line(points={{22,-36},{34,
-          -36},{34,44},{22.8,44}},   color={0,0,127}));
+  connect(loaEnePlu.numOcc, hva.numOcc) annotation (Line(points={{22,-34},{34,
+          -34},{34,45.2},{22.8,45.2}},
+                                     color={0,0,127}));
   connect(loaEnePlu.weaBus, hva.weaBus) annotation (Line(
       points={{0,-20},{0,20}},
       color={255,204,51},
       thickness=0.5));
+  connect(hva.mWat_flow, loaEnePlu.mWat_flow) annotation (Line(points={{22.8,40},
+          {32,40},{32,-52},{22,-52}}, color={0,0,127}));
   annotation (Icon(coordinateSystem(preserveAspectRatio=false)), Diagram(
         coordinateSystem(preserveAspectRatio=false)),
     experiment(
-      StopTime=604800,
+      StopTime=31536000,
       Interval=599.999616,
       Tolerance=1e-06,
       __Dymola_Algorithm="Cvode"),

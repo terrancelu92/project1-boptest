@@ -12,17 +12,17 @@ model LoadWrapper "Load calculation in EnergyPlus using Spawn"
     annotation (Placement(transformation(extent={{100,50},{120,70}}),
         iconTransformation(extent={{100,50},{120,70}})));
   Modelica.Blocks.Interfaces.RealOutput relHum "relative humidity"
-    annotation (Placement(transformation(extent={{100,-60},{120,-40}}),
-        iconTransformation(extent={{100,-60},{120,-40}})));
+    annotation (Placement(transformation(extent={{100,-40},{120,-20}}),
+        iconTransformation(extent={{100,-40},{120,-20}})));
   Modelica.Blocks.Interfaces.RealOutput numOcc[15] "number of occupant"
     annotation (Placement(transformation(extent={{100,-10},{120,10}}),
-        iconTransformation(extent={{100,10},{120,30}})));
+        iconTransformation(extent={{100,20},{120,40}})));
 
   Modelica.Blocks.Interfaces.RealOutput QLoa[15] "Zone load" annotation (
-      Placement(transformation(extent={{100,-30},{120,-10}}),
-        iconTransformation(extent={{100,-30},{120,-10}})));
+      Placement(transformation(extent={{100,-28},{120,-8}}),
+        iconTransformation(extent={{100,-28},{120,-8}})));
   Modelica.Blocks.Math.Add3 add[15](each k3=-1)
-    annotation (Placement(transformation(extent={{60,-30},{80,-10}})));
+    annotation (Placement(transformation(extent={{60,-28},{80,-8}})));
   Modelica.Blocks.Interfaces.RealOutput yHvaOpe "HVAC operation signal"
     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
@@ -44,9 +44,20 @@ model LoadWrapper "Load calculation in EnergyPlus using Spawn"
   Modelica.Icons.SignalBus weaBus
     annotation (Placement(transformation(extent={{-8,92},{8,108}}),
         iconTransformation(extent={{-8,92},{8,108}})));
+  Modelica.Blocks.Interfaces.RealOutput mWat_flow[15]
+    "Moisture mass flow rate added to the medium"
+    annotation (Placement(transformation(extent={{100,-70},{120,-50}})));
+
+  Modelica.Blocks.Math.Gain gaiWat_flow[15](
+    final k(unit="kg/J") = 1/h_fg,
+    u(final unit="W"),
+    y(final unit="kg/s")) "Water flow rate due to latent heat gain"
+    annotation (Placement(transformation(extent={{-10,-70},{10,-50}})));
+  constant Modelica.Units.SI.SpecificEnergy h_fg=Buildings.Utilities.Psychrometrics.Constants.h_fg "Latent heat of water vapor";
+
 equation
   connect(whoBui.Outdoor_Humidity, relHum) annotation (Line(points={{-38,0},{40,
-          0},{40,-50},{110,-50}}, color={0,0,127}));
+          0},{40,-30},{110,-30}}, color={0,0,127}));
   connect(TZonAir[1], whoBui.Temp1_bot);
   connect(TZonAir[2], whoBui.Temp2_bot);
   connect(TZonAir[3], whoBui.Temp3_bot);
@@ -81,11 +92,11 @@ equation
   connect(numOcc[15], whoBui.Zone5_top_People);
 
   connect(add[1].u1, whoBui.Zone1_bot_Sensible_COOLING_LOAD) annotation (Line(
-        points={{58,-12},{0,-12},{0,0},{-38,0}}, color={0,0,127}));
+        points={{58,-10},{0,-10},{0,0},{-38,0}}, color={0,0,127}));
   connect(add[1].u2, whoBui.Zone1_bot_Latent_COOLING_LOAD) annotation (Line(
-        points={{58,-20},{10,-20},{10,0},{-38,0}}, color={0,0,127}));
-  connect(add[1].u3, whoBui.Zone1_bot_HEATING_LOAD) annotation (Line(points={{
-          58,-28},{20,-28},{20,0},{-38,0}}, color={0,0,127}));
+        points={{58,-18},{10,-18},{10,0},{-38,0}}, color={0,0,127}));
+  connect(add[1].u3, whoBui.Zone1_bot_HEATING_LOAD) annotation (Line(points={{58,-26},
+          {20,-26},{20,0},{-38,0}},         color={0,0,127}));
   connect(add[2].u1, whoBui.Zone2_bot_Sensible_COOLING_LOAD);
   connect(add[2].u2, whoBui.Zone2_bot_Latent_COOLING_LOAD);
   connect(add[2].u3, whoBui.Zone2_bot_HEATING_LOAD);
@@ -138,7 +149,7 @@ equation
   connect(TWetBul, whoBui.Wetbulb) annotation (Line(points={{110,90},{-10,90},{
           -10,0},{-38,0}}, color={0,0,127}));
   connect(add.y, QLoa)
-    annotation (Line(points={{81,-20},{110,-20}}, color={0,0,127}));
+    annotation (Line(points={{81,-18},{110,-18}}, color={0,0,127}));
   connect(weaSta.weaBus, whoBui.weaBus) annotation (Line(
       points={{-39.9,49.9},{-50,49.9},{-50,10}},
       color={255,204,51},
@@ -155,6 +166,27 @@ equation
       index=1,
       extent={{-3,6},{-3,6}},
       horizontalAlignment=TextAlignment.Right));
+  connect(gaiWat_flow.y, mWat_flow)
+    annotation (Line(points={{11,-60},{110,-60}}, color={0,0,127}));
+  connect(gaiWat_flow[1].u, whoBui.Zone1_bot_Latent_COOLING_LOAD) annotation (
+      Line(points={{-12,-60},{-26,-60},{-26,0},{-38,0}}, color={0,0,127}));
+  connect(gaiWat_flow[2].u, whoBui.Zone2_bot_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[3].u, whoBui.Zone3_bot_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[4].u, whoBui.Zone4_bot_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[5].u, whoBui.Zone5_bot_Latent_COOLING_LOAD);
+
+  connect(gaiWat_flow[6].u, whoBui.Zone1_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[7].u, whoBui.Zone2_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[8].u, whoBui.Zone3_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[9].u, whoBui.Zone4_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[10].u, whoBui.Zone5_Latent_COOLING_LOAD);
+
+  connect(gaiWat_flow[11].u, whoBui.Zone1_top_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[12].u, whoBui.Zone2_top_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[13].u, whoBui.Zone3_top_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[14].u, whoBui.Zone4_top_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[15].u, whoBui.Zone5_top_Latent_COOLING_LOAD);
+
   annotation (Icon(coordinateSystem(preserveAspectRatio=false), graphics={
           Rectangle(
           extent={{-100,100},{100,-100}},
