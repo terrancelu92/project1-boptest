@@ -129,96 +129,81 @@ model WholeBuildingEnergyPlus "EnergyPlusFMU"
 
   Modelica.Blocks.Interfaces.RealOutput Occ "IDF line 5933"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone1_Sensible_COOLING_LOAD "IDF line 5938"
+  Modelica.Blocks.Interfaces.RealOutput Zone1_Sensible_Load "IDF line 5938"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone1_Latent_COOLING_LOAD "IDF line 5943"
+  Modelica.Blocks.Interfaces.RealOutput Zone1_Latent_Load "IDF line 5943"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone1_HEATING_LOAD "IDF line 5948"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone1_top_Sensible_Load "IDF line 5953"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone1_top_Sensible_COOLING_LOAD "IDF line 5953"
+  Modelica.Blocks.Interfaces.RealOutput Zone1_top_Latent_Load "IDF line 5958"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone1_top_Latent_COOLING_LOAD "IDF line 5958"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone1_bot_Sensible_Load "IDF line 5968"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone1_top_HEATING_LOAD "IDF line 5963"
+  Modelica.Blocks.Interfaces.RealOutput Zone1_bot_Latent_Load "IDF line 5973"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone1_bot_Sensible_COOLING_LOAD "IDF line 5968"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone2_Sensible_Load "IDF line 5983"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone1_bot_Latent_COOLING_LOAD "IDF line 5973"
+  Modelica.Blocks.Interfaces.RealOutput Zone2_Latent_Load "IDF line 5988"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone1_bot_HEATING_LOAD "IDF line 5978"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone2_top_Sensible_Load "IDF line 5998"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone2_Sensible_COOLING_LOAD "IDF line 5983"
+  Modelica.Blocks.Interfaces.RealOutput Zone2_top_Latent_Load "IDF line 6003"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone2_Latent_COOLING_LOAD "IDF line 5988"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone2_bot_Sensible_Load "IDF line 6013"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone2_HEATING_LOAD "IDF line 5993"
+  Modelica.Blocks.Interfaces.RealOutput Zone2_bot_Latent_Load "IDF line 6018"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone2_top_Sensible_COOLING_LOAD "IDF line 5998"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone3_Sensible_Load "IDF line 6028"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone2_top_Latent_COOLING_LOAD "IDF line 6003"
+  Modelica.Blocks.Interfaces.RealOutput Zone3_Latent_Load "IDF line 6033"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone2_top_HEATING_LOAD "IDF line 6008"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone3_top_Sensible_Load "IDF line 6043"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone2_bot_Sensible_COOLING_LOAD "IDF line 6013"
+  Modelica.Blocks.Interfaces.RealOutput Zone3_top_Latent_Load "IDF line 6048"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone2_bot_Latent_COOLING_LOAD "IDF line 6018"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone3_bot_Sensible_Load "IDF line 6058"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone2_bot_HEATING_LOAD "IDF line 6023"
+  Modelica.Blocks.Interfaces.RealOutput Zone3_bot_Latent_Load "IDF line 6063"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone3_Sensible_COOLING_LOAD "IDF line 6028"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone4_Sensible_Load "IDF line 6073"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone3_Latent_COOLING_LOAD "IDF line 6033"
+  Modelica.Blocks.Interfaces.RealOutput Zone4_Latent_Load "IDF line 6078"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone3_HEATING_LOAD "IDF line 6038"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone4_top_Sensible_Load "IDF line 6088"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone3_top_Sensible_COOLING_LOAD "IDF line 6043"
+  Modelica.Blocks.Interfaces.RealOutput Zone4_top_Latent_Load "IDF line 6093"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone3_top_Latent_COOLING_LOAD "IDF line 6048"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone4_bot_Sensible_Load "IDF line 6103"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone3_top_HEATING_LOAD "IDF line 6053"
+  Modelica.Blocks.Interfaces.RealOutput Zone4_bot_Latent_Load "IDF line 6108"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone3_bot_Sensible_COOLING_LOAD "IDF line 6058"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone5_Sensible_Load "IDF line 6118"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone3_bot_Latent_COOLING_LOAD "IDF line 6063"
+  Modelica.Blocks.Interfaces.RealOutput Zone5_Latent_Load "IDF line 6123"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone3_bot_HEATING_LOAD "IDF line 6068"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone5_top_Sensible_Load "IDF line 6133"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone4_Sensible_COOLING_LOAD "IDF line 6073"
+  Modelica.Blocks.Interfaces.RealOutput Zone5_top_Latent_Load "IDF line 6138"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone4_Latent_COOLING_LOAD "IDF line 6078"
+
+  Modelica.Blocks.Interfaces.RealOutput Zone5_bot_Sensible_Load "IDF line 6148"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone4_HEATING_LOAD "IDF line 6083"
+  Modelica.Blocks.Interfaces.RealOutput Zone5_bot_Latent_Load "IDF line 6153"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone4_top_Sensible_COOLING_LOAD "IDF line 6088"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone4_top_Latent_COOLING_LOAD "IDF line 6093"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone4_top_HEATING_LOAD "IDF line 6098"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone4_bot_Sensible_COOLING_LOAD "IDF line 6103"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone4_bot_Latent_COOLING_LOAD "IDF line 6108"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone4_bot_HEATING_LOAD "IDF line 6113"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone5_Sensible_COOLING_LOAD "IDF line 6118"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone5_Latent_COOLING_LOAD "IDF line 6123"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone5_HEATING_LOAD "IDF line 6128"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone5_top_Sensible_COOLING_LOAD "IDF line 6133"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone5_top_Latent_COOLING_LOAD "IDF line 6138"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone5_top_HEATING_LOAD "IDF line 6143"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone5_bot_Sensible_COOLING_LOAD "IDF line 6148"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone5_bot_Latent_COOLING_LOAD "IDF line 6153"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
-  Modelica.Blocks.Interfaces.RealOutput Zone5_bot_HEATING_LOAD "IDF line 6158"
-  annotation (Placement(transformation(extent={{100,-20},{140,20}})));
+
   Modelica.Blocks.Interfaces.RealOutput Zone1_People "IDF line 6163"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
   Modelica.Blocks.Interfaces.RealOutput Zone2_People "IDF line 6168"
@@ -262,8 +247,6 @@ model WholeBuildingEnergyPlus "EnergyPlusFMU"
     final quantity="ThermodynamicTemperature") "IDF line 6248"
   annotation (Placement(transformation(extent={{100,-20},{140,20}})));
 
-  Modelica.Blocks.Math.Gain neg[15](each k=-1)
-    annotation (Placement(transformation(extent={{60,-40},{80,-20}})));
   Buildings.ThermalZones.EnergyPlus_9_6_0.OutputVariable OccSch(
     name="Schedule Value",
     key="HVACOperationSchd",
@@ -333,15 +316,6 @@ equation
     connect(TIn.y, fmuZonBotFlr[numZon].TInlet) annotation (Line(points={{-67,-14},
             {-6,-14},{-6,28},{18,28}},
                                    color={0,0,127}));
-    connect(neg[numZon].u, fmuZonMidFlr[numZon].QCon_flow)
-      annotation (Line(points={{58,-30},{50,-30},{50,-8},{41,-8}},
-                                        color={0,0,127}));
-    connect(neg[5+numZon].u, fmuZonTopFlr[numZon].QCon_flow)
-      annotation (Line(points={{58,-30},{50,-30},{50,-46},{41,-46}},
-                                        color={0,0,127}));
-    connect(neg[10+numZon].u, fmuZonBotFlr[numZon].QCon_flow)
-      annotation (Line(points={{58,-30},{50,-30},{50,34},{41,34}},
-                                        color={0,0,127}));
   end for;
 
   connect(Temp1, fmuZonMidFlr[1].T)
@@ -366,68 +340,50 @@ equation
   connect(Temp4_bot, fmuZonBotFlr[4].T);
   connect(Temp5_bot, fmuZonBotFlr[5].T);
 
-  connect(Zone1_Sensible_COOLING_LOAD, fmuZonMidFlr[1].QCon_flow)
+  connect(Zone1_Sensible_Load, fmuZonMidFlr[1].QCon_flow)
   annotation (Line(points={{120,0},{50,0},{50,-8},{41,-8}},
                                         color={0,0,127}));
-  connect(Zone2_Sensible_COOLING_LOAD, fmuZonMidFlr[2].QCon_flow);
-  connect(Zone3_Sensible_COOLING_LOAD, fmuZonMidFlr[3].QCon_flow);
-  connect(Zone4_Sensible_COOLING_LOAD, fmuZonMidFlr[4].QCon_flow);
-  connect(Zone5_Sensible_COOLING_LOAD, fmuZonMidFlr[5].QCon_flow);
-  connect(Zone1_top_Sensible_COOLING_LOAD, fmuZonTopFlr[1].QCon_flow)
+  connect(Zone2_Sensible_Load, fmuZonMidFlr[2].QCon_flow);
+  connect(Zone3_Sensible_Load, fmuZonMidFlr[3].QCon_flow);
+  connect(Zone4_Sensible_Load, fmuZonMidFlr[4].QCon_flow);
+  connect(Zone5_Sensible_Load, fmuZonMidFlr[5].QCon_flow);
+  connect(Zone1_top_Sensible_Load, fmuZonTopFlr[1].QCon_flow)
   annotation (Line(points={{120,0},{50,0},{50,-46},{41,-46}},
                                         color={0,0,127}));
-  connect(Zone2_top_Sensible_COOLING_LOAD, fmuZonTopFlr[2].QCon_flow);
-  connect(Zone3_top_Sensible_COOLING_LOAD, fmuZonTopFlr[3].QCon_flow);
-  connect(Zone4_top_Sensible_COOLING_LOAD, fmuZonTopFlr[4].QCon_flow);
-  connect(Zone5_top_Sensible_COOLING_LOAD, fmuZonTopFlr[5].QCon_flow);
-  connect(Zone1_bot_Sensible_COOLING_LOAD, fmuZonBotFlr[1].QCon_flow)
+  connect(Zone2_top_Sensible_Load, fmuZonTopFlr[2].QCon_flow);
+  connect(Zone3_top_Sensible_Load, fmuZonTopFlr[3].QCon_flow);
+  connect(Zone4_top_Sensible_Load, fmuZonTopFlr[4].QCon_flow);
+  connect(Zone5_top_Sensible_Load, fmuZonTopFlr[5].QCon_flow);
+  connect(Zone1_bot_Sensible_Load, fmuZonBotFlr[1].QCon_flow)
   annotation (Line(points={{120,0},{50,0},{50,34},{41,34}},
                                         color={0,0,127}));
-  connect(Zone2_bot_Sensible_COOLING_LOAD, fmuZonBotFlr[2].QCon_flow);
-  connect(Zone3_bot_Sensible_COOLING_LOAD, fmuZonBotFlr[3].QCon_flow);
-  connect(Zone4_bot_Sensible_COOLING_LOAD, fmuZonBotFlr[4].QCon_flow);
-  connect(Zone5_bot_Sensible_COOLING_LOAD, fmuZonBotFlr[5].QCon_flow);
+  connect(Zone2_bot_Sensible_Load, fmuZonBotFlr[2].QCon_flow);
+  connect(Zone3_bot_Sensible_Load, fmuZonBotFlr[3].QCon_flow);
+  connect(Zone4_bot_Sensible_Load, fmuZonBotFlr[4].QCon_flow);
+  connect(Zone5_bot_Sensible_Load, fmuZonBotFlr[5].QCon_flow);
 
-  connect(Zone1_Latent_COOLING_LOAD, fmuZonMidFlr[1].QLat_flow)
+  connect(Zone1_Latent_Load, fmuZonMidFlr[1].QLat_flow)
   annotation (Line(points={{120,0},{96,0},{96,-12},{41,-12}},
                                         color={0,0,127}));
-  connect(Zone2_Latent_COOLING_LOAD, fmuZonMidFlr[2].QLat_flow);
-  connect(Zone3_Latent_COOLING_LOAD, fmuZonMidFlr[3].QLat_flow);
-  connect(Zone4_Latent_COOLING_LOAD, fmuZonMidFlr[4].QLat_flow);
-  connect(Zone5_Latent_COOLING_LOAD, fmuZonMidFlr[5].QLat_flow);
-  connect(Zone1_top_Latent_COOLING_LOAD, fmuZonTopFlr[1].QLat_flow)
+  connect(Zone2_Latent_Load, fmuZonMidFlr[2].QLat_flow);
+  connect(Zone3_Latent_Load, fmuZonMidFlr[3].QLat_flow);
+  connect(Zone4_Latent_Load, fmuZonMidFlr[4].QLat_flow);
+  connect(Zone5_Latent_Load, fmuZonMidFlr[5].QLat_flow);
+  connect(Zone1_top_Latent_Load, fmuZonTopFlr[1].QLat_flow)
   annotation (Line(points={{120,0},{96,0},{96,-50},{41,-50}},
                                         color={0,0,127}));
-  connect(Zone2_top_Latent_COOLING_LOAD, fmuZonTopFlr[2].QLat_flow);
-  connect(Zone3_top_Latent_COOLING_LOAD, fmuZonTopFlr[3].QLat_flow);
-  connect(Zone4_top_Latent_COOLING_LOAD, fmuZonTopFlr[4].QLat_flow);
-  connect(Zone5_top_Latent_COOLING_LOAD, fmuZonTopFlr[5].QLat_flow);
+  connect(Zone2_top_Latent_Load, fmuZonTopFlr[2].QLat_flow);
+  connect(Zone3_top_Latent_Load, fmuZonTopFlr[3].QLat_flow);
+  connect(Zone4_top_Latent_Load, fmuZonTopFlr[4].QLat_flow);
+  connect(Zone5_top_Latent_Load, fmuZonTopFlr[5].QLat_flow);
 
-  connect(Zone1_bot_Latent_COOLING_LOAD, fmuZonBotFlr[1].QLat_flow)
+  connect(Zone1_bot_Latent_Load, fmuZonBotFlr[1].QLat_flow)
   annotation (Line(points={{120,0},{96,0},{96,30},{41,30}},
                                        color={0,0,127}));
-  connect(Zone2_bot_Latent_COOLING_LOAD, fmuZonBotFlr[2].QLat_flow);
-  connect(Zone3_bot_Latent_COOLING_LOAD, fmuZonBotFlr[3].QLat_flow);
-  connect(Zone4_bot_Latent_COOLING_LOAD, fmuZonBotFlr[4].QLat_flow);
-  connect(Zone5_bot_Latent_COOLING_LOAD, fmuZonBotFlr[5].QLat_flow);
-
-  connect(Zone1_HEATING_LOAD, neg[1].y);
-  connect(Zone2_HEATING_LOAD, neg[2].y);
-  connect(Zone3_HEATING_LOAD, neg[3].y);
-  connect(Zone4_HEATING_LOAD, neg[4].y);
-  connect(Zone5_HEATING_LOAD, neg[5].y);
-  connect(Zone1_top_HEATING_LOAD, neg[6].y);
-  connect(Zone2_top_HEATING_LOAD, neg[7].y);
-  connect(Zone3_top_HEATING_LOAD, neg[8].y)
-  annotation (Line(points={{120,0},{92,0},{92,-30},{81,-30}},
-                                        color={0,0,127}));
-  connect(Zone4_top_HEATING_LOAD, neg[9].y);
-  connect(Zone5_top_HEATING_LOAD, neg[10].y);
-  connect(Zone1_bot_HEATING_LOAD, neg[11].y);
-  connect(Zone2_bot_HEATING_LOAD, neg[12].y);
-  connect(Zone3_bot_HEATING_LOAD, neg[13].y);
-  connect(Zone4_bot_HEATING_LOAD, neg[14].y);
-  connect(Zone5_bot_HEATING_LOAD, neg[15].y);
+  connect(Zone2_bot_Latent_Load, fmuZonBotFlr[2].QLat_flow);
+  connect(Zone3_bot_Latent_Load, fmuZonBotFlr[3].QLat_flow);
+  connect(Zone4_bot_Latent_Load, fmuZonBotFlr[4].QLat_flow);
+  connect(Zone5_bot_Latent_Load, fmuZonBotFlr[5].QLat_flow);
 
   connect(Zone1_People, peoCou[1].y);
   connect(Zone2_People, peoCou[2].y);
