@@ -19,11 +19,11 @@ model LoadWrapper "Load calculation in EnergyPlus using Spawn"
         iconTransformation(extent={{100,20},{120,40}})));
 
   Modelica.Blocks.Interfaces.RealOutput QLoa[15] "Zone load" annotation (
+      Placement(transformation(extent={{100,-28},{120,-8}}),
+        iconTransformation(extent={{100,-28},{120,-8}})));
 
-      Placement(transformation(extent={{100,-30},{120,-10}}),
-        iconTransformation(extent={{100,-30},{120,-10}})));
   Modelica.Blocks.Math.Add  add[15]
-    annotation (Placement(transformation(extent={{60,-30},{80,-10}})));
+    annotation (Placement(transformation(extent={{60,-28},{80,-8}})));
 
   Modelica.Blocks.Interfaces.RealOutput yHvaOpe "HVAC operation signal"
     annotation (Placement(transformation(
@@ -95,9 +95,9 @@ equation
 
 
   connect(add[1].u1, whoBui.Zone1_bot_Sensible_Load) annotation (Line(
-        points={{58,-14},{0,-14},{0,0},{-38,0}}, color={0,0,127}));
+        points={{58,-12},{0,-12},{0,0},{-38,0}}, color={0,0,127}));
   connect(add[1].u2, whoBui.Zone1_bot_Latent_Load) annotation (Line(
-        points={{58,-26},{10,-26},{10,0},{-38,0}}, color={0,0,127}));
+        points={{58,-24},{10,-24},{10,0},{-38,0}}, color={0,0,127}));
 
   connect(add[2].u1, whoBui.Zone2_bot_Sensible_Load);
   connect(add[2].u2, whoBui.Zone2_bot_Latent_Load);
@@ -170,24 +170,24 @@ equation
       horizontalAlignment=TextAlignment.Right));
   connect(gaiWat_flow.y, mWat_flow)
     annotation (Line(points={{11,-60},{110,-60}}, color={0,0,127}));
-  connect(gaiWat_flow[1].u, whoBui.Zone1_bot_Latent_COOLING_LOAD) annotation (
+  connect(gaiWat_flow[1].u, whoBui.Zone1_bot_Latent_Load) annotation (
       Line(points={{-12,-60},{-26,-60},{-26,0},{-38,0}}, color={0,0,127}));
-  connect(gaiWat_flow[2].u, whoBui.Zone2_bot_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[3].u, whoBui.Zone3_bot_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[4].u, whoBui.Zone4_bot_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[5].u, whoBui.Zone5_bot_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[2].u, whoBui.Zone2_bot_Latent_Load);
+  connect(gaiWat_flow[3].u, whoBui.Zone3_bot_Latent_Load);
+  connect(gaiWat_flow[4].u, whoBui.Zone4_bot_Latent_Load);
+  connect(gaiWat_flow[5].u, whoBui.Zone5_bot_Latent_Load);
 
-  connect(gaiWat_flow[6].u, whoBui.Zone1_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[7].u, whoBui.Zone2_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[8].u, whoBui.Zone3_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[9].u, whoBui.Zone4_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[10].u, whoBui.Zone5_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[6].u, whoBui.Zone1_Latent_Load);
+  connect(gaiWat_flow[7].u, whoBui.Zone2_Latent_Load);
+  connect(gaiWat_flow[8].u, whoBui.Zone3_Latent_Load);
+  connect(gaiWat_flow[9].u, whoBui.Zone4_Latent_Load);
+  connect(gaiWat_flow[10].u, whoBui.Zone5_Latent_Load);
 
-  connect(gaiWat_flow[11].u, whoBui.Zone1_top_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[12].u, whoBui.Zone2_top_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[13].u, whoBui.Zone3_top_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[14].u, whoBui.Zone4_top_Latent_COOLING_LOAD);
-  connect(gaiWat_flow[15].u, whoBui.Zone5_top_Latent_COOLING_LOAD);
+  connect(gaiWat_flow[11].u, whoBui.Zone1_top_Latent_Load);
+  connect(gaiWat_flow[12].u, whoBui.Zone2_top_Latent_Load);
+  connect(gaiWat_flow[13].u, whoBui.Zone3_top_Latent_Load);
+  connect(gaiWat_flow[14].u, whoBui.Zone4_top_Latent_Load);
+  connect(gaiWat_flow[15].u, whoBui.Zone5_top_Latent_Load);
 
   annotation (Icon(coordinateSystem(preserveAspectRatio=false), graphics={
           Rectangle(
