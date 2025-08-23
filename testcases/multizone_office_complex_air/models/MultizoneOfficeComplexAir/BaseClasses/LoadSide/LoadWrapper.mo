@@ -19,10 +19,12 @@ model LoadWrapper "Load calculation in EnergyPlus using Spawn"
         iconTransformation(extent={{100,20},{120,40}})));
 
   Modelica.Blocks.Interfaces.RealOutput QLoa[15] "Zone load" annotation (
-      Placement(transformation(extent={{100,-28},{120,-8}}),
-        iconTransformation(extent={{100,-28},{120,-8}})));
-  Modelica.Blocks.Math.Add3 add[15](each k3=-1)
-    annotation (Placement(transformation(extent={{60,-28},{80,-8}})));
+
+      Placement(transformation(extent={{100,-30},{120,-10}}),
+        iconTransformation(extent={{100,-30},{120,-10}})));
+  Modelica.Blocks.Math.Add  add[15]
+    annotation (Placement(transformation(extent={{60,-30},{80,-10}})));
+
   Modelica.Blocks.Interfaces.RealOutput yHvaOpe "HVAC operation signal"
     annotation (Placement(transformation(
         extent={{-10,-10},{10,10}},
@@ -91,56 +93,56 @@ equation
   connect(numOcc[14], whoBui.Zone4_top_People);
   connect(numOcc[15], whoBui.Zone5_top_People);
 
-  connect(add[1].u1, whoBui.Zone1_bot_Sensible_COOLING_LOAD) annotation (Line(
-        points={{58,-10},{0,-10},{0,0},{-38,0}}, color={0,0,127}));
-  connect(add[1].u2, whoBui.Zone1_bot_Latent_COOLING_LOAD) annotation (Line(
-        points={{58,-18},{10,-18},{10,0},{-38,0}}, color={0,0,127}));
-  connect(add[1].u3, whoBui.Zone1_bot_HEATING_LOAD) annotation (Line(points={{58,-26},
-          {20,-26},{20,0},{-38,0}},         color={0,0,127}));
-  connect(add[2].u1, whoBui.Zone2_bot_Sensible_COOLING_LOAD);
-  connect(add[2].u2, whoBui.Zone2_bot_Latent_COOLING_LOAD);
-  connect(add[2].u3, whoBui.Zone2_bot_HEATING_LOAD);
-  connect(add[3].u1, whoBui.Zone3_bot_Sensible_COOLING_LOAD);
-  connect(add[3].u2, whoBui.Zone3_bot_Latent_COOLING_LOAD);
-  connect(add[3].u3, whoBui.Zone3_bot_HEATING_LOAD);
-  connect(add[4].u1, whoBui.Zone4_bot_Sensible_COOLING_LOAD);
-  connect(add[4].u2, whoBui.Zone4_bot_Latent_COOLING_LOAD);
-  connect(add[4].u3, whoBui.Zone4_bot_HEATING_LOAD);
-  connect(add[5].u1, whoBui.Zone5_bot_Sensible_COOLING_LOAD);
-  connect(add[5].u2, whoBui.Zone5_bot_Latent_COOLING_LOAD);
-  connect(add[5].u3, whoBui.Zone5_bot_HEATING_LOAD);
 
-  connect(add[6].u1, whoBui.Zone1_Sensible_COOLING_LOAD);
-  connect(add[6].u2, whoBui.Zone1_Latent_COOLING_LOAD);
-  connect(add[6].u3, whoBui.Zone1_HEATING_LOAD);
-  connect(add[7].u1, whoBui.Zone2_Sensible_COOLING_LOAD);
-  connect(add[7].u2, whoBui.Zone2_Latent_COOLING_LOAD);
-  connect(add[7].u3, whoBui.Zone2_HEATING_LOAD);
-  connect(add[8].u1, whoBui.Zone3_Sensible_COOLING_LOAD);
-  connect(add[8].u2, whoBui.Zone3_Latent_COOLING_LOAD);
-  connect(add[8].u3, whoBui.Zone3_HEATING_LOAD);
-  connect(add[9].u1, whoBui.Zone4_Sensible_COOLING_LOAD);
-  connect(add[9].u2, whoBui.Zone4_Latent_COOLING_LOAD);
-  connect(add[9].u3, whoBui.Zone4_HEATING_LOAD);
-  connect(add[10].u1, whoBui.Zone5_Sensible_COOLING_LOAD);
-  connect(add[10].u2, whoBui.Zone5_Latent_COOLING_LOAD);
-  connect(add[10].u3, whoBui.Zone5_HEATING_LOAD);
+  connect(add[1].u1, whoBui.Zone1_bot_Sensible_Load) annotation (Line(
+        points={{58,-14},{0,-14},{0,0},{-38,0}}, color={0,0,127}));
+  connect(add[1].u2, whoBui.Zone1_bot_Latent_Load) annotation (Line(
+        points={{58,-26},{10,-26},{10,0},{-38,0}}, color={0,0,127}));
 
-  connect(add[11].u1, whoBui.Zone1_top_Sensible_COOLING_LOAD);
-  connect(add[11].u2, whoBui.Zone1_top_Latent_COOLING_LOAD);
-  connect(add[11].u3, whoBui.Zone1_top_HEATING_LOAD);
-  connect(add[12].u1, whoBui.Zone2_top_Sensible_COOLING_LOAD);
-  connect(add[12].u2, whoBui.Zone2_top_Latent_COOLING_LOAD);
-  connect(add[12].u3, whoBui.Zone2_top_HEATING_LOAD);
-  connect(add[13].u1, whoBui.Zone3_top_Sensible_COOLING_LOAD);
-  connect(add[13].u2, whoBui.Zone3_top_Latent_COOLING_LOAD);
-  connect(add[13].u3, whoBui.Zone3_top_HEATING_LOAD);
-  connect(add[14].u1, whoBui.Zone4_top_Sensible_COOLING_LOAD);
-  connect(add[14].u2, whoBui.Zone4_top_Latent_COOLING_LOAD);
-  connect(add[14].u3, whoBui.Zone4_top_HEATING_LOAD);
-  connect(add[15].u1, whoBui.Zone5_top_Sensible_COOLING_LOAD);
-  connect(add[15].u2, whoBui.Zone5_top_Latent_COOLING_LOAD);
-  connect(add[15].u3, whoBui.Zone5_top_HEATING_LOAD);
+  connect(add[2].u1, whoBui.Zone2_bot_Sensible_Load);
+  connect(add[2].u2, whoBui.Zone2_bot_Latent_Load);
+
+  connect(add[3].u1, whoBui.Zone3_bot_Sensible_Load);
+  connect(add[3].u2, whoBui.Zone3_bot_Latent_Load);
+
+  connect(add[4].u1, whoBui.Zone4_bot_Sensible_Load);
+  connect(add[4].u2, whoBui.Zone4_bot_Latent_Load);
+
+  connect(add[5].u1, whoBui.Zone5_bot_Sensible_Load);
+  connect(add[5].u2, whoBui.Zone5_bot_Latent_Load);
+
+
+  connect(add[6].u1, whoBui.Zone1_Sensible_Load);
+  connect(add[6].u2, whoBui.Zone1_Latent_Load);
+
+  connect(add[7].u1, whoBui.Zone2_Sensible_Load);
+  connect(add[7].u2, whoBui.Zone2_Latent_Load);
+
+  connect(add[8].u1, whoBui.Zone3_Sensible_Load);
+  connect(add[8].u2, whoBui.Zone3_Latent_Load);
+
+  connect(add[9].u1, whoBui.Zone4_Sensible_Load);
+  connect(add[9].u2, whoBui.Zone4_Latent_Load);
+
+  connect(add[10].u1, whoBui.Zone5_Sensible_Load);
+  connect(add[10].u2, whoBui.Zone5_Latent_Load);
+
+
+  connect(add[11].u1, whoBui.Zone1_top_Sensible_Load);
+  connect(add[11].u2, whoBui.Zone1_top_Latent_Load);
+
+  connect(add[12].u1, whoBui.Zone2_top_Sensible_Load);
+  connect(add[12].u2, whoBui.Zone2_top_Latent_Load);
+
+  connect(add[13].u1, whoBui.Zone3_top_Sensible_Load);
+  connect(add[13].u2, whoBui.Zone3_top_Latent_Load);
+
+  connect(add[14].u1, whoBui.Zone4_top_Sensible_Load);
+  connect(add[14].u2, whoBui.Zone4_top_Latent_Load);
+
+  connect(add[15].u1, whoBui.Zone5_top_Sensible_Load);
+  connect(add[15].u2, whoBui.Zone5_top_Latent_Load);
+
 
   connect(whoBui.Occ, yHvaOpe) annotation (Line(points={{-38,0},{30,0},{30,-84},
           {110,-84}}, color={0,0,127}));
