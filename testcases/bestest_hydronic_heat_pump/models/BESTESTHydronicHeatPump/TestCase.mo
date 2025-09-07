@@ -66,6 +66,14 @@ model TestCase
     "Block for reading the electrical power of the pump of the emission system"
     annotation (Placement(transformation(extent={{20,70},{40,90}})));
 
+  IDEAS.Utilities.IO.SignalExchange.Read reayPum(
+    description="Emission circuit pump control output measurement",
+    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel,
+    y(unit="1"),
+    CAT=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.Pump)
+    "Block for reading emission circuit pump control output measurement"
+    annotation (Placement(transformation(extent={{30,-60},{50,-40}})));
+
   Modelica.Blocks.Math.RealToInteger realToInteger
     annotation (Placement(transformation(extent={{52,100},{72,120}})));
   IDEAS.Utilities.IO.SignalExchange.Overwrite ovePum(u(
@@ -277,6 +285,22 @@ model TestCase
         extent={{10,10},{-10,-10}},
         rotation=180,
         origin={30,150})));
+  IDEAS.Utilities.IO.SignalExchange.Read reayFan(
+    description="Heat pump evaporator fan control output measurement",
+    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel,
+    y(unit="1"),
+    CAT=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.Fan)
+    "Block for reading actual fan speed of the heat pump evaporator fan"
+    annotation (Placement(transformation(extent={{200,0},{220,20}})));
+
+  IDEAS.Utilities.IO.SignalExchange.Read reayHeaPum(
+    description="Air to water heat pump control signal measurement",
+    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel,
+    y(unit="1"),
+    CAT=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.HVACEquipment)
+    "Block for reading air to water heat pump control signal measurement"
+    annotation (Placement(transformation(extent={{220,120},{240,140}})));
+
 equation
   connect(case900Template.ppm, reaCO2RooAir.u) annotation (Line(points={{-59,10},
           {-54,10},{-54,-50},{-58,-50}},
@@ -376,6 +400,12 @@ equation
     annotation (Line(points={{213,110},{250,110}}, color={0,0,127}));
   connect(ovePum.y, realToInteger.u)
     annotation (Line(points={{13,110},{50,110}}, color={0,0,127}));
+  connect(reayPum.u, pum.y_actual) annotation (Line(points={{28,-50},{8,-50},{8,
+          47},{19,47}}, color={0,0,127}));
+  connect(reayFan.u, fan.y_actual) annotation (Line(points={{198,10},{190,10},{
+          190,47},{199,47}}, color={0,0,127}));
+  connect(oveHeaPumY.y, reayHeaPum.u) annotation (Line(points={{161,150},{192,
+          150},{192,130},{218,130}}, color={0,0,127}));
   annotation (
     experiment(StopTime=1728000, __Dymola_Algorithm="Dassl"),
     Documentation(info="<html>
