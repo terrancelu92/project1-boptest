@@ -58,14 +58,13 @@ model TestCase
   Modelica.Blocks.Sources.Constant offSetOcc(k=0.2, y(unit="K"))
     "Offset above heating temperature setpoint during occupied hours to ensure comfort"
     annotation (Placement(transformation(extent={{-200,140},{-180,160}})));
-  IDEAS.Utilities.IO.SignalExchange.Read reayPum(
-    description="Emission circuit pump control output measurement",
-    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel,
+  IDEAS.Utilities.IO.SignalExchange.Read reaPPumEmi(
+    description="Emission circuit pump electrical power",
+    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ElectricPower,
 
-    y(unit="1"),
-    CAT=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.Pump)
-    "Block for reading emission circuit pump control output measurement"
-    annotation (Placement(transformation(extent={{30,-60},{50,-40}})));
+    y(unit="W"))
+    "Block for reading the electrical power of the pump of the emission system"
+    annotation (Placement(transformation(extent={{20,70},{40,90}})));
 
   Modelica.Blocks.Math.RealToInteger realToInteger
     annotation (Placement(transformation(extent={{52,100},{72,120}})));
@@ -83,6 +82,7 @@ model TestCase
   IDEAS.Utilities.IO.SignalExchange.Read reaCO2RooAir(
     description="CO2 concentration in the zone",
     KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.CO2Concentration,
+
     y(unit="ppm")) "Block for reading CO2 concentration in the zone"
     annotation (Placement(transformation(extent={{-60,-60},{-80,-40}})));
 
@@ -174,12 +174,14 @@ model TestCase
   IDEAS.Utilities.IO.SignalExchange.Read reaPHeaPum(
     description="Heat pump electrical power",
     KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ElectricPower,
+
     y(unit="W")) "Block for reading the electrical power of the heat pump"
     annotation (Placement(transformation(extent={{140,70},{160,90}})));
 
   IDEAS.Utilities.IO.SignalExchange.Read reaTZon(
     description="Zone operative temperature",
     KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.OperativeZoneTemperature,
+
     y(unit="K")) "Block for reading the operative zone temperature"
     annotation (Placement(transformation(extent={{-32,70},{-12,90}})));
 
@@ -248,6 +250,7 @@ model TestCase
   IDEAS.Utilities.IO.SignalExchange.Read reaPFan(
     description="Electrical power of the heat pump evaporator fan",
     KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ElectricPower,
+
     y(unit="W")) "Electrical power of the heat pump evaporator fan"
     annotation (Placement(transformation(extent={{220,70},{240,90}})));
 
@@ -274,22 +277,6 @@ model TestCase
         extent={{10,10},{-10,-10}},
         rotation=180,
         origin={30,150})));
-  IDEAS.Utilities.IO.SignalExchange.Read reayFan(
-    description="Heat pump evaporator fan control output measurement",
-    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel,
-
-    y(unit="1"),
-    CAT=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.Fan)
-    "Block for reading actual fan speed of the heat pump evaporator fan"
-    annotation (Placement(transformation(extent={{200,-2},{220,18}})));
-  IDEAS.Utilities.IO.SignalExchange.Read reayHeaPum(
-    description="Air to water heat pump control signal measurement",
-    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel,
-
-    y(unit="1"),
-    CAT=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.HVACEquipment)
-    "Block for reading air to water heat pump control signal measurement"
-    annotation (Placement(transformation(extent={{220,120},{240,140}})));
 equation
   connect(case900Template.ppm, reaCO2RooAir.u) annotation (Line(points={{-59,10},
           {-54,10},{-54,-50},{-58,-50}},
@@ -311,6 +298,8 @@ equation
     annotation (Line(points={{20,40},{0,40},{0,10}}, color={0,127,255}));
   connect(floHea.port_b, senTemRet.port_b)
     annotation (Line(points={{-20,10},{-20,-20},{60,-20}},color={0,127,255}));
+  connect(pum.P, reaPPumEmi.u)
+    annotation (Line(points={{19,49},{0,49},{0,80},{18,80}}, color={0,0,127}));
   connect(yPum.y, ovePum.u)
     annotation (Line(points={{-19,110},{-10,110}}, color={0,0,127}));
   connect(realToInteger.y, pum.stage) annotation (Line(points={{73,110},{80,110},
@@ -335,7 +324,7 @@ equation
   connect(yFan.y, oveFan.u)
     annotation (Line(points={{181,110},{190,110}}, color={0,0,127}));
   connect(fan.port_a, outAir.ports[1])
-    annotation (Line(points={{220,40},{240,40},{240,12}},color={0,127,255}));
+    annotation (Line(points={{220,40},{240,40},{240,9}}, color={0,127,255}));
   connect(realToInteger2.y, fan.stage) annotation (Line(points={{273,110},{280,110},
           {280,60},{210,60},{210,52}}, color={255,127,0}));
   connect(fan.P, reaPFan.u) annotation (Line(points={{199,49},{190,49},{190,80},
@@ -360,7 +349,7 @@ equation
           -90,88},{-82,88}}, color={0,0,127}));
   connect(yOcc.y, greater.u1) annotation (Line(points={{-59,40},{-52,40},{-52,
           60},{-100,60},{-100,80},{-82,80}}, color={0,0,127}));
-  connect(outAir.ports[2], heaPum.port_b2) annotation (Line(points={{240,8},{
+  connect(outAir.ports[2], heaPum.port_b2) annotation (Line(points={{240,11},{
           240,-20},{136,-20},{136,0}},
                                    color={0,127,255}));
   connect(heaPum.port_a2, fan.port_b)
@@ -387,12 +376,6 @@ equation
     annotation (Line(points={{213,110},{250,110}}, color={0,0,127}));
   connect(ovePum.y, realToInteger.u)
     annotation (Line(points={{13,110},{50,110}}, color={0,0,127}));
-  connect(reayPum.u, pum.y_actual) annotation (Line(points={{28,-50},{8,-50},{8,
-          47},{19,47}}, color={0,0,127}));
-  connect(reayFan.u, fan.y_actual) annotation (Line(points={{198,8},{190,8},{
-          190,47},{199,47}}, color={0,0,127}));
-  connect(oveHeaPumY.y, reayHeaPum.u) annotation (Line(points={{161,150},{192,
-          150},{192,130},{218,130}}, color={0,0,127}));
   annotation (
     experiment(StopTime=1728000, __Dymola_Algorithm="Dassl"),
     Documentation(info="<html>
