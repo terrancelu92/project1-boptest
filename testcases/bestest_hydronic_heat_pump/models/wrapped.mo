@@ -18,6 +18,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaWinSpe_y(unit="m/s") = mod.weaSta.reaWeaWinSpe.y "Wind speed measurement";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaNOpa_y(unit="1") = mod.weaSta.reaWeaNOpa.y "Opaque sky cover measurement";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaRelHum_y(unit="1") = mod.weaSta.reaWeaRelHum.y "Outside relative humidity measurement";
+	Modelica.Blocks.Interfaces.RealOutput reayFan_y(unit="1") = mod.reayFan.y "Heat pump evaporator fan control output measurement";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaCloTim_y(unit="s") = mod.weaSta.reaWeaCloTim.y "Day number with units of seconds";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaHGloHor_y(unit="W/m2") = mod.weaSta.reaWeaHGloHor.y "Global horizontal solar irradiation measurement";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaTDryBul_y(unit="K") = mod.weaSta.reaWeaTDryBul.y "Outside drybulb temperature measurement";
@@ -32,8 +33,9 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaHDifHor_y(unit="W/m2") = mod.weaSta.reaWeaHDifHor.y "Horizontal diffuse solar radiation measurement";
 	Modelica.Blocks.Interfaces.RealOutput reaCOP_y(unit="1") = mod.reaCOP.y "Heat pump COP";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaPAtm_y(unit="Pa") = mod.weaSta.reaWeaPAtm.y "Atmospheric pressure measurement";
-	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaHDirNor_y(unit="W/m2") = mod.weaSta.reaWeaHDirNor.y "Direct normal radiation measurement";
+	Modelica.Blocks.Interfaces.RealOutput reayPum_y(unit="1") = mod.reayPum.y "Emission circuit pump control output measurement";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaSolDec_y(unit="rad") = mod.weaSta.reaWeaSolDec.y "Solar declination angle measurement";
+	Modelica.Blocks.Interfaces.RealOutput reayHeaPum_y(unit="1") = mod.reayHeaPum.y "Air to water heat pump control signal measurement";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaSolTim_y(unit="s") = mod.weaSta.reaWeaSolTim.y "Solar time";
 	Modelica.Blocks.Interfaces.RealOutput reaTSetHea_y(unit="K") = mod.reaTSetHea.y "Zone operative temperature setpoint for heating";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaLon_y(unit="rad") = mod.weaSta.reaWeaLon.y "Longitude of the location";
@@ -43,6 +45,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput reaPFan_y(unit="W") = mod.reaPFan.y "Electrical power of the heat pump evaporator fan";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaTDewPoi_y(unit="K") = mod.weaSta.reaWeaTDewPoi.y "Dew point temperature measurement";
 	Modelica.Blocks.Interfaces.RealOutput reaCO2RooAir_y(unit="ppm") = mod.reaCO2RooAir.y "CO2 concentration in the zone";
+	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaHDirNor_y(unit="W/m2") = mod.weaSta.reaWeaHDirNor.y "Direct normal radiation measurement";
 	Modelica.Blocks.Interfaces.RealOutput reaTRet_y(unit="K") = mod.reaTRet.y "Return water temperature from radiant floor";
 	Modelica.Blocks.Interfaces.RealOutput weaSta_reaWeaTWetBul_y(unit="K") = mod.weaSta.reaWeaTWetBul.y "Wet bulb temperature measurement";
 	Modelica.Blocks.Interfaces.RealOutput ovePum_y(unit="1") = mod.ovePum.y "Integer signal to control the emission circuit pump either on or off";
@@ -50,7 +53,7 @@ model wrapped "Wrapped model"
 	Modelica.Blocks.Interfaces.RealOutput oveFan_y(unit="1") = mod.oveFan.y "Integer signal to control the heat pump evaporator fan either on or off";
 	Modelica.Blocks.Interfaces.RealOutput oveTSet_y(unit="K") = mod.oveTSet.y "Zone operative temperature setpoint";
 	// Original model
-	BESTESTHydronicHeatPump.TestCase mod(
+	TestCase mod(
 		ovePum(uExt(y=ovePum_u),activate(y=ovePum_activate)),
 		oveHeaPumY(uExt(y=oveHeaPumY_u),activate(y=oveHeaPumY_activate)),
 		oveFan(uExt(y=oveFan_u),activate(y=oveFan_activate)),

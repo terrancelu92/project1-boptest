@@ -282,57 +282,68 @@ class TestCase(object):
         # Set control inputs if they exist and are written
         # Check if possible to overwrite
         if u.keys():
-            # Create input object
-            u_list = []
-            u_trajectory = self.start_time
+            # If there are overwriting keys available
+            # Check that any are overwritten
+            written = False
             for key in u.keys():
-                if (key not in self.input_names):
-                    payload = None
-                    status = 400
-                    message = "Unexpected input variable: {}.".format(key)
-                    logging.error(message)
-                    return status, message, payload
-                if (key != 'time' and (u[key] != None)):
-                    if '_activate' in key:
-                        try:
-                            if float(u[key]) == 1:
-                                checked_value = 1
-                            elif  float(u[key]) == 0:
-                                checked_value = 0
-                            else:
+                if u[key]:
+                    written = True
+                    break
+            # If there are, create input object
+            if written:
+                u_list = []
+                u_trajectory = self.start_time
+                for key in u.keys():
+                    if (key not in self.input_names):
+                        payload = None
+                        status = 400
+                        message = "Unexpected input variable: {}.".format(key)
+                        logging.error(message)
+                        return status, message, payload
+                    if (key != 'time' and (u[key] != None)):
+                        if '_activate' in key:
+                            try:
+                                if float(u[key]) == 1:
+                                    checked_value = 1
+                                elif  float(u[key]) == 0:
+                                    checked_value = 0
+                                else:
+                                    payload = None
+                                    status = 400
+                                    message = "Invalid value {} and/or type {} for input {}. Input must be a boolean, float, integer, string, or unicode able to be converted to a 1 or 0 (or 'T[t]rue' or 'F[f]alse').".format(u[key], type(u[key]), key)
+                                    logging.error(message)
+                                    return status, message, payload
+                            except ValueError:
+                                if (u[key] == 'True') or (u[key] == 'true'):
+                                    checked_value = 1
+                                elif  (u[key] == 'False') or (u[key] == 'false'):
+                                    checked_value = 0
+                                else:
+                                    payload = None
+                                    status = 400
+                                    message = "Invalid value {} and/or type {} for input {}. Input must be a boolean, float, integer, string, or unicode able to be converted to a 1 or 0 (or 'T[t]rue' or 'F[f]alse').".format(u[key], type(u[key]), key)
+                                    logging.error(message)
+                                    return status, message, payload
+                        else:
+                            try:
+                                value = float(u[key])
+                            except:
                                 payload = None
                                 status = 400
-                                message = "Invalid value {} and/or type {} for input {}. Input must be a boolean, float, integer, string, or unicode able to be converted to a 1 or 0 (or 'T[t]rue' or 'F[f]alse').".format(u[key], type(u[key]), key)
+                                message = "Invalid value {} for input {}. Value must be a float, integer, or string able to be converted to a float, but is {}.".format(u[key], key, type(u[key]))
                                 logging.error(message)
                                 return status, message, payload
-                        except ValueError:
-                            if (u[key] == 'True') or (u[key] == 'true'):
-                                checked_value = 1
-                            elif  (u[key] == 'False') or (u[key] == 'false'):
-                                checked_value = 0
-                            else:
-                                payload = None
-                                status = 400
-                                message = "Invalid value {} and/or type {} for input {}. Input must be a boolean, float, integer, string, or unicode able to be converted to a 1 or 0 (or 'T[t]rue' or 'F[f]alse').".format(u[key], type(u[key]), key)
-                                logging.error(message)
-                                return status, message, payload
-                    else:
-                        try:
-                            value = float(u[key])
-                        except:
-                            payload = None
-                            status = 400
-                            message = "Invalid value {} for input {}. Value must be a float, integer, or string able to be converted to a float, but is {}.".format(u[key], key, type(u[key]))
-                            logging.error(message)
-                            return status, message, payload
-                        # Check min/max if not activation input
-                        checked_value, message = self._check_value_min_max(key, value)
-                        if message is not None:
-                            logging.warning(message)
-                            alert_message = message + ';' + alert_message
-                    u_list.append(key)
-                    u_trajectory = np.vstack((u_trajectory, checked_value))
-            input_object = (u_list, np.transpose(u_trajectory))
+                            # Check min/max if not activation input
+                            checked_value, message = self._check_value_min_max(key, value)
+                            if message is not None:
+                                logging.warning(message)
+                                alert_message = message + ';' + alert_message
+                        u_list.append(key)
+                        u_trajectory = np.vstack((u_trajectory, checked_value))
+                input_object = (u_list, np.transpose(u_trajectory))
+            # Otherwise, input object is None
+            else:
+                input_object = None
         # Otherwise, input object is None
         else:
             input_object = None
@@ -417,10 +428,7 @@ class TestCase(object):
         self.fmu.reset()
         # Reset simulation data storage
         self.__initilize_data()
-        # Reset computational time ratio timer
         self.elapsed_control_time_ratio = np.array([])
-        if hasattr(self, 'tic_time'):
-            delattr(self,'tic_time')
         # Check if the inputs are valid
         try:
             start_time = float(start_time)
@@ -859,7 +867,6 @@ class TestCase(object):
 
         '''
 
-
         # Get the forecast
         status = 200
         message = "Queried the forecast data successfully."
@@ -902,44 +909,10 @@ class TestCase(object):
             message = "Invalid point name(s) {} in parameter point_names.  Check list of available forecast points.".format(wrong_points)
             logging.error(message)
             return status, message, payload
-        # Check that horizon and interval ok if variable under forecast uncertainty scenario
-        _,_,scenario = self.get_scenario()
-        if (scenario['temperature_uncertainty']) and ('TDryBul' in point_names):
-            if horizon > 48*3600:
-                payload = None
-                status = 400
-                message = "Invalid value {} for parameter horizon. Value must <= 48 hours in a temperature_uncertainty scenario.".format(horizon)
-                logging.error(message)
-                return status, message, payload
-            if interval != 3600:
-                payload = None
-                status = 200
-                message = "Value {} for parameter interval. Note that error model for temperature_uncertainty scenario validated at hourly intervals.".format(interval)
-                logging.info(message)
-        if (scenario['solar_uncertainty']) and ('HGloHor' in point_names):
-            if horizon > 48*3600:
-                payload = None
-                status = 400
-                message = "Invalid value {} for parameter horizon. Value must <= 48 hours in a solar_uncertainty scenario.".format(horizon)
-                logging.error(message)
-                return status, message, payload
-            if interval != 3600:
-                payload = None
-                status = 200
-                message = "Value {} for parameter interval. Note that error model for solar_uncertainty scenario validated at hourly intervals.".format(interval)
-                logging.info(message)
-        # Get forecast
         try:
-            if scenario['seed'] is not None:
-                applied_seed = int(scenario['seed']+self.start_time)
-            else:
-                applied_seed = None
             payload = self.forecaster.get_forecast(point_names,
                                                    horizon=horizon,
-                                                   interval=interval,
-                                                   wea_tem_dry_bul=scenario['temperature_uncertainty'],
-                                                   wea_sol_glo_hor=scenario['solar_uncertainty'],
-                                                   seed=applied_seed)
+                                                   interval=interval)
         except:
             status = 500
             message = "Failed to query the test case forecast data: {}".format(traceback.format_exc())
@@ -956,10 +929,7 @@ class TestCase(object):
         ----------
         scenario : dict
             {'electricity_price': <'constant' or 'dynamic' or 'highly_dynamic'>,
-             'time_period': see available <str> keys for test case,
-             'temperature_uncertainty':<'low' or 'medium' or 'high'>,
-             'solar_uncertainty':<'low' or 'medium' or 'high'>,
-             'seed': int, used for uncertainty sampling
+             'time_period': see available <str> keys for test case
             }
             If any value is None, it will not change existing.
 
@@ -968,46 +938,25 @@ class TestCase(object):
         status: int
             Indicates whether a request for setting the scenario has been completed
             If 200, the scenario was successfully set.
-            If 400, invalid scenario entry was identified.
+            If 400, invalid electricity_price and/or time_period (non-numeric) were identified.
             If 500, an internal error occurred.
         message: str
             Includes the detailed debug information
         payload: dict
-            {'electricity_price': if succeeded in changing then value, else None,
-             'time_period': if succeeded then initial measurements, else None,
-             'temperature_uncertainty': if succeeded in changing then value, else None,
-             'solar_uncertainty': if succeeded in changing then value, else None,
-             'seed': if succeeded then value, else None
+            {'electricity_price': if succeeded in changing then True, else None,
+             'time_period': if succeeded then initial measurements, else None
             }
-
         '''
 
         status = 200
         message = "Test case scenario was set successfully."
         payload = {
             'electricity_price': None,
-            'time_period': None,
-            'temperature_uncertainty': None,
-            'solar_uncertainty': None,
-            'seed':None,
+            'time_period': None
         }
-
         if not hasattr(self, 'scenario'):
             self.scenario = {}
         try:
-            # Handle weather forecast uncertainty weather variables
-            if (scenario['temperature_uncertainty'] and 'TDryBul' not in self.forecast_names) or \
-                    (scenario['solar_uncertainty'] and 'HGloHor' not in self.forecast_names):
-                missing_variables = []
-                if scenario['temperature_uncertainty'] and 'TDryBul' not in self.forecast_names:
-                    missing_variables.append('TDryBul for temperature uncertainty')
-                if scenario['solar_uncertainty'] and 'HGloHor' not in self.forecast_names:
-                    missing_variables.append('HGloHor for solar uncertainty')
-                status = 400
-                message = "Scenario parameters are set for uncertainty, but the forecast variables do not include: {}.".format(
-                    ', '.join(missing_variables))
-                logging.error(message)
-                return status, message, payload
             # Handle electricity price
             if scenario['electricity_price']:
                 if scenario['electricity_price'] not in ['constant', 'dynamic', 'highly_dynamic']:
@@ -1033,45 +982,6 @@ class TestCase(object):
                 key = self.scenario['time_period']
                 start_time = self.days_json[key]*24*3600.-7*24*3600.
                 end_time = start_time + 14*24*3600.
-            # Handle temperature uncertainty levels
-            if scenario['temperature_uncertainty']:
-                if scenario['temperature_uncertainty'] not in ['low', 'medium', 'high']:
-                    status = 400
-                    message = "Scenario parameter temperature_uncertainty is {}, " \
-                              "but should be 'low', 'medium', or 'high'.". \
-                              format(scenario['temperature_uncertainty'])
-                    logging.error(message)
-                    return status, message, payload
-                self.scenario['temperature_uncertainty'] = scenario['temperature_uncertainty']
-                payload['temperature_uncertainty'] = self.scenario['temperature_uncertainty']
-            else:
-                self.scenario['temperature_uncertainty'] = None
-            # Handle solar uncertainty levels
-            if scenario['solar_uncertainty']:
-                if scenario['solar_uncertainty'] not in ['low', 'medium', 'high']:
-                    status = 400
-                    message = "Scenario parameter solar_uncertainty is {}, " \
-                              "but should be 'low', 'medium', or 'high'.". \
-                        format(scenario['solar_uncertainty'])
-                    logging.error(message)
-                    return status, message, payload
-                self.scenario['solar_uncertainty'] = scenario['solar_uncertainty']
-                payload['solar_uncertainty'] = self.scenario['solar_uncertainty']
-            else:
-                self.scenario['solar_uncertainty'] = None
-            # Handle seed for uncertainty
-            if scenario['seed']:
-                if isinstance(scenario['seed'], int) and scenario['seed'] >= 0:
-                    self.scenario['seed'] = scenario['seed']
-                    payload['seed'] = self.scenario['seed']
-                else:
-                    status = 400
-                    message = "Scenario parameter seed is {}, " \
-                              "but should be a non-negative integer.".format(scenario['seed'])
-                    logging.error(message)
-                    return status, message, payload
-            else:
-                self.scenario['seed'] = None
         except:
             status = 400
             message = "Invalid values for the scenario parameters: {}".format(traceback.format_exc())
@@ -1113,12 +1023,9 @@ class TestCase(object):
         message: str
             Includes detailed debugging information
         payload: dict
-            {'electricity_price': <'constant' or 'dynamic' or 'highly_dynamic'>,
-             'time_period': see available <str> keys for test case,
-             'temperature_uncertainty':<'low' or 'medium' or 'high'>,
-             'solar_uncertainty':<'low' or 'medium' or 'high'>,
-             'seed': int, used for uncertainty sampling
-            }
+            {'electricity_price': <str>,
+             'time_period': <str>
+             }
 
         '''
 
@@ -1344,15 +1251,7 @@ class TestCase(object):
                 mini = None
                 maxi = None
             else:
-                try:
-                    unit = fmu.get_variable_unit(var)
-                except Exception as e:
-                    if 'CO2' in var:
-                        logging.warning('Getting unit via FMI failed for variable "{0}". Assuming unit is "ppm" since variable name contains "CO2".'.format(var))
-                        unit = 'ppm'
-                    else:
-                        logging.error(e)
-                        raise Exception(e)
+                unit = fmu.get_variable_unit(var)
                 description = fmu.get_variable_description(var)
                 if inputs:
                     mini = fmu.get_variable_min(var)
