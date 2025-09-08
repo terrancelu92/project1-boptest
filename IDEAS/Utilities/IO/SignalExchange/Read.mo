@@ -23,6 +23,12 @@ model Read "Block that allows a signal to be read as an FMU output"
     KPIs==IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.RelativeHumidity or
     KPIs==IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.CO2Concentration)));
 
+  parameter SignalTypes.SignalsForActuatorTravel CAT = SignalTypes.SignalsForActuatorTravel.None
+    "Tag with the type of signal for the calculation of the control actuator travel (CAT)"
+  annotation(Dialog(enable=(
+    KPIs==IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel)));
+
+
 protected
   final parameter Boolean boptestRead = true
     "Protected parameter, used by tools to search for read block in models";

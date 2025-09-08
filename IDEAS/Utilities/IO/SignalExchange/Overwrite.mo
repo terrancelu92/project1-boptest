@@ -4,9 +4,8 @@ block Overwrite "Block that allows a signal to overwritten by an FMU input"
 
   parameter String description "Description of the signal being overwritten";
 
-  parameter SignalTypes.SignalsForActuatorTravel CAT = SignalTypes.SignalsForActuatorTravel.None
-    "Tag with the type of signal for the calculation of the control actuator travel (CAT)";
-
+  final parameter Boolean boptestOverwrite = true
+    "Parameter that is used by tools to search for overwrite block in models";
 
   Modelica.Blocks.Logical.Switch swi
     "Switch between external signal and direct feedthrough signal"
@@ -16,9 +15,6 @@ block Overwrite "Block that allows a signal to overwritten by an FMU input"
   Modelica.Blocks.Sources.BooleanExpression activate
     "Block to activate use of external signal"
     annotation (Placement(transformation(extent={{-60,-10},{-40,10}})));
-protected
-  final parameter Boolean boptestOverwrite = true
-    "Protected parameter, used by tools to search for overwrite block in models";
 
 equation
   connect(activate.y, swi.u2)
@@ -59,6 +55,11 @@ by modifying its attributes.
 </html>",
 revisions="<html>
 <ul>
+<li>
+February 17, 2022 by David Blum:<br/>
+Made parameter <code>boptestOverwrite</code> unprotected.
+This is for <a href=\"https://github.com/ibpsa/modelica-ibpsa/issues/1585\">#1585</a>.
+</li>
 <li>
 July 17, 2019 by Michael Wetter:<br/>
 Changed parameter name from <code>Description</code> to <code>description</code>.

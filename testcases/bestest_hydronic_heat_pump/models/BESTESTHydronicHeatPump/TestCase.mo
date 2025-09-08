@@ -61,7 +61,6 @@ model TestCase
   IDEAS.Utilities.IO.SignalExchange.Read reaPPumEmi(
     description="Emission circuit pump electrical power",
     KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ElectricPower,
-
     y(unit="W"))
     "Block for reading the electrical power of the pump of the emission system"
     annotation (Placement(transformation(extent={{20,70},{40,90}})));
@@ -90,7 +89,6 @@ model TestCase
   IDEAS.Utilities.IO.SignalExchange.Read reaCO2RooAir(
     description="CO2 concentration in the zone",
     KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.CO2Concentration,
-
     y(unit="ppm")) "Block for reading CO2 concentration in the zone"
     annotation (Placement(transformation(extent={{-60,-60},{-80,-40}})));
 
@@ -182,14 +180,12 @@ model TestCase
   IDEAS.Utilities.IO.SignalExchange.Read reaPHeaPum(
     description="Heat pump electrical power",
     KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ElectricPower,
-
     y(unit="W")) "Block for reading the electrical power of the heat pump"
     annotation (Placement(transformation(extent={{140,70},{160,90}})));
 
   IDEAS.Utilities.IO.SignalExchange.Read reaTZon(
     description="Zone operative temperature",
     KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.OperativeZoneTemperature,
-
     y(unit="K")) "Block for reading the operative zone temperature"
     annotation (Placement(transformation(extent={{-32,70},{-12,90}})));
 
@@ -258,7 +254,6 @@ model TestCase
   IDEAS.Utilities.IO.SignalExchange.Read reaPFan(
     description="Electrical power of the heat pump evaporator fan",
     KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ElectricPower,
-
     y(unit="W")) "Electrical power of the heat pump evaporator fan"
     annotation (Placement(transformation(extent={{220,70},{240,90}})));
 
@@ -348,7 +343,7 @@ equation
   connect(yFan.y, oveFan.u)
     annotation (Line(points={{181,110},{190,110}}, color={0,0,127}));
   connect(fan.port_a, outAir.ports[1])
-    annotation (Line(points={{220,40},{240,40},{240,9}}, color={0,127,255}));
+    annotation (Line(points={{220,40},{240,40},{240,12}},color={0,127,255}));
   connect(realToInteger2.y, fan.stage) annotation (Line(points={{273,110},{280,110},
           {280,60},{210,60},{210,52}}, color={255,127,0}));
   connect(fan.P, reaPFan.u) annotation (Line(points={{199,49},{190,49},{190,80},
@@ -373,7 +368,7 @@ equation
           -90,88},{-82,88}}, color={0,0,127}));
   connect(yOcc.y, greater.u1) annotation (Line(points={{-59,40},{-52,40},{-52,
           60},{-100,60},{-100,80},{-82,80}}, color={0,0,127}));
-  connect(outAir.ports[2], heaPum.port_b2) annotation (Line(points={{240,11},{
+  connect(outAir.ports[2], heaPum.port_b2) annotation (Line(points={{240,8},{
           240,-20},{136,-20},{136,0}},
                                    color={0,127,255}));
   connect(heaPum.port_a2, fan.port_b)
