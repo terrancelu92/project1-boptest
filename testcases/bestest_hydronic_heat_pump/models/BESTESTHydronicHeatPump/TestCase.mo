@@ -67,9 +67,9 @@ model TestCase
 
   IDEAS.Utilities.IO.SignalExchange.Read reayPum(
     description="Emission circuit pump control output measurement",
-    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel,
+    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ActuatorTravel,
     y(unit="1"),
-    CAT=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.Pump)
+    actuatorType=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.Pump)
     "Block for reading emission circuit pump control output measurement"
     annotation (Placement(transformation(extent={{30,-60},{50,-40}})));
 
@@ -282,17 +282,17 @@ model TestCase
         origin={30,150})));
   IDEAS.Utilities.IO.SignalExchange.Read reayFan(
     description="Heat pump evaporator fan control output measurement",
-    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel,
+    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ActuatorTravel,
     y(unit="1"),
-    CAT=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.Fan)
+    actuatorType=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.Fan)
     "Block for reading actual fan speed of the heat pump evaporator fan"
     annotation (Placement(transformation(extent={{200,0},{220,20}})));
 
   IDEAS.Utilities.IO.SignalExchange.Read reayHeaPum(
     description="Air to water heat pump control signal measurement",
-    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel,
+    KPIs=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ActuatorTravel,
     y(unit="1"),
-    CAT=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.HVACEquipment)
+    actuatorType=IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForActuatorTravel.HVACEquipment)
     "Block for reading air to water heat pump control signal measurement"
     annotation (Placement(transformation(extent={{220,120},{240,140}})));
 
