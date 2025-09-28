@@ -23,10 +23,11 @@ model Read "Block that allows a signal to be read as an FMU output"
     KPIs==IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.RelativeHumidity or
     KPIs==IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.CO2Concentration)));
 
-  parameter SignalTypes.SignalsForActuatorTravel CAT = SignalTypes.SignalsForActuatorTravel.None
-    "Tag with the type of signal for the calculation of the control actuator travel (CAT)"
+  parameter SignalTypes.SignalsForActuatorTravel actuatorType = SignalTypes.SignalsForActuatorTravel.None if (
+  KPIs==IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ActuatorTravel)
+"Actuator type designation, required if KPIs is ActuatorTravel"
   annotation(Dialog(enable=(
-    KPIs==IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ControlActuatorTravel)));
+    KPIs==IDEAS.Utilities.IO.SignalExchange.SignalTypes.SignalsForKPIs.ActuatorTravel)));
 
 
 protected

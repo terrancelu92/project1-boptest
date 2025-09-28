@@ -24,8 +24,8 @@ type SignalsForKPIs = enumeration(
       "Thermal power from solar thermal",
     FreshWaterFlowRate
       "FreshWaterFlowRate",
-    ControlActuatorTravel
-      "Control actuator travel")
+    ActuatorTravel
+      "Actuator travel")
         "Signals used for the calculation of key performance indicators"
   annotation (Documentation(info="<html>
 <p>
